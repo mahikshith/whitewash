@@ -15,3 +15,5 @@ The repository is private. Product name, audience, implementation stack, and pri
 Research checkpoint (18 October 2026): [15-repository code audit](docs/research/repository-audit.md), [watermark evidence](docs/research/watermark-evidence.md), [community findings](docs/research/community-findings.md), and [competitive benchmark plan](docs/research/benchmark-plan.md). These distinguish observed code, author claims, reproduced checks and untested product hypotheses.
 
 The [website guide](website/README.md) covers running, testing and current limits. The initial site uses plain HTML/CSS/JavaScript with no runtime dependencies. Source is under `website/dist/`; the hosting manifest binds the private Sites preview separately from this GitHub origin.
+
+Open the [private website preview](https://whitewash-studio.astute-newt-2147.chatgpt.site). [Validation](docs/validation.md) and [deployment details](docs/deployment.md) record completed checks and operational limits.
