@@ -1,0 +1,37 @@
+{
+  "scope": "Inspected pure-code paths with synthetic stubs; no model inference or live detector queries",
+  "results": [
+    {
+      "check": "Markdown protected parts",
+      "tilde_code_change_missed": true,
+      "backtick_control_change_detected": true
+    },
+    {
+      "check": "RAID include_all=False propagation",
+      "downstream_received": true,
+      "argument_not_forwarded": true
+    },
+    {
+      "check": "Random-walk repository detection export",
+      "returned_scores": [
+        0.1,
+        0.9
+      ],
+      "saved_scores": [
+        0.9,
+        0.9
+      ],
+      "saved_ids": [
+        1,
+        1
+      ],
+      "last_result_reused_in_export": true
+    },
+    {
+      "check": "Random-walk total_steps=2 with unchanged positive detector",
+      "perturbation_calls_before_audit_stop": 7,
+      "total_steps_not_hard_cap": true
+    }
+  ],
+  "humanizer_package_validation": "v3.1.0 passed; packaging check, not writing-quality validation"
+}

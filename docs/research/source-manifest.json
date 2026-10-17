@@ -1,0 +1,1092 @@
+{
+  "research_date": "2026-10-18",
+  "scope": "Retrieved source snapshots for targeted static review, not a full security audit of every file. File list means retrieved; specific inspection paths are documented in repository-audit.md.",
+  "repositories": [
+    {
+      "repository": "ahans30/Binoculars",
+      "commit": "c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8",
+      "committed_at": "2024-05-14T10:55:03Z",
+      "license_declared": "BSD-3-Clause",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "c9af34dfb98067ae3a96bd4776213e774526e363d0307247842690dfaea8a7ce",
+          "bytes": 1535,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/LICENSE.md"
+        },
+        {
+          "path": "README.md",
+          "sha256": "4a76914a5eab44439fbed659f6246facde47f6436facb44f51f624a67bea0222",
+          "bytes": 3977,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/README.md"
+        },
+        {
+          "path": "app.py",
+          "sha256": "652b6268ffa532e72f8ac14116bcc9337d2287e95d87f391ebf11dde8b3419da",
+          "bytes": 143,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/app.py"
+        },
+        {
+          "path": "binoculars/__init__.py",
+          "sha256": "0cbe66a94c7abda4a224984257efaeafc5e4023b204e0c6fc99d96f7eabb3cf2",
+          "bytes": 59,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/binoculars/__init__.py"
+        },
+        {
+          "path": "binoculars/detector.py",
+          "sha256": "9724932e34a78e019c949ee986b34593f66e58f5975c9e76e359621ee0d1aade",
+          "bytes": 5009,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/binoculars/detector.py"
+        },
+        {
+          "path": "binoculars/metrics.py",
+          "sha256": "863876e772893f03a3d2a6b82c4589123751c7b77f2499c2a8cd92159a2d7061",
+          "bytes": 2061,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/binoculars/metrics.py"
+        },
+        {
+          "path": "binoculars/utils.py",
+          "sha256": "14419a88cff22960049ce6228d4507160ac028859078199203da00dbc6210485",
+          "bytes": 383,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/binoculars/utils.py"
+        },
+        {
+          "path": "demo/demo.py",
+          "sha256": "4750f81f61a4231ea62894d815382c57298bb8b8d86436e265ecd16dacfc31fd",
+          "bytes": 6872,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/demo/demo.py"
+        },
+        {
+          "path": "experiments/run.py",
+          "sha256": "86cb5aeaf675441937276b80e8c683b98ae269d22ee279f77b05d3f4b626bead",
+          "bytes": 4264,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/experiments/run.py"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "6ac7d0be6b025032ab60e66f340909794440b55f17ec2365c4ae75961adef814",
+          "bytes": 173,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/requirements.txt"
+        },
+        {
+          "path": "setup.py",
+          "sha256": "1b764dde05a2a560416aa7fcf67b1d59bc71a3828f190a878cf24d7fb723f159",
+          "bytes": 628,
+          "url": "https://raw.githubusercontent.com/ahans30/Binoculars/c8ae2f90d50ee696418bc71d8d9e5020e5f9d7b8/setup.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "ai-zixun/humanizer-zh",
+      "commit": "f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3",
+      "committed_at": "2026-05-22T01:54:45Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "609132fb364baa7688c086c5baa267ebb88edf32ea431d2dbf3e745d39576d3f",
+          "bytes": 1064,
+          "url": "https://raw.githubusercontent.com/ai-zixun/humanizer-zh/f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3/LICENSE"
+        },
+        {
+          "path": "README.en.md",
+          "sha256": "ffc44ca33c6d87b25d514311584467f1adce8e246a5478a643885d000222d7ac",
+          "bytes": 6794,
+          "url": "https://raw.githubusercontent.com/ai-zixun/humanizer-zh/f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3/README.en.md"
+        },
+        {
+          "path": "README.md",
+          "sha256": "7fdde2bc15316b842853c4b4b136d7355a6b3d485fc6d6e8a7c94d6f4f8d3ae9",
+          "bytes": 6910,
+          "url": "https://raw.githubusercontent.com/ai-zixun/humanizer-zh/f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3/README.md"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "d7ef1115ef9f05697bf08dc0218983e0c8fcb472e5c33eb4bb1d6faa200c0a32",
+          "bytes": 10116,
+          "url": "https://raw.githubusercontent.com/ai-zixun/humanizer-zh/f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3/SKILL.md"
+        },
+        {
+          "path": "references/corpus-quickpick.md",
+          "sha256": "b96642965981e96d89feb7561c3f9ec54d197c0a44194584c0deb0500bed9074",
+          "bytes": 2932,
+          "url": "https://raw.githubusercontent.com/ai-zixun/humanizer-zh/f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3/references/corpus-quickpick.md"
+        },
+        {
+          "path": "references/patterns.md",
+          "sha256": "d65f714ea6f160cfb030c374ad33bf77f15a86c70ee82a4d18236a8ac0ff6491",
+          "bytes": 16896,
+          "url": "https://raw.githubusercontent.com/ai-zixun/humanizer-zh/f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3/references/patterns.md"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "baoguangsheng/fast-detect-gpt",
+      "commit": "971b05202bac2bb504d60c0ac0812fea7a8f7c82",
+      "committed_at": "2026-02-07T07:18:26Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "3f49eca8e2cff129eb14135d570f98466830fbb8377c18261d43e176084dba48",
+          "bytes": 1071,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "996ba5321fdf250dca37527386d69398f188c011608e4d3ad5ae00ccadea643a",
+          "bytes": 4082,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/README.md"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "3f0af8ca6e7acfaaf32715ebb555ff6e76d23a877301c1208e2a5e5afda3374e",
+          "bytes": 78,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/requirements.txt"
+        },
+        {
+          "path": "scripts/fast_detect_gpt.py",
+          "sha256": "70fcdafca0182a4e5f9773d82f435cf06610f291bca60ff726ef0d2ff255a929",
+          "bytes": 8096,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/scripts/fast_detect_gpt.py"
+        },
+        {
+          "path": "scripts/local_infer.py",
+          "sha256": "4cbe06cdb456df729ce9eede14505757775bc388f4c17d762a6b28f57b169cb0",
+          "bytes": 5482,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/scripts/local_infer.py"
+        },
+        {
+          "path": "scripts/metrics.py",
+          "sha256": "0ef6e99971e60f0453ac78fcfda5fc264ba3b9d3ebe69f361da9bd3f619ac6d4",
+          "bytes": 1062,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/scripts/metrics.py"
+        },
+        {
+          "path": "scripts/model.py",
+          "sha256": "7d847ef3aa14b164d958a257d7f00d90ce07ddc28dcd99ef03189418a4b9de9c",
+          "bytes": 3386,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/scripts/model.py"
+        },
+        {
+          "path": "scripts/paraphrasing.py",
+          "sha256": "57c640574666b0220b877574de457dafea30938ea4ffe72a71e1a3796b6aaf87",
+          "bytes": 3899,
+          "url": "https://raw.githubusercontent.com/baoguangsheng/fast-detect-gpt/971b05202bac2bb504d60c0ac0812fea7a8f7c82/scripts/paraphrasing.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "blader/humanizer",
+      "commit": "8c307f367c91bd974002f10f2be2965d642c13df",
+      "committed_at": "2026-10-16T19:12:03Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "sha256": "e539740285b660d2288a38b6d9b237396c6769828c671c46b9f91e760db6cc29",
+          "bytes": 521,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/.claude-plugin/marketplace.json"
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "sha256": "054c0afeeb03c12f01a7f156da949edfdec3a2b756588f5ff4ee7357b0c07f6a",
+          "bytes": 526,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/.claude-plugin/plugin.json"
+        },
+        {
+          "path": ".cursor-plugin/plugin.json",
+          "sha256": "d1e0b50594cf4bbe57fd164b771b401713a91b76b5a213ebe8f4558bb2036546",
+          "bytes": 388,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/.cursor-plugin/plugin.json"
+        },
+        {
+          "path": ".github/workflows/validate.yml",
+          "sha256": "f2d6a8780fb0b3cf6fa7d2ffccd72d0fc8bee29b4e63ea0fd65924712c9055fd",
+          "bytes": 815,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/.github/workflows/validate.yml"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "b3591fe203429f1a6bd2f713c79272e9a8e58a487843d0908d2bbe0700722afa",
+          "bytes": 5922,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/CHANGELOG.md"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96",
+          "bytes": 1066,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "500b53c0d29cd3219d160b5f9a109c0969f706aec74b49a4a081d2026ba48ec7",
+          "bytes": 12926,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/README.md"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "0612f1dfb1672b0ea9b97e139bf1f06cabe98d8b27424fe8ff01e1fb4cc99cad",
+          "bytes": 32348,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/SKILL.md"
+        },
+        {
+          "path": "scripts/validate-package.py",
+          "sha256": "941bd99e52b2ba21449719bb7969607ac8117e3dc173d0c9dfe64fd274c65938",
+          "bytes": 5418,
+          "url": "https://raw.githubusercontent.com/blader/humanizer/8c307f367c91bd974002f10f2be2965d642c13df/scripts/validate-package.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "docling-project/docling",
+      "commit": "0e54294231b69bc2cf7a39873235495788f76b57",
+      "committed_at": "2026-10-16T09:00:46Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "edb765d1e3e60d0c7a7d5fba5f2bb2c3c29f7465cecb5c22cf1185c884954e4c",
+          "bytes": 1072,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "ce605634509dc87d79182131ad001e5fddf6053963b9045b971c6e87e6b9bfa1",
+          "bytes": 8589,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/README.md"
+        },
+        {
+          "path": "docling/backend/msexcel_backend.py",
+          "sha256": "0dcca636923a236efc12b982876a0b9a16a1419060dfa6ee7816b4ba786be4fd",
+          "bytes": 78156,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/docling/backend/msexcel_backend.py"
+        },
+        {
+          "path": "docling/backend/mspowerpoint_backend.py",
+          "sha256": "3fb4cae8278f2b081e7fcfc1c4f189ac823540798b1e1d0595a479fb7099c535",
+          "bytes": 91380,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/docling/backend/mspowerpoint_backend.py"
+        },
+        {
+          "path": "docling/backend/msword_backend.py",
+          "sha256": "f9fea65b57d0d5a37c9f8db1d1dd92c54966eea11031ebb7fdcd730037322ac8",
+          "bytes": 199256,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/docling/backend/msword_backend.py"
+        },
+        {
+          "path": "docling/datamodel/pipeline_options.py",
+          "sha256": "60b31cac740b72e2b872b46b5e981b701386016b41b773b8491820d3fb8fe8e8",
+          "bytes": 93857,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/docling/datamodel/pipeline_options.py"
+        },
+        {
+          "path": "docling/document_converter.py",
+          "sha256": "50f0af029f7ae04f925f769e1ec4c004dae842f6032d24df70dc8c459b772977",
+          "bytes": 40681,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/docling/document_converter.py"
+        },
+        {
+          "path": "docling/pipeline/standard_pdf_pipeline.py",
+          "sha256": "eef33425f793815ca32629ea7e2068fa6f1f27ebd2bf4950cf933ec5812cfa16",
+          "bytes": 55698,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/docling/pipeline/standard_pdf_pipeline.py"
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "80c469baca62d1ec134891bfdd274a4333167082e4905914f9bae4cd39e03f11",
+          "bytes": 16201,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/pyproject.toml"
+        },
+        {
+          "path": "tests/test_backend_msword.py",
+          "sha256": "90cc9eb63003f00d2b4b91e8ae85ff337d0c6d5a5531785f284321a0aca656da",
+          "bytes": 98722,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/tests/test_backend_msword.py"
+        },
+        {
+          "path": "tests/test_document_converter_import_without_convert_core.py",
+          "sha256": "70c73a60e89d3610c4bc1b8f2f3a2919fc5af997f73e95338482214bdcc4395d",
+          "bytes": 2070,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/tests/test_document_converter_import_without_convert_core.py"
+        },
+        {
+          "path": "tests/test_invalid_input.py",
+          "sha256": "ae5df66bd6785cce84b33568b6c881dca5d80f408a55ff0d1be3988178d33931",
+          "bytes": 11668,
+          "url": "https://raw.githubusercontent.com/docling-project/docling/0e54294231b69bc2cf7a39873235495788f76b57/tests/test_invalid_input.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "google-deepmind/synthid-text",
+      "commit": "a6ec02c22ce87177c061643503e14a7cc839dc2b",
+      "committed_at": "2026-09-30T16:17:29Z",
+      "license_declared": "Apache-2.0",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "7de017bcce4ec6d040f668d3836a09966b6daa6742e6b4b33bbae2b15870690c",
+          "bytes": 12565,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/README.md"
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "85e72e654a96ab131ef8425c8e0d3d1583d76a82e9f002dc1be751745ec65cd6",
+          "bytes": 1729,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/pyproject.toml"
+        },
+        {
+          "path": "src/synthid_text/detector_bayesian.py",
+          "sha256": "371cb9681e3bbc5281837fba9f403067ae1de360f27e638fc72b285f3def7337",
+          "bytes": 37338,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/detector_bayesian.py"
+        },
+        {
+          "path": "src/synthid_text/detector_mean.py",
+          "sha256": "ad63135cf8c3e3f98719a7977bfaaf6d4276675b693064ea246949ed55f2d37d",
+          "bytes": 2650,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/detector_mean.py"
+        },
+        {
+          "path": "src/synthid_text/g_value_expectations.py",
+          "sha256": "67932c3f4d03bad4180711d1fc937eecdd1b22b6b58927e62e58bb37cd4d1639",
+          "bytes": 1844,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/g_value_expectations.py"
+        },
+        {
+          "path": "src/synthid_text/hashing_function.py",
+          "sha256": "67de58db3eee11e30ce02a18eb9ff1b862bbfda9bc57549f86b2dc94f47a1c1f",
+          "bytes": 1664,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/hashing_function.py"
+        },
+        {
+          "path": "src/synthid_text/logits_processing.py",
+          "sha256": "9c2d08fbeb7799941348b7e0550d0b61b28ecde03d33d15960339028fbcd387e",
+          "bytes": 17986,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/logits_processing.py"
+        },
+        {
+          "path": "src/synthid_text/logits_processing_test.py",
+          "sha256": "965da928b00b86fefbaa299397af2c207bbb73f41fcb1872dbb557fc5b4df89b",
+          "bytes": 13593,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/logits_processing_test.py"
+        },
+        {
+          "path": "src/synthid_text/synthid_mixin.py",
+          "sha256": "70d89f77a891b8ab06e87251413c44b42e3cdc720a8d4fcccfa13fecc0d02428",
+          "bytes": 15374,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/synthid_mixin.py"
+        },
+        {
+          "path": "src/synthid_text/synthid_mixin_test.py",
+          "sha256": "a532ada2d2383d3c47edb80cc5e83188a964f0a7ceafb747c32afaccc4d8ed8a",
+          "bytes": 2860,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/synthid_mixin_test.py"
+        },
+        {
+          "path": "src/synthid_text/torch_testing.py",
+          "sha256": "a38ebe69c8142c1db88a4d73f3273d96efe80bc6fef12ceef69383125cbfc043",
+          "bytes": 848,
+          "url": "https://raw.githubusercontent.com/google-deepmind/synthid-text/a6ec02c22ce87177c061643503e14a7cc839dc2b/src/synthid_text/torch_testing.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "guillaumemeyer/watermarks-remover",
+      "commit": "980c0b4c5786ca710ed77276b6e55b622f340d4c",
+      "committed_at": "2026-10-17T05:28:05Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "7b238ac3774945dae85fad6e83819b43f7d5f48c181ecb4d005e5e91fe7e0ec1",
+          "bytes": 1089,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "629fd73ddf4243a13f7a21c687982617b08ac588a7a13fa14780873bfe17a992",
+          "bytes": 102332,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/README.md"
+        },
+        {
+          "path": "benchmarks/README.md",
+          "sha256": "25cee73cc96042d98af009171073b20900c39b0f9271a1f8b3f21644ad4badf0",
+          "bytes": 1043,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/benchmarks/README.md"
+        },
+        {
+          "path": "service/scripts/bench_synthid_text.py",
+          "sha256": "f1bee1d530985823b2262040ad55eff49eda45c583fc30bbb69f27393acf6801",
+          "bytes": 158769,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/bench_synthid_text.py"
+        },
+        {
+          "path": "service/scripts/clean_file.py",
+          "sha256": "50a4c9a03670e7fe38695524b05c013c570746732abee2c09841cdff35efaf8e",
+          "bytes": 10931,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/clean_file.py"
+        },
+        {
+          "path": "service/scripts/clean_text.py",
+          "sha256": "9f78d6e4eaaebbff42fdf3f7024456e96e986f0cc8f7a7c82c26e51ab37556a0",
+          "bytes": 3109,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/clean_text.py"
+        },
+        {
+          "path": "service/scripts/rewrite_text.py",
+          "sha256": "2858b6c582ab283b9867c377444f62c1bd0cf164e0e78709c337f5a0cf47773f",
+          "bytes": 56822,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/rewrite_text.py"
+        },
+        {
+          "path": "service/scripts/score_synthid.py",
+          "sha256": "b43174beeacc6b691335aeb000dce98df5e86e362da243d546947d5922e100ad",
+          "bytes": 5647,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/score_synthid.py"
+        },
+        {
+          "path": "service/scripts/server.py",
+          "sha256": "30682bcfe12cef7c757371640ebdda45e1a7f5359226484ce691d381ef4a4453",
+          "bytes": 70584,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/server.py"
+        },
+        {
+          "path": "service/scripts/synthid_text_server.py",
+          "sha256": "ffa83d9f8d7da716015add81b62c84e25b7c427df50cf4217ce85ae814be7c3c",
+          "bytes": 12506,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/synthid_text_server.py"
+        },
+        {
+          "path": "service/scripts/text_unicode.py",
+          "sha256": "ed86ed9715f40e306371731f97bf6f2a63f6a7719674630afac89eb3741bc6fd",
+          "bytes": 25110,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/text_unicode.py"
+        },
+        {
+          "path": "service/scripts/text_watermark.py",
+          "sha256": "740c7e5300a3cea9dae40aa57408074a627c427cc4abb07e1c274f0eb4b1c226",
+          "bytes": 18405,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/service/scripts/text_watermark.py"
+        },
+        {
+          "path": "tests/test_bench_synthid_text.py",
+          "sha256": "16bfbf9c4cc7f74a6c02a14068bd681e2e119775554158f8c9d757cdc658d23d",
+          "bytes": 88137,
+          "url": "https://raw.githubusercontent.com/guillaumemeyer/watermarks-remover/980c0b4c5786ca710ed77276b6e55b622f340d4c/tests/test_bench_synthid_text.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "hlzhang109/impossibility-watermark",
+      "commit": "fc1da1d09dc3f22377ac1d70526765511a826270",
+      "committed_at": "2024-09-12T19:18:34Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "89087e516f3782f5ea59ae001142658fdf394a654b8b4d8f31c6e37728bac523",
+          "bytes": 1068,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "2914a9de5c4988589aceef52a397f154d9cc8936af771d1ca4e77ff3dc4ff685",
+          "bytes": 4648,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/README.md"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "fcd847bbe07629ff63c8fbc7801fa2e262e63bbe0c8138b5b600fe9d3b904aed",
+          "bytes": 3291,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/requirements.txt"
+        },
+        {
+          "path": "text/evaluation/pipelines/detection.py",
+          "sha256": "eb33000fc84856497d70a7906dd05a774d9000b3c40f863c27efaec7f4112b5c",
+          "bytes": 8265,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/text/evaluation/pipelines/detection.py"
+        },
+        {
+          "path": "text/evaluation/pipelines/quality_analysis.py",
+          "sha256": "786722e8cd81d78227ee82169b7c175a3b8662a76eb867099d7b37132ecd80b8",
+          "bytes": 15992,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/text/evaluation/pipelines/quality_analysis.py"
+        },
+        {
+          "path": "text/evaluation/tools/oracle.py",
+          "sha256": "1e559de78c81c79a5e2fdd015cd8d68fd8381e65bc8d6caaceae74212dd93343",
+          "bytes": 13501,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/text/evaluation/tools/oracle.py"
+        },
+        {
+          "path": "text/evaluation/tools/text_editor.py",
+          "sha256": "d270ed24b97af5a913b61668c8afe14b33746168050a5e9617c5c24690bcde17",
+          "bytes": 19733,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/text/evaluation/tools/text_editor.py"
+        },
+        {
+          "path": "text/main.py",
+          "sha256": "4f2647ab04984a2ed72731779a3dc3e1648c2c14347efdd979b2c41b44c3e432",
+          "bytes": 7915,
+          "url": "https://raw.githubusercontent.com/hlzhang109/impossibility-watermark/fc1da1d09dc3f22377ac1d70526765511a826270/text/main.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "liamdugan/raid",
+      "commit": "d847408c2fed266d472a422745d303b278910cd8",
+      "committed_at": "2026-10-14T13:33:45Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "ffc5aafea5bd37371f9977e90efde0327561150d6619a828bcf6b8f3b4230560",
+          "bytes": 1068,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "7ff574d32c60947f292cc6838fe7ae9b6e11288041e44743684f691768a158be",
+          "bytes": 13940,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/README.md"
+        },
+        {
+          "path": "detect_cli.py",
+          "sha256": "b4eaad761f00b8b440ba5a0ac5cf9246669a776519de8353d1424592684b091d",
+          "bytes": 1067,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/detect_cli.py"
+        },
+        {
+          "path": "evaluate_cli.py",
+          "sha256": "70118cabdc36eee36d12fd0c7236aefbb240a108b4b8457d8b7ef336c9c6a392",
+          "bytes": 1346,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/evaluate_cli.py"
+        },
+        {
+          "path": "generation/adversarial/attackers/paraphrase.py",
+          "sha256": "cce8fd9f0d7875ebab5d2f3fa7b8a9dd0d8d9ec63852fe6a34996888dfa37ff6",
+          "bytes": 6393,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/generation/adversarial/attackers/paraphrase.py"
+        },
+        {
+          "path": "generation/adversarial/attackers/zero_width_space.py",
+          "sha256": "9c6ebc3aa12daedd01b0b6a7eb2be0610b0f97f3d13ef12fece032b3d26f6a51",
+          "bytes": 1386,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/generation/adversarial/attackers/zero_width_space.py"
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "6d85af2e5890a66932e0633116601e013dd70b62284ff7749a0c8dd4ef3b390b",
+          "bytes": 1431,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/pyproject.toml"
+        },
+        {
+          "path": "raid/__init__.py",
+          "sha256": "7588fcbc1319f40293d2766a416cefe375c4e611cd766948641c7ed34d785ee4",
+          "bytes": 105,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/raid/__init__.py"
+        },
+        {
+          "path": "raid/_version.py",
+          "sha256": "667d4a15b970b851e20d17510224670c14646cfb6d5a1e388ca6b9cc6da8bf41",
+          "bytes": 22,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/raid/_version.py"
+        },
+        {
+          "path": "raid/detect.py",
+          "sha256": "0c21e82d9ce74ca614249d53d73c022a0a7b889064200dae1e9d40f8ab9e242c",
+          "bytes": 503,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/raid/detect.py"
+        },
+        {
+          "path": "raid/evaluate.py",
+          "sha256": "2fcc9dabfbc3c70b0904368f1f1c828f6755a321f5b7b8043cde60fa0dfedc27",
+          "bytes": 10832,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/raid/evaluate.py"
+        },
+        {
+          "path": "raid/utils.py",
+          "sha256": "ed7e7ff7e9122ed7f325619ac9c4c7de4515f9464a2ddf6a430a35726975283c",
+          "bytes": 1696,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/raid/utils.py"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "6e5c0f1319e1408513a6b80178e122889ae7b62e12c30ffa185855a650dc249a",
+          "bytes": 425,
+          "url": "https://raw.githubusercontent.com/liamdugan/raid/d847408c2fed266d472a422745d303b278910cd8/requirements.txt"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "microsoft/markitdown",
+      "commit": "4cc9fa17653d695d64fb9eee5b33d4de55ff84e8",
+      "committed_at": "2026-10-04T03:59:49Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "bytes": 1141,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "9f9dc0e582d066e8ac671a1f63b3a73c70a7be9909e8be51a7f5aeb5a7c04af2",
+          "bytes": 18313,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/README.md"
+        },
+        {
+          "path": "packages/markitdown/pyproject.toml",
+          "sha256": "68275854fef84923b1a62fce9d7f366ef7073232edfe5ba0b930a6f6cc02b4a8",
+          "bytes": 2934,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/pyproject.toml"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/_base_converter.py",
+          "sha256": "3b9cfbe86bc2af4f7f23042e60eaccf5e8d9df866d8a35a77d00672eab5202e6",
+          "bytes": 4516,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/_base_converter.py"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/_markitdown.py",
+          "sha256": "753481c59531db3a2d31cbb34db6c29fbde7f40481f945883b4ff25b9e130332",
+          "bytes": 32924,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/_markitdown.py"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/_uri_utils.py",
+          "sha256": "6b2e86705a449c3171878104cecaffa752ff2335f7d088085093c137112dd7c1",
+          "bytes": 2418,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/_uri_utils.py"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/converters/_docx_converter.py",
+          "sha256": "35b6da35a3d2bb940d2c872a092965c249b9f34cb77e3f3dfb76131a110d7302",
+          "bytes": 4581,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/converters/_docx_converter.py"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/converters/_pdf_converter.py",
+          "sha256": "8a48783a111f8c240ab87320921455e879a5f6753421a6cc472e6d2b89bf2c92",
+          "bytes": 20542,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/converters/_pdf_converter.py"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/converters/_pptx_converter.py",
+          "sha256": "626fc4614e96b4646ef1f927aa5c873e12a323e44822d5629db5fb8b702471fb",
+          "bytes": 14271,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/converters/_pptx_converter.py"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/converters/_xlsx_converter.py",
+          "sha256": "ea01d4447ef83a827cfc109e8886fb262c129a8257cb774a5f3dd784d8854090",
+          "bytes": 8598,
+          "url": "https://raw.githubusercontent.com/microsoft/markitdown/4cc9fa17653d695d64fb9eee5b33d4de55ff84e8/packages/markitdown/src/markitdown/converters/_xlsx_converter.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "op7418/Humanizer-zh",
+      "commit": "f4518a8eab97b8bfebc66a89d34320a89bef6930",
+      "committed_at": "2026-09-23T02:24:26Z",
+      "license_declared": "MIT",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "aa00e74769e1b9d8e7fa7094dbfcca9b129a0ded6dce1cf4da050b99146d2fa7",
+          "bytes": 1063,
+          "url": "https://raw.githubusercontent.com/op7418/Humanizer-zh/f4518a8eab97b8bfebc66a89d34320a89bef6930/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "c4f42c5f590b2845608c3913754e0339db0783481efb6d5ec90144fb721bd1d4",
+          "bytes": 6459,
+          "url": "https://raw.githubusercontent.com/op7418/Humanizer-zh/f4518a8eab97b8bfebc66a89d34320a89bef6930/README.md"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "95627fd4437d886f98032ccc62d79136e6310f1fc04e354bb86431795ff206df",
+          "bytes": 20527,
+          "url": "https://raw.githubusercontent.com/op7418/Humanizer-zh/f4518a8eab97b8bfebc66a89d34320a89bef6930/SKILL.md"
+        },
+        {
+          "path": "tests/check_structure.py",
+          "sha256": "82ba1f91aab7a70abf039e79009fb1b77c036aa892925e5e3df5c2550d20230a",
+          "bytes": 1373,
+          "url": "https://raw.githubusercontent.com/op7418/Humanizer-zh/f4518a8eab97b8bfebc66a89d34320a89bef6930/tests/check_structure.py"
+        },
+        {
+          "path": "tests/fixtures/cases.json",
+          "sha256": "6a62586ee93dd9695976cd45271036f2a92be4f74e1b3b9b6c21a411c8497c0e",
+          "bytes": 5297,
+          "url": "https://raw.githubusercontent.com/op7418/Humanizer-zh/f4518a8eab97b8bfebc66a89d34320a89bef6930/tests/fixtures/cases.json"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "opendatalab/MinerU",
+      "commit": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "committed_at": "2026-10-11T02:21:25Z",
+      "license_declared": "NOASSERTION",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "2d9aeb5d15159329a20dd804f251c64860ba954fbd26ec02f802220e6d71cf5c",
+          "bytes": 3301,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/LICENSE.md"
+        },
+        {
+          "path": "README.md",
+          "sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb",
+          "bytes": 55856,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/README.md"
+        },
+        {
+          "path": "README_zh-CN.md",
+          "sha256": "768a9de411276a648ad7eb06ce4f4bfdcca3142685c933b304a390841eeacddd",
+          "bytes": 54381,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/README_zh-CN.md"
+        },
+        {
+          "path": "mineru/backend/analysis/office.py",
+          "sha256": "79036abdd12b6035c62de830504c1208c226f8b363065b78d2a126138bc75b55",
+          "bytes": 1473,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/backend/analysis/office.py"
+        },
+        {
+          "path": "mineru/backend/analysis/pdf/pipeline.py",
+          "sha256": "9c3a166a98d242190ee2137485e8f00b0c621a79c767e710184467c453402491",
+          "bytes": 6408,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/backend/analysis/pdf/pipeline.py"
+        },
+        {
+          "path": "mineru/backend/analyze.py",
+          "sha256": "fd1cbd9392cc87203fe299d74ecd9072302e2df99bae86a6217adfbdc877e046",
+          "bytes": 7007,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/backend/analyze.py"
+        },
+        {
+          "path": "mineru/config.py",
+          "sha256": "ac0e8fe185b38fbdabfd93cbc9242576654e68fd606315be9e2d63ee55c2662e",
+          "bytes": 21118,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/config.py"
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "c67cd0915df125c6e962633e5741288a8a0bd9b5eb05a573f604b039839a7c8d",
+          "bytes": 4933,
+          "url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/pyproject.toml"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "OTTO-OTO/RLCracker",
+      "commit": "bb78b6ced7d756a9ee36b4b2129e184fa0c9161d",
+      "committed_at": "2026-05-13T10:12:11Z",
+      "license_declared": "Apache-2.0",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "GRPOTrainer_reph.py",
+          "sha256": "7072f265cd8fb337a3cf721854015d8af18f65d635dc39c776e923d5dd803cdf",
+          "bytes": 64915,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/GRPOTrainer_reph.py"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "37d8fa3d4df2f3d8901eaf40c9789d937acce4112abcef6598aacf7952eaf972",
+          "bytes": 15703,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/README.md"
+        },
+        {
+          "path": "config_grpo_demo_reph.yaml",
+          "sha256": "ee42331f2b6395d9ca02396fa3a28b023319de2bb0645aca024bf5696fe80fd1",
+          "bytes": 4666,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/config_grpo_demo_reph.yaml"
+        },
+        {
+          "path": "data_utils.py",
+          "sha256": "b828331e59fc967a6f2137c97c4e82a00fd188c378106d933b3e444ddd27618a",
+          "bytes": 35875,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/data_utils.py"
+        },
+        {
+          "path": "evaluation.py",
+          "sha256": "f5af185712f5acf725c79b7c1ba8c462129722e841fa39344be7dbf51c3cd955",
+          "bytes": 38123,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/evaluation.py"
+        },
+        {
+          "path": "grpo_reph.py",
+          "sha256": "fa50b83adcd72b4f535404f0e32369633be2fef7e0eac41ef6ac2c4f71176e3c",
+          "bytes": 10445,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/grpo_reph.py"
+        },
+        {
+          "path": "metrics/p_sp.py",
+          "sha256": "3e933ba9ff18faa59714e1e6184d4939b8e3d2a47449561c9209582645b247f1",
+          "bytes": 4393,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/metrics/p_sp.py"
+        },
+        {
+          "path": "multi_thread.py",
+          "sha256": "6da2e0eaed515f26d3b2768d34c20878f36d87c653f5e02e0b05ea8b5a7e7b60",
+          "bytes": 6702,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/multi_thread.py"
+        },
+        {
+          "path": "open_r1/rewards.py",
+          "sha256": "c0844a99b32500ac6889633deb2a593e98cccbc685b04378ea45f24d158b188e",
+          "bytes": 16294,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/open_r1/rewards.py"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "34b679cf3e6d5d446e939144462d5c338a61129c38bbae544e010c29a416ed8f",
+          "bytes": 249,
+          "url": "https://raw.githubusercontent.com/OTTO-OTO/RLCracker/bb78b6ced7d756a9ee36b4b2129e184fa0c9161d/requirements.txt"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "swaylq/humanize-chinese",
+      "commit": "6510ca720b91919a12fa2e828b5ec959deb11db4",
+      "committed_at": "2026-08-29T15:26:01Z",
+      "license_declared": "NOASSERTION",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "39365bca7eb1d56a38fb7557dd7b36d7cde0bedcc8c04a5ee20a2df1e4f2ceff",
+          "bytes": 1937,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "3986ad93a4dec2a5ba2663d9e2866a7a2cd1e16a5a3bfdc30c97c674e1034209",
+          "bytes": 44469,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/README.md"
+        },
+        {
+          "path": "evals/h1_acceptance.py",
+          "sha256": "036899c67023a624ac3806b06e973097b8789f7737875e3f01ed396fe9f40d3f",
+          "bytes": 5733,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/evals/h1_acceptance.py"
+        },
+        {
+          "path": "evals/oracles/zhuque_adapter.py",
+          "sha256": "b3161c197edd163b8c1aea2da68b75f5abb71fc7437f22fd98479d05e04fdda3",
+          "bytes": 3416,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/evals/oracles/zhuque_adapter.py"
+        },
+        {
+          "path": "evals/watermark_sim.py",
+          "sha256": "6581b78675f101e67b55f30219f53538ec1d1db07883c8aeb19036d876bc8eb2",
+          "bytes": 9818,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/evals/watermark_sim.py"
+        },
+        {
+          "path": "package.json",
+          "sha256": "dd48ce1fd83b39c0d165bdefcaac5c2dc567da12b0207890d7d4b9a2502c1bd7",
+          "bytes": 1181,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/package.json"
+        },
+        {
+          "path": "scripts/detect_cn.py",
+          "sha256": "3b5f2505baac7db39e60fcefc534f272648e9c893ca2da7bd8f02f8f0044337b",
+          "bytes": 33683,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/scripts/detect_cn.py"
+        },
+        {
+          "path": "scripts/humanize.py",
+          "sha256": "aa2c9522218b60bac7fa1a065450572903c6f25fcea239e469027967cb1a7ee7",
+          "bytes": 4841,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/scripts/humanize.py"
+        },
+        {
+          "path": "scripts/humanize_cn.py",
+          "sha256": "882d5bf583b5bf1fce436e5a48cae494a78fa9237ac31993c7aba6e9d599a711",
+          "bytes": 188312,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/scripts/humanize_cn.py"
+        },
+        {
+          "path": "scripts/pipeline/guards.py",
+          "sha256": "760007ca9af9147fbbf47ddcb05b0926a1f595f522730911c87ae170c391f664",
+          "bytes": 6648,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/scripts/pipeline/guards.py"
+        },
+        {
+          "path": "scripts/pipeline/run.py",
+          "sha256": "12743ddd7085b0e78cbb9a475eedea58f763282b8f64f3f6e80478c270e656f9",
+          "bytes": 8296,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/scripts/pipeline/run.py"
+        },
+        {
+          "path": "scripts/watermark_cn.py",
+          "sha256": "c3eaa618d48c55941a2d9d2c9aabff5778cf339f68eb0694b52de7c21ac49e70",
+          "bytes": 28743,
+          "url": "https://raw.githubusercontent.com/swaylq/humanize-chinese/6510ca720b91919a12fa2e828b5ec959deb11db4/scripts/watermark_cn.py"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "repository": "THU-BPM/MarkLLM",
+      "commit": "0a4fe8c642b31b8a8c4993615b1c70a0c300d918",
+      "committed_at": "2026-09-05T04:09:59Z",
+      "license_declared": "Apache-2.0",
+      "tree_truncated": false,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f9f5219d9e0e4e7e77ca68af6cbbdf91b44f25720bc77396c70bffbefaffb9de",
+          "bytes": 33281,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/README.md"
+        },
+        {
+          "path": "config/SynthID.json",
+          "sha256": "6662693fd5cd38e4b6bfd76a6af1dce9da868d4757c0d3cf6f6cbc055d6eac05",
+          "bytes": 460,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/config/SynthID.json"
+        },
+        {
+          "path": "evaluation/pipelines/detection.py",
+          "sha256": "74d6915b42056a6bb388230be83ee106be2bacd04d566881ed9e35a3c53c9a5f",
+          "bytes": 6632,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/evaluation/pipelines/detection.py"
+        },
+        {
+          "path": "evaluation/pipelines/quality_analysis.py",
+          "sha256": "7bc86495b3f65017eff434f1d69cc1574647dee9974698627a6e17c34bb36869",
+          "bytes": 16676,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/evaluation/pipelines/quality_analysis.py"
+        },
+        {
+          "path": "evaluation/tools/oracle.py",
+          "sha256": "7b6e126a3f55eaa5de62e7a5d1a00cb42ffc72daa618d882879cee83fb34be99",
+          "bytes": 14854,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/evaluation/tools/oracle.py"
+        },
+        {
+          "path": "evaluation/tools/success_rate_calculator.py",
+          "sha256": "88243c51ce9464a16297aff6eb6a6fd31ff90581e2101da010a8633de3067246",
+          "bytes": 10787,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/evaluation/tools/success_rate_calculator.py"
+        },
+        {
+          "path": "evaluation/tools/text_editor.py",
+          "sha256": "f97426e6707b5d215a15c0546af4c52cd234149416a25b8c4a29a1fafcb48409",
+          "bytes": 20794,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/evaluation/tools/text_editor.py"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "fd39be7c3064dee125846a348ae6c4a25d3e16a2e4d8d18b5818132e084a402c",
+          "bytes": 182,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/requirements.txt"
+        },
+        {
+          "path": "test/test_pipeline.py",
+          "sha256": "ae650951c2fca8ba99ee4d744befd915f2917be3e7fba577e95a5b1dff377275",
+          "bytes": 14472,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/test/test_pipeline.py"
+        },
+        {
+          "path": "watermark/auto_watermark.py",
+          "sha256": "4738b91c92ff90c809694301eccca3d0b25f7c875381b29ce0913ee8f8cf6093",
+          "bytes": 4965,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/auto_watermark.py"
+        },
+        {
+          "path": "watermark/base.py",
+          "sha256": "7d38019ca8d8894886752035e53fa0463879a8f4fee66a33e6baf0064ed8e650",
+          "bytes": 3827,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/base.py"
+        },
+        {
+          "path": "watermark/kgw/kgw.py",
+          "sha256": "3413d9a8715bceee972d31e71ea944017dee423bb2ffc474a6304266e86af475",
+          "bytes": 12059,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/kgw/kgw.py"
+        },
+        {
+          "path": "watermark/synthid/__init__.py",
+          "sha256": "da0a195be2f50ace3e5e75a652b0b117784b9d6788904b2c0ac11b48bb0c865c",
+          "bytes": 645,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/synthid/__init__.py"
+        },
+        {
+          "path": "watermark/synthid/detector.py",
+          "sha256": "959a702fb7b5863702708a5d67fe18cbf84356ab43a403deb39465a87835ad44",
+          "bytes": 10529,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/synthid/detector.py"
+        },
+        {
+          "path": "watermark/synthid/detector_bayesian_torch.py",
+          "sha256": "5e012dd695113fadb11c8c6c8d017f19a212f5edff1584ffbbecf4fb2dfc6b7b",
+          "bytes": 20536,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/synthid/detector_bayesian_torch.py"
+        },
+        {
+          "path": "watermark/synthid/synthid.py",
+          "sha256": "19fd5ea106aa64d820466d157bdce94e4793d687ea4f339e4abeb15a6c2eecbb",
+          "bytes": 22865,
+          "url": "https://raw.githubusercontent.com/THU-BPM/MarkLLM/0a4fe8c642b31b8a8c4993615b1c70a0c300d918/watermark/synthid/synthid.py"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "unavailable": [
+    {
+      "repository": "lkr-gif/MarkSec",
+      "status": "GitHub repository API could not resolve it; paper and public project pages reviewed instead."
+    }
+  ]
+}
