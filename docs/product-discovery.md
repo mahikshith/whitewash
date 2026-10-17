@@ -16,6 +16,7 @@ Four different problems sit inside the original idea.
 | Improve clarity, rhythm, and personal voice | High, with review and evaluation | Suggest natural edits and protect specified content |
 | Estimate whether prose resembles AI output | Possible, with substantial uncertainty | Provide a fallible signal with scope and an inconclusive result |
 | Verify a particular provider watermark | Depends on authorized detector access | Report that provider's verification result and its limits |
+| Remove selected file metadata | High for explicitly supported fields and formats | Inspect, remove selected fields, and verify the exported copy |
 | Guarantee universal detector bypass | Not supportable | Do not sell this guarantee |
 | Preserve arbitrary documents perfectly while rewriting | Not supportable across all formats | Publish supported structures and flag exceptions |
 
@@ -84,6 +85,7 @@ The useful features, in priority order, are:
 4. A character inspector that explains each cleanup instead of silently deleting text.
 5. Text and Markdown import/export with explicit protection for code and link destinations.
 6. A supported Word workflow, once preservation checks pass.
+7. Metadata & Privacy: inspect supported file metadata, remove selected fields, and show a before/after export report, with the boundaries below.
 
 For example, a draft might say, "We are delighted to inform you that the revised estimate is INR 48,500, valid until 21 October." A useful edit is "The revised estimate is INR 48,500 and is valid until 21 October." The interface should show the removed filler and confirm the protected amount and date stayed unchanged. This demonstrates observable value without a detector score.
 
@@ -113,6 +115,42 @@ PDFs store positioned content and do not reliably expose semantic paragraphs. Sc
 The openpyxl documentation warns that unsupported workbook objects, including shapes, can be lost on save. For rich spreadsheets, narrowly patching supported OOXML parts or using a fidelity-oriented document SDK may be preferable; compare options on representative files before choosing. [openpyxl tutorial](https://openpyxl.readthedocs.io/en/stable/tutorial.html)
 
 Keep the uploaded original immutable. Display unsupported features before processing, write a new output, and reopen and validate it before offering download. Where faithful editing is unavailable, offer an explicit text-only conversion rather than silently degrading the file.
+
+## Metadata and Privacy feature
+
+Add this feature to the planned product scope. It creates a separate copy with selected metadata removed and tells the user what the exporter checked. Its value is controlled disclosure when sharing documents. It must distinguish removable file properties, embedded content credentials, visible document watermarks, and statistical text watermarks.
+
+### Removal scope
+
+| Information | Planned behavior | Boundary |
+| --- | --- | --- |
+| Author, last editor, creator application, dates, and custom properties | Inspect and allow selective removal in supported formats | These fields are not inherently AI evidence; file-system or service dates are separate |
+| PDF document properties and XMP metadata | Inspect both stores and remove selected supported values | Clearing only one store is insufficient; do not advertise forensic erasure |
+| Office comments, tracked changes, notes, hidden sheets, and embedded objects | Show separately in the inspection report | These can contain substantive content; removal needs a distinct user selection and preview |
+| Embedded C2PA or other supported provenance metadata | Identify it; offer explicit removal only for formats we can validate | Removal discards provenance information; external copies or bindings may remain |
+| Unusual Unicode characters in text | Use the existing reviewed cleanup operation | Preserve meaningful Unicode; this does not remove a word-selection watermark |
+| Statistical LLM text watermark | Mark removal as unverified and outside the metadata-cleaning guarantee | Do not label the output watermark-free based on metadata absence or an ordinary detector score |
+| Visible logos, attribution, or page watermarks | Leave intact in this feature | They are content, not ordinary file metadata |
+
+The PDF implementation must handle both regular document metadata and XMP. The pypdf documentation describes these as separate stores. [PDF metadata documentation](https://pypdf.readthedocs.io/en/stable/user/metadata.html)
+
+Office inspection also needs format-specific coverage: Microsoft lists properties, comments, revisions, hidden content, and embedded objects among inspection categories. Removing them all indiscriminately could alter the user's document. [Microsoft Document Inspector](https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/using-the-document-inspector)
+
+C2PA supports recovery of a manifest separated from an asset through soft bindings and a manifest repository. Removing an embedded credential therefore cannot establish that every provenance association has disappeared. Do not query external recovery services without user authorization to transmit the necessary data. [C2PA manifest recovery specification](https://spec.c2pa.org/specifications/specifications/2.4/softbinding/Decoupled.html)
+
+### User experience and export checks
+
+Use a Metadata & Privacy panel with Inspect, Remove selected metadata, and Download cleaned copy actions. Show field categories and values before processing. After export, label each category Removed and verified, Retained, Unsupported, or Not checked. A result such as "Selected author and creator fields removed; text watermark status not checked" is meaningful. "All AI traces permanently erased" is unsupported.
+
+Keep this operation independent of rewriting and avoid model calls. Process locally where practical; disclose when a server receives the file. Preserve the original, and do not create a persistent metadata report containing removed personal information unless the user chooses to save one. Do not substitute invented author names, dates, human-authorship declarations, or forged credentials for removed fields.
+
+Start with inspection and selected properties in the supported DOCX workflow. Add simple unsigned PDFs only after round-trip preservation checks. Follow with PPTX and XLSX as their adapters mature. Plain pasted text has no original document metadata to erase, and Markdown frontmatter is content requiring an explicit selection.
+
+Reject or clearly report unsupported encrypted, signed, protected, or structurally complex documents. Signed documents need specialized handling because editing may invalidate signatures. Changes affecting archival/accessibility conformance need their own validation. Do not silently flatten a file or lose formulas, form fields, links, notes, or accessibility structure to claim a successful cleanup.
+
+Before release, test files with distinctive values planted in every supported metadata store. Reopen the output with an independent inspection path, check selected values are absent and retained values remain, and verify supported content and rendering. Check nested objects and historical PDF data before expanding any erasure claim; merely making an entry inaccessible through the usual API is not sufficient evidence. The writer must not silently reintroduce selected metadata. Any removal failure must prevent a success label.
+
+Scope the result to the exported copy and inspected stores. It does not erase cloud history, backups, provider records, operating-system attributes, external credentials, or information in the document body. This is an added product specification, not an implemented sanitizer or a validated watermark-removal engine.
 
 ## Open source options
 
