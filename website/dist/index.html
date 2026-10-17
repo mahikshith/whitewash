@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Clearer drafts. Every change in your hands. A private, browser-local text cleanup and review workspace.">
+  <meta name="theme-color" content="#183d32">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Whitewash — Draft studio</title>
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#draft">Skip to editor</a>
+  <aside class="sidebar" aria-label="Workspace navigation">
+    <a class="brand" href="./" aria-label="Whitewash home"><img src="./mark.svg" width="30" height="30" alt=""><span>whitewash<span class="brand-dot">.</span></span></a>
+    <div class="side-label">YOUR WORKSPACE</div>
+    <nav>
+      <a class="nav-item active" href="#studio" aria-current="page"><span aria-hidden="true">▤</span> Draft studio</a>
+      <button class="nav-item" id="open-principles"><span aria-hidden="true">◈</span> Our approach <span class="arrow" aria-hidden="true">↗</span></button>
+    </nav>
+    <div class="sidebar-bottom"><span class="local-dot"></span> Local by design<p>Your words stay in this browser tab. No account needed.</p><span class="version">EARLY PREVIEW · 0.1</span></div>
+  </aside>
+  <main id="studio">
+    <header class="topbar"><span>Workspace <span class="slash">/</span> <strong>Draft studio</strong></span><button class="privacy-link" id="open-privacy"><span aria-hidden="true">⌑</span> Your text stays yours</button></header>
+    <section class="intro" aria-labelledby="page-title">
+      <div><div class="eyebrow"><span></span> LESS FRICTION. MORE YOU.</div><h1 id="page-title">Good writing. <em>Without the noise.</em></h1><p>Clean up a draft, make a few thoughtful edits, and keep what matters.</p></div>
+      <button class="button secondary sample-button" id="load-sample"><span aria-hidden="true">↻</span> Try a sample</button>
+    </section>
+    <section class="studio" aria-label="Writing workspace">
+      <div class="document-bar"><div class="document-title"><span class="file-icon" aria-hidden="true">▤</span><strong id="document-name">Sample draft.txt</strong><span class="sample-tag" id="sample-tag">SAMPLE</span></div><div class="document-actions"><button id="undo-source" class="text-button" disabled>Undo replace</button><button id="import-file" class="text-button"><span aria-hidden="true">↑</span> Import text</button><button id="clear-draft" class="text-button">Clear</button><input id="file-input" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden></div></div>
+      <div class="workspace-grid">
+        <div class="writing-area">
+          <div class="toolbar"><div class="mode-switch" role="group" aria-label="Editing mode"><button id="mode-clean" aria-pressed="false">Clean text</button><button id="mode-polish" aria-pressed="true">Light edit</button></div><button class="text-button inspector-button" id="open-inspector">Inspect characters <span id="character-badge" class="badge">0</span></button></div>
+          <div class="mobile-tabs" role="group" aria-label="Editor view"><button id="show-original" aria-pressed="true">Original</button><button id="show-result" aria-pressed="false">Result</button></div>
+          <div class="editors" data-view="original">
+            <section class="editor-pane original-pane" aria-labelledby="original-label"><div class="pane-heading"><label id="original-label" for="draft">ORIGINAL</label><label class="format-label" for="format">Format <select id="format"><option value="txt">Text</option><option value="md">Markdown</option></select></label></div><textarea id="draft" spellcheck="false" placeholder="Paste your draft here, or drop a .txt or .md file…" aria-describedby="input-help" maxlength="100000"></textarea><div class="pane-footer"><span id="input-count">0 words</span><span id="input-help">Up to 100,000 characters</span></div></section>
+            <section class="editor-pane result-pane" aria-labelledby="result-label"><div class="pane-heading"><h2 id="result-label">YOUR REFINED DRAFT</h2><span class="result-status" id="result-status">Ready to review</span></div><div id="result" class="result-text" role="region" aria-label="Edited draft" tabindex="0"></div><div class="pane-footer"><span id="output-count">0 words</span><span class="highlight-key"><i></i> Accepted edits</span></div></section>
+          </div>
+          <div class="actionbar"><div><button id="review" class="button primary">Review changes <span aria-hidden="true">↗</span></button><p id="mode-help">Rule-based polish · no model calls</p></div><div class="output-actions"><button id="copy" class="button secondary" disabled>Copy result</button><button id="download" class="button icon-button" aria-label="Download edited draft" title="Download edited draft" disabled>↓</button></div></div>
+          <div class="preservation"><span aria-hidden="true">✓</span><p>Numbers, quotes, links and code stay protected.<br><span>Light edits are suggestions. You make the final call.</span></p></div>
+        </div>
+        <aside class="review-panel" aria-labelledby="review-title"><div class="review-heading"><h2 id="review-title">A little less noise</h2><span id="edit-count" class="badge">0</span></div><p class="review-subtitle" id="review-subtitle">Every suggestion is yours to keep.</p><div class="review-controls"><button class="text-button" id="accept-all" disabled>Accept all</button><button class="text-button" id="reject-all" disabled>Reject all</button></div><div id="changes" class="changes"></div><details class="preferences"><summary>Cleanup preferences</summary><label><input type="checkbox" id="spaces" checked> Regular spaces <small>Replace nonbreaking spaces.</small></label><label><input type="checkbox" id="soft-hyphens" checked> Remove soft hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>May affect word boundaries.</small></label><label class="locks-label" for="locks">Keep these phrases exactly</label><textarea id="locks" rows="3" maxlength="2000" placeholder="One phrase per line" aria-describedby="lock-help"></textarea><small id="lock-help">Up to 50 case-sensitive phrases. Joiners and direction controls are always retained.</small></details></aside>
+      </div>
+    </section>
+    <div class="below-editor"><span><i class="local-dot"></i> Processed on your device</span><span>Original preserved</span><span>TXT + Markdown</span><span class="below-note">A quieter place to work.</span></div>
+    <footer><span>Built for words worth keeping.</span><button class="text-button" id="open-limits">What this preview can do <span aria-hidden="true">↗</span></button></footer>
+  </main>
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+  <dialog id="info-dialog"><div class="dialog-heading"><h2 id="dialog-title"></h2><button id="close-dialog" class="close-button" aria-label="Close dialog">×</button></div><div id="dialog-content"></div></dialog>
+</body>
+</html>
