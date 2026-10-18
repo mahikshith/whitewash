@@ -245,6 +245,7 @@ $('close-dialog').addEventListener('click', () => $('info-dialog').close());
 $('info-dialog').addEventListener('click', (event) => { if (event.target === $('info-dialog')) { const rect = $('info-dialog').getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) $('info-dialog').close(); } });
 $('open-privacy').addEventListener('click', () => openDialog('Your words, on your device.', [
   'This preview processes your draft in this browser tab. It sends no document text to a model or detector and uses no analytics, cookies or draft storage. Reloading or closing the tab clears the in-app draft.',
+  'Only your light/dark appearance preference is saved in this browser. Your draft and edits are not saved.',
   'The hosting service still receives normal page requests and may keep access logs. Your clipboard and downloaded files are managed by your device.',
   'TXT and Markdown exports contain the reviewed text. Original Office/PDF metadata is not available from pasted text, and this preview does not sanitize those documents.',
 ]));

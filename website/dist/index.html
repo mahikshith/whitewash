@@ -7,8 +7,10 @@
   <meta name="theme-color" content="#183d32">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Whitewash — Draft studio</title>
+  <script src="./theme.js"></script>
   <link rel="icon" href="./mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./theme.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
@@ -23,7 +25,7 @@
     <div class="sidebar-bottom"><span class="local-dot"></span> Local by design<p>Your words stay in this browser tab. No account needed.</p><span class="version">EARLY PREVIEW · 0.1</span></div>
   </aside>
   <main id="studio">
-    <header class="topbar"><span>Workspace <span class="slash">/</span> <strong>Draft studio</strong></span><button class="privacy-link" id="open-privacy"><span aria-hidden="true">⌑</span> Your text stays yours</button></header>
+    <header class="topbar"><span>Workspace <span class="slash">/</span> <strong>Draft studio</strong></span><div class="topbar-actions"><button id="theme-toggle" class="theme-toggle" aria-label="Dark mode" aria-pressed="false" title="Switch to dark mode"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-name">Dark mode</span></button><button class="privacy-link" id="open-privacy"><span aria-hidden="true">⌑</span> Your text stays yours</button></div></header>
     <section class="intro" aria-labelledby="page-title">
       <div><div class="eyebrow"><span></span> LESS FRICTION. MORE YOU.</div><h1 id="page-title">Good writing. <em>Without the noise.</em></h1><p>Clean up a draft, make a few thoughtful edits, and keep what matters.</p></div>
       <button class="button secondary sample-button" id="load-sample"><span aria-hidden="true">↻</span> Try a sample</button>

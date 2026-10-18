@@ -13,10 +13,11 @@ From this directory, run `python -m http.server 4173 --bind 127.0.0.1 --director
 - Exact user-locked phrases, numbers, URLs/email, quotations and conservative code protection.
 - Local UTF-8 TXT/Markdown import and drag/drop; reviewed copy/download. Uploaded originals are never rewritten.
 - Responsive mobile Original/Result views, labeled controls, keyboard focus and native dialogs.
+- Light/dark themes: follows device appearance initially; a visible switch saves your choice locally.
 
 ## Limits and privacy
 
-One UTF-8 file, 400 KB, 100,000 UTF-16 code units, up to 500 suggestions per review and 50 locked phrases (2,000 characters total). Oversized/unsupported input fails visibly. Browser storage, analytics and external processing are absent from application code; a hosting service still handles page/access requests. Draft state is memory-only and disappears on reload. Clipboard/downloaded copies are controlled by the device.
+One UTF-8 file, 400 KB, 100,000 UTF-16 code units, up to 500 suggestions per review and 50 locked phrases (2,000 characters total). Oversized/unsupported input fails visibly. Only the appearance preference uses local storage; drafts, analytics and external processing are absent from storage/application requests. A hosting service still handles page/access requests. Draft state is memory-only and disappears on reload. Clipboard/downloaded copies are controlled by the device.
 
 Markdown is edited as text, not rendered. Both fence types, unclosed fences, indented code, inline-code lines, frontmatter, and heading/link/table/HTML/math-like lines are conservatively retained. This is not a complete Markdown parser or a promise of every dialect's structural fidelity. Mixed-script word boundaries are respected. Word counts are space-delimited estimates and are unsuitable for exact Chinese segmentation.
 

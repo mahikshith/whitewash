@@ -17,3 +17,5 @@ Research checkpoint (18 October 2026): [15-repository code audit](docs/research/
 The [website guide](website/README.md) covers running, testing and current limits. The initial site uses plain HTML/CSS/JavaScript with no runtime dependencies. Source is under `website/dist/`; the hosting manifest binds the private Sites preview separately from this GitHub origin.
 
 Open the [private website preview](https://whitewash-studio.astute-newt-2147.chatgpt.site). [Validation](docs/validation.md) and [deployment details](docs/deployment.md) record completed checks and operational limits.
+
+The [implementation roadmap](docs/implementation-roadmap.md) separates the current editor from the next model, document and metadata features. The site now includes light/dark appearance with a locally remembered choice.
