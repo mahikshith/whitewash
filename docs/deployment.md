@@ -34,3 +34,7 @@ Automatic approval review initially rejected cached opening metadata as stale. T
 All 22 website source files matched the publishing checkout. All eleven browser assets in the helper-created archive matched the tested source; the normalized manifest is packaged at `dist/.openai/hosting.json` and retains the exact project ID/static configuration. Native publication confirmed success. The live browser displayed "Humanize AI-written text", the matching subtitle and all thirteen AI-labeled feature entries. The shared catalog also supplies the menu and individual task headings. The screenshot is retained under ignored `.research/qa/ai-features-live.png`.
 
 The update ships bounded Office text refinement, defined Office property cleaning and editorial writing notes. Full generative rewriting, PDF editing, AI classification and provider watermark checks remain explicitly planned/research. No audience change was made.
+
+## Before-and-after cards
+
+18 October 2026: private deployment `appgdep_6ad43811aed881919242f49b48553e9b` succeeded. Version: `appgprj_6ad3dd2e0cb08191a5da67d8ea9ee005~appgver_3be2927fce908191b7d9ac31289b8df6`; Sites source: `d615aecb719f4b7f9dc35e22299ab2384fe6ba31`; GitHub implementation: `7b2eecb`. All eleven packaged browser assets matched the checked source. The live homepage confirmed input → outcome cards with no extra description paragraphs, and no browser warnings/errors were reported. New/Soon/Research status and the owner-private audience were preserved. Screenshot: `.research/qa/before-after-cards-live.png`.
