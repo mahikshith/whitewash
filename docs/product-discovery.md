@@ -252,3 +252,7 @@ Ponytail is the active lean-development preference. Additional skills were insta
 | Security best practices | openai/skills at 49f948faa9258a0c61caceaf225e179651397431 | C:/Users/mahik/.codex/skills/security-best-practices | Secure implementation and later focused reviews |
 
 The Humanizer MIT license is included in its installed folder. Its writing-pattern rules are heuristics and should not become blanket bans or detector claims. Installed skills become available on the next turn. Existing React, Next.js, mobile, design, document, PDF, and spreadsheet skills can be applied as those tasks arise; no application runtime dependencies are needed during brainstorming.
+
+## Implemented follow-up: supplied repositories
+
+The October follow-up adds local Word/slide/spreadsheet prose refinement, defined Office-property removal and a writing check. These use bounded deterministic rules and do not implement the proposed generative humanizer or detector. The homepage describes the job as making AI drafts clearer; file cards describe text refinement rather than general Office editing. See [source findings and feature mapping](research/supplied-repositories.md) and [current implementation limits](../website/README.md).

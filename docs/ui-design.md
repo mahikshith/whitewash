@@ -13,3 +13,7 @@ Review is optional and collapsed after a result. Defaults allow one processing a
 [iLovePDF's homepage](https://www.ilovepdf.com/) puts task choices in a grid, and its [compression page](https://www.ilovepdf.com/compress_pdf) centers a single file-selection action. [QuillBot](https://quillbot.com/ai-humanizer) and [Grammarly](https://www.grammarly.com/ai-humanizer) offer direct writing actions. The adopted principle is separation of tool discovery and task execution; branding, copy and visual assets are not copied. These observations do not establish conversion or retention performance.
 
 Paid value must come from successful repeated tasks, less repair work and reliable document handling. This redesign changes discovery and interaction; it does not turn planned model/document features into working services or establish willingness to pay.
+
+## Purpose-led labels
+
+The homepage says “Make AI drafts clearer.” File cards say “Refine Word text”, “Refine slide text” and “Refine spreadsheet text”, with a one-sentence description of the text task. They are entry points for refining AI drafts inside those formats, not general Office editors. Keep the boxes, short heading, shared menu and one primary action; avoid adding promotional sections to explain this.

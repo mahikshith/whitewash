@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Simple tools to clean, edit and check your text. Choose a tool and get straight to work.">
+<meta name="description" content="Make AI drafts clearer. Refine wording inside your text, documents, slides and spreadsheets.">
 <meta name="theme-color" content="#14795c">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Whitewash — All tools</title>
@@ -21,7 +21,7 @@
 </header>
 <div id="content" tabindex="-1">
 <main id="home-view" class="home">
-  <div class="home-heading"><h1>Choose a tool. Get to work.</h1><p>Simple tools for clearer writing.</p></div>
+  <div class="home-heading"><h1>Make AI drafts clearer.</h1><p>Refine the wording in your text, documents, slides and spreadsheets.</p></div>
   <div id="tool-grid" class="tool-grid" aria-label="All writing tools"></div>
 </main>
 <main id="tool-view" class="tool-page" hidden>
@@ -33,14 +33,25 @@
     <textarea id="draft" placeholder="Paste your text here…" spellcheck="false" maxlength="100000" aria-describedby="input-count"></textarea>
     <div class="input-bottom"><span id="input-count">0 words</span><button id="undo-replace" class="text-button" hidden>Undo replace</button><button id="clear" class="text-button">Clear</button></div>
     <div class="primary-row"><button id="run" class="primary" disabled>Clean text</button></div>
-    <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Text</option><option value="md">Markdown</option></select></label><label><input type="checkbox" id="spaces" checked> Regular spaces</label><label><input type="checkbox" id="soft-hyphens" checked> Remove soft hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>May affect word boundaries.</small></label><label for="locks">Keep these phrases exactly</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One phrase per line"></textarea><small>Up to 50 case-sensitive phrases.</small></div></details>
+    <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Text</option><option value="md">Markdown</option></select></label><div id="cleanup-settings" class="options-content"><label><input type="checkbox" id="spaces" checked> Regular spaces</label><label><input type="checkbox" id="soft-hyphens" checked> Remove soft hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>May affect word boundaries.</small></label><label><input type="checkbox" id="punctuation"> Plain punctuation <small>Spaced dashes, apostrophes and ellipses.</small></label></div><label for="locks">Keep these phrases exactly</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One phrase per line"></textarea><small>Up to 50 case-sensitive phrases.</small></div></details>
     <section id="output" class="output" aria-labelledby="output-title" hidden><div class="output-header"><h2 id="output-title">Result</h2><span id="edit-count"></span><button id="copy" class="text-button">Copy</button><button id="download" class="text-button">Download</button></div><div id="result" class="result" tabindex="0"></div><div id="character-report" class="character-report" hidden></div><details id="changes-panel" class="changes-panel"><summary id="changes-title">Review changes</summary><div class="review-actions"><button id="keep-all" class="text-button">Keep all</button><button id="reject-all" class="text-button">Reject all</button></div><div id="changes"></div></details></section>
   </section>
   <input id="file-input" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
 </main>
+<main id="office-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="office-title"></h1><p id="office-description"></p></div>
+  <section class="office-workspace" aria-label="Document workspace">
+    <div class="office-entry"><p id="office-filename" hidden></p><button id="office-action" class="primary large">Select file</button><p id="office-limits"></p><button id="office-another" class="text-button" hidden>Choose another file</button></div>
+    <details id="office-options" class="options"><summary>Options</summary><div class="options-content"><label>Editing <select id="office-mode"><option value="polish">Light edit</option><option value="clean">Character cleanup only</option></select></label><label><input type="checkbox" id="office-punctuation"> Plain punctuation</label><label for="office-locks">Keep these phrases exactly</label><textarea id="office-locks" rows="2" maxlength="2000" placeholder="One phrase per line"></textarea></div></details>
+    <section id="office-output" class="office-output" hidden><h2 id="office-summary" tabindex="-1"></h2><p id="office-scope"></p><details id="office-review"><summary id="office-review-title">Review changes</summary><div id="office-changes"></div></details></section>
+    <p id="office-error" class="office-error" role="alert" hidden></p>
+  </section>
+  <input id="office-input" type="file" accept=".docx,.pptx,.xlsx" hidden>
+</main>
 <main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#clean-text">Use text tools</a></div></main>
 </div>
-<footer class="footer"><span>Local text processing</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
+<footer class="footer"><span>Local file & text processing</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
 <dialog id="info-dialog"><div class="dialog-header"><h2 id="dialog-title"></h2><button id="close-dialog" class="icon-button" aria-label="Close dialog">×</button></div><div id="dialog-content"></div></dialog>
 <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>

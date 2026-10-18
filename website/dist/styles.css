@@ -86,6 +86,20 @@ h1 { font-size:32px; line-height:1.25; letter-spacing:-.7px; font-weight:650; ma
 .options-content select { margin-left:8px; padding:4px; background:var(--soft); border:1px solid var(--border); color:var(--ink); border-radius:4px; }
 .options-content input { accent-color:var(--primary); vertical-align:middle; }
 #locks { display:block; width:100%; border:1px solid var(--border); background:var(--surface); color:var(--ink); resize:vertical; padding:8px 10px; border-radius:5px; font-size:12px; }
+#office-locks { width:100%; border:1px solid var(--border); background:var(--surface); color:var(--ink); padding:8px 10px; border-radius:5px; resize:vertical; }
+.office-workspace { background:var(--surface); border:1px solid var(--border); border-radius:9px; overflow:hidden; }
+.office-entry { text-align:center; padding:35px 20px; }
+.office-entry p { color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
+#office-another { display:block; margin:15px auto 0; }
+.office-output { padding:20px; border-top:1px solid var(--border); }
+.office-output h2 { font-size:16px; margin:0 0 7px; }
+.office-output>p,.office-change small { color:var(--muted); font-size:12px; }
+.office-output details { margin-top:20px; font-size:12px; }
+.office-output summary { cursor:pointer; color:var(--muted); }
+#office-changes { max-height:400px; overflow:auto; }
+.office-change { border-bottom:1px solid var(--border); padding:12px 0; overflow-wrap:anywhere; }
+.office-change p { margin:0 0 5px; font-size:13px; }
+.office-error { padding:16px 20px; color:var(--removed); border-top:1px solid var(--border); font-size:13px; }
 .primary-row { padding:17px 20px; border-top:1px solid var(--border); text-align:center; }
 .primary { display:inline-flex; align-items:center; justify-content:center; min-height:46px; min-width:170px; padding:12px 24px; border:0; border-radius:6px; background:var(--primary); color:var(--primary-ink); font-size:15px; font-weight:600; text-decoration:none; }
 .primary:hover:not(:disabled) { filter:brightness(.95); }

@@ -1,5 +1,8 @@
 export const MAX_CHARACTERS = 100_000;
 export const MAX_FILE_BYTES = 400_000;
+export function quotationRanges(text) {
+  return Array.from(text.matchAll(/"[^"]*(?:"|$)|“[^”]*(?:”|$)|‘[^’]*(?:’|$)|(?<!\p{L})'[^']*'(?!\p{L})/gu), (match) => [match.index, match.index + match[0].length]);
+}
 
 // Protect whole Markdown constructs conservatively; richer prose-node editing needs a parser.
 export function protectedRanges(text, format = 'txt', locks = []) {
@@ -28,7 +31,7 @@ export function protectedRanges(text, format = 'txt', locks = []) {
     for (const match of text.matchAll(pattern)) ranges.push([match.index, match.index + match[0].length]);
   };
   addMatches(/https?:\/\/[^\s<>]+|www\.[^\s<>]+|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/gu);
-  addMatches(/"[^"]*(?:"|$)|“[^”]*(?:”|$)|‘[^’]*(?:’|$)|(?<!\p{L})'[^']*'(?!\p{L})/gu);
+  ranges.push(...quotationRanges(text));
   addMatches(/\p{N}+(?:[.,:/%-]\p{N}+)*/gu);
   for (const term of locks.filter(Boolean)) {
     let start = text.indexOf(term);
@@ -57,7 +60,7 @@ export function proposeEdits(text, options = {}) {
   if (text.length > MAX_CHARACTERS) throw new Error('Keep this draft under 100,000 characters.');
   if ((options.locks || []).length > 50 || (options.locks || []).join('').length > 2000) throw new Error('Use up to 50 locked phrases, with 2,000 characters in total.');
   const protectedSpans = [];
-  for (const range of protectedRanges(text, options.format, options.locks || []).sort((a, b) => a[0] - b[0])) {
+  for (const range of [...protectedRanges(text, options.format, options.locks || []), ...(options.protectedSpans || [])].sort((a, b) => a[0] - b[0])) {
     const last = protectedSpans.at(-1);
     if (last && range[0] <= last[1]) last[1] = Math.max(last[1], range[1]);
     else protectedSpans.push([...range]);
@@ -91,6 +94,11 @@ export function proposeEdits(text, options = {}) {
   if (options.softHyphens !== false) add(/\u00ad/gu, '', 'cleanup', 'Remove a discretionary soft hyphen');
   if (options.zeroWidth) add(/\u200b/gu, '', 'cleanup', 'Remove a zero-width space; review word boundaries');
   add(/^\ufeff/gu, '', 'cleanup', 'Remove the leading byte-order mark');
+  if (options.punctuation) {
+    add(/…/gu, '...', 'cleanup', 'Use three dots for an ellipsis');
+    add(/ — /gu, ' - ', 'cleanup', 'Use a spaced hyphen instead of a spaced em dash');
+    add(/(?<=\p{L})’(?=\p{L})/gu, "'", 'cleanup', 'Use a straight apostrophe');
+  }
   if (options.mode === 'polish') for (const [pattern, after, reason] of clarityRules) add(pattern, after, 'clarity', reason);
   let previousEnd = 0;
   return edits.sort((a, b) => a.start - b.start).filter((edit) => {
@@ -130,9 +138,14 @@ export function inspectCharacters(text) {
   const found = new Map();
   let position = 0;
   for (const char of text) {
-    if (characters.has(char)) {
+    const point = char.codePointAt(0);
+    const special = characters.get(char) || (point >= 0xe0000 && point <= 0xe007f
+      ? ['Unicode tag character', 'May be part of a flag emoji. Retained.']
+      : ((point >= 0xfe00 && point <= 0xfe0f) || (point >= 0xe0100 && point <= 0xe01ef))
+        ? ['Variation selector', 'Selects a glyph or emoji presentation. Retained.'] : null);
+    if (special) {
       if (!found.has(char)) {
-        const [name, note] = characters.get(char);
+        const [name, note] = special;
         found.set(char, { name, note, code: `U+${char.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`, count: 0, positions: [] });
       }
       const item = found.get(char);
@@ -147,6 +160,25 @@ export function inspectCharacters(text) {
 export function wordCount(text) {
   // Space-delimited count; shown as an estimate for languages without word spaces.
   return text.trim() ? text.trim().split(/\s+/u).length : 0;
+}
+
+// Editorial prompts, not a classifier: common expressions cannot prove authorship.
+export function inspectWriting(text, format = 'txt', locks = []) {
+  if (text.length > MAX_CHARACTERS) throw new Error('Keep this draft under 100,000 characters.');
+  if (locks.length > 50 || locks.join('').length > 2000) throw new Error('Use up to 50 locked phrases, with 2,000 characters in total.');
+  const protectedSpans = protectedRanges(text, format, locks);
+  const findings = [];
+  const add = (pattern, note) => {
+    for (const match of text.matchAll(pattern)) {
+      if (protectedSpans.some(([start, end]) => match.index < end && match.index + match[0].length > start)) continue;
+      if (findings.length >= 500) throw new Error('More than 500 writing notes. Check a smaller section.');
+      findings.push({ text: match[0], position: match.index + 1, note });
+    }
+  };
+  add(/(?<![\p{L}\p{N}_])(?:it is (?:important|worthwhile) to note that|it should be noted that|in today's fast-paced world|in the modern era)(?![\p{L}\p{N}_])/giu, 'Consider starting with the point itself.');
+  add(/(?<![\p{L}\p{N}_])(?:as an ai(?: language model)?|i hope this helps|let me know if you (?:have|need)|here is the (?:revised|rewritten) (?:text|version))(?![\p{L}\p{N}_])/giu, 'Check whether this assistant-style aside belongs in the final draft.');
+  add(/(?<![\p{L}\p{N}_])(?:seamless(?:ly)?|game-changing|cutting-edge|unparalleled)(?![\p{L}\p{N}_])/giu, 'Consider a concrete detail that supports this description.');
+  return findings.sort((a, b) => a.position - b.position);
 }
 
 export function validateFile(name, size) {

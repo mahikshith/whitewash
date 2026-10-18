@@ -1,6 +1,7 @@
-import { proposeEdits, applyEdits, inspectCharacters, wordCount, MAX_CHARACTERS } from './engine.js';
+import { proposeEdits, applyEdits, inspectCharacters, inspectWriting, wordCount, MAX_CHARACTERS } from './engine.js';
 import { tools, toolFromHash, statusLabel } from './tools.js';
 import { readTextFile } from './uploads.js';
+import { showOffice } from './office-ui.js';
 
 const $ = (id) => document.getElementById(id);
 let active = null;
@@ -80,19 +81,23 @@ function route() {
   if (location.hash === '#content') { $('content').focus(); return; }
   active = toolFromHash(location.hash);
   const ready = active?.state === 'ready';
+  const office = ready && active.mode === 'office';
   $('home-view').hidden = !!active;
-  $('tool-view').hidden = !ready;
+  $('tool-view').hidden = !ready || office;
+  $('office-view').hidden = !office;
+  showOffice(office ? active : null);
   $('upcoming-view').hidden = !active || ready;
   $('tools-menu').open = false;
   document.title = active ? active.title + ' — Whitewash' : 'Whitewash — All tools';
-  if (ready) {
+  if (ready && !office) {
     $('page-title').textContent = active.title;
     $('page-description').textContent = active.description;
     $('run').textContent = active.action;
     $('options').hidden = active.mode === 'inspect';
+    $('cleanup-settings').hidden = active.mode === 'writing';
     if (editorMode !== active.mode) { editorMode = active.mode; invalidate(); }
     fileGate();
-  } else if (active) {
+  } else if (active && !ready) {
     $('upcoming-title').textContent = active.title;
     $('upcoming-description').textContent = active.state === 'research'
       ? 'This tool is still in research.'
@@ -167,13 +172,26 @@ function processDraft() {
   if (active?.state !== 'ready' || !$('draft').value.length) return;
   try {
     if ($('draft').value.length > MAX_CHARACTERS) throw new Error('Keep the draft under 100,000 characters.');
-    const inspecting = active.mode === 'inspect';
+    const inspecting = ['inspect', 'writing'].includes(active.mode);
     $('result').hidden = inspecting;
     $('character-report').hidden = !inspecting;
     $('copy').hidden = inspecting;
     $('download').hidden = inspecting;
-    $('output-title').textContent = inspecting ? 'Character check' : 'Result';
-    if (inspecting) {
+    $('output-title').textContent = inspecting ? active.title : 'Result';
+    if (active.mode === 'writing') {
+      const items = inspectWriting($('draft').value, $('format').value, $('locks').value.split(/\r?\n/).filter(Boolean));
+      $('character-report').replaceChildren();
+      const intro = document.createElement('p'); intro.textContent = 'Editorial notes only. These phrases do not establish AI authorship.';
+      $('character-report').append(intro);
+      for (const item of items) {
+        const row = document.createElement('div'); row.className = 'office-change';
+        const phrase = document.createElement('p'); phrase.textContent = item.text;
+        const note = document.createElement('small'); note.textContent = item.note + ' Position ' + item.position + '.';
+        row.append(phrase, note); $('character-report').append(row);
+      }
+      if (!items.length) { const p = document.createElement('p'); p.textContent = 'No matching phrases found.'; $('character-report').append(p); }
+      $('edit-count').textContent = items.length + ' notes'; $('changes-panel').hidden = true;
+    } else if (inspecting) {
       const items = inspectCharacters($('draft').value);
       $('character-report').replaceChildren();
       for (const item of items) {
@@ -188,7 +206,7 @@ function processDraft() {
       $('changes-panel').hidden = true;
     } else {
       original = $('draft').value;
-      edits = proposeEdits(original, { mode: active.mode, format: $('format').value, spaces: $('spaces').checked, softHyphens: $('soft-hyphens').checked, zeroWidth: $('zero-width').checked, locks: $('locks').value.split(/\r?\n/).filter(Boolean) });
+      edits = proposeEdits(original, { mode: active.mode, format: $('format').value, spaces: $('spaces').checked, softHyphens: $('soft-hyphens').checked, zeroWidth: $('zero-width').checked, punctuation: $('punctuation').checked, locks: $('locks').value.split(/\r?\n/).filter(Boolean) });
       selected = new Set(edits.map((edit) => edit.id));
       $('changes-panel').hidden = !edits.length;
       $('changes-panel').open = false;
@@ -207,10 +225,10 @@ $('draft').addEventListener('paste', (event) => {
     event.preventDefault(); notify('Paste a smaller section. The limit is 100,000 characters.');
   }
 });
-for (const id of ['format', 'spaces', 'soft-hyphens', 'zero-width']) $(id).addEventListener('change', invalidate);
+for (const id of ['format', 'spaces', 'soft-hyphens', 'zero-width', 'punctuation']) $(id).addEventListener('change', invalidate);
 $('locks').addEventListener('input', invalidate);
 $('sample').addEventListener('click', () => {
-  replace('At this point in time, we want to utilize customer feedback.\n\nThe estimate is INR\u00a048,500 for 12 teams. Keep the original figures in order to review the budget.', '', 'txt', false);
+  replace(active.mode === 'writing' ? 'It is important to note that this is a seamless process.\n\nWe completed the review on Friday. I hope this helps.' : 'At this point in time, we want to utilize customer feedback.\n\nThe estimate is INR\u00a048,500 for 12 teams. Keep the original figures in order to review the budget.', '', 'txt', false);
   processDraft();
 });
 $('clear').addEventListener('click', () => { replace('', '', 'txt', fileLoaded); $('draft').focus(); });
@@ -225,12 +243,12 @@ $('undo-replace').addEventListener('click', () => {
 $('keep-all').addEventListener('click', () => { selected = new Set(edits.map((edit) => edit.id)); changes(); });
 $('reject-all').addEventListener('click', () => { selected.clear(); changes(); });
 $('copy').addEventListener('click', async () => {
-  if ($('output').hidden || active?.mode === 'inspect') return;
+  if ($('output').hidden || ['inspect', 'writing'].includes(active?.mode)) return;
   try { await navigator.clipboard.writeText(resultText); notify('Copied.'); }
   catch { notify('Clipboard unavailable. Use Download instead.'); }
 });
 $('download').addEventListener('click', () => {
-  if ($('output').hidden || active?.mode === 'inspect') return;
+  if ($('output').hidden || ['inspect', 'writing'].includes(active?.mode)) return;
   const extension = $('format').value;
   const url = URL.createObjectURL(new Blob([resultText], { type: extension === 'md' ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8' }));
   const link = document.createElement('a'); link.href = url; link.download = (filename || 'draft').replace(/\.(txt|md|markdown)$/i, '') + '-edited.' + extension;
@@ -269,14 +287,17 @@ function dialog(title, paragraphs) {
   $('info-dialog').showModal();
 }
 $('privacy').addEventListener('click', () => dialog('Privacy', [
-  'The working text tools run in this tab. No draft is sent to a model or detector. Only your appearance preference is stored locally.',
+  'The working text and Office tools run in this tab. No draft or file is sent to a model, detector or processing server. Only your appearance preference is stored locally.',
   'Home and tool navigation keep the in-tab draft. Reloading or closing the tab clears it. Hosting access logs, downloaded files and your clipboard are separate.',
 ]));
 $('help').addEventListener('click', () => dialog('Help', [
   'Choose a tool, add text, then use its main button. File processing accepts one UTF-8 TXT or Markdown file, up to 400 KB and 100,000 characters. Originals are preserved.',
   'Light edit uses English phrase rules. Review changes is optional; reject any edit before copying or downloading. Options protect exact phrases and control cleanup.',
   'Markdown protection is conservative, not a full renderer. Joiners and direction controls are retained. Character counts do not determine human authorship or statistical watermarks.',
-  'Tools marked Soon or Research are not available. PDF, Office, metadata, AI rewriting and provider watermark checks are not connected yet.',
+  'Office tools accept one DOCX, PPTX or XLSX up to 10 MB; expanded package limit 30 MB, 1,000 parts, 5 MB per XML part, 100,000 editable characters and 500 edits. Encrypted, signed and macro-enabled files are rejected. ZIP64 is unsupported. English phrase edits use rules, not a model.',
+  'Office copies preserve untouched package payloads. Edited XML is reserialized and checked for structural changes. A shorter phrase can alter line wrapping. Spreadsheet first-row labels, formulas, numbers and short cells remain unchanged. Review the copy in your Office app.',
+  'Metadata cleaning clears standard core/custom properties, selected application properties and ZIP dates/comments. It does not scrub comments, revisions, embedded media, visible content or statistical watermarks. It is not complete anonymization.',
+  'Tools marked Soon or Research are not available. PDF editing, AI rewriting, AI classification and provider watermark checks remain unconnected.',
 ]));
 $('close-dialog').addEventListener('click', () => $('info-dialog').close());
 $('info-dialog').addEventListener('click', (event) => {

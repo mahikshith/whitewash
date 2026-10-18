@@ -1,0 +1,13 @@
+{
+  "lynote_postprocessor": {
+    "input": "The robust_value identifier and \"robust\" quote must remain unchanged.",
+    "actual": "The strong_value identifier and \"robust\" quote must remain unchanged.",
+    "quoted_input_output": "The quote is \"strong\".",
+    "identifier_and_quote_changed": true
+  },
+  "turnitout_demo": {
+    "hardcoded_4_percent": true,
+    "hardcoded_0_percent": true
+  },
+  "limits": "Narrow source-path checks only. No model, detector or provider watermark experiment was run."
+}

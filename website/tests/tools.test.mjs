@@ -12,9 +12,9 @@ test('every directory entry has a unique, directly addressable task page', () =>
 });
 
 test('only implemented tools have a processing action and mode', () => {
-  assert.equal(tools.filter((tool) => tool.state === 'ready').length, 4);
+  assert.equal(tools.filter((tool) => tool.state === 'ready').length, 9);
   for (const tool of tools) {
-    if (tool.state === 'ready') { assert.ok(tool.action); assert.ok(['clean', 'polish', 'inspect'].includes(tool.mode)); }
+    if (tool.state === 'ready') { assert.ok(tool.action); assert.ok(['clean', 'polish', 'inspect', 'writing', 'office'].includes(tool.mode)); }
     else { assert.equal(tool.action, undefined); assert.ok(['Soon', 'Research'].includes(statusLabel(tool))); }
   }
 });
