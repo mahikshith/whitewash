@@ -43,3 +43,7 @@ Browser checks covered the 13-card home, clear AI-draft purpose and file-task la
 The previously declined browser file-upload action was not retried or recreated. Office file selection through the browser remains unverified; independent synthetic file/library checks covered the processing and export logic. No external detector, model or provider watermark was queried, and no competitive quality benchmark was run. Two narrow upstream source findings are reproducible with `scripts/check-supplied-source.py` and recorded in `research/supplied-source-checks.json`.
 
 Final copy verification: all thirteen feature titles explicitly contain AI. Browser checks confirmed the homepage, top-menu labels and an individual Office task heading. The owner-private live deployment displayed the same copy and reported no browser warnings/errors.
+
+## Before-and-after homepage cards
+
+18 October 2026. All thirteen catalog entries define an input and an outcome. Browser checks confirmed thirteen visible conversion flows/arrows, retained New/Soon/Research badges and matching accessible status labels. Desktop cards use a right arrow; at a 334 CSS px mobile width the sequence stacks with a down arrow and no horizontal overflow. Both themes were checked. JavaScript syntax and catalog completeness checks passed. Text/file processing was unchanged, so the processing suite and file round trips were not rerun for this presentation-only update.

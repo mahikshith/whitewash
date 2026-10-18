@@ -39,10 +39,14 @@ for (const tool of tools) {
   card.href = '#' + tool.id;
   card.className = 'tool-card';
   card.dataset.tool = tool.id;
-  const title = document.createElement('h2'); title.textContent = tool.title;
-  const description = document.createElement('p'); description.textContent = tool.description;
-  card.append(icon(tool), title, description);
+  const title = document.createElement('h2'); title.className = 'tool-flow';
+  const before = document.createElement('span'); before.className = 'flow-before'; before.textContent = tool.before;
+  const arrow = document.createElement('span'); arrow.className = 'flow-arrow'; arrow.textContent = '→'; arrow.setAttribute('aria-hidden', 'true');
+  const after = document.createElement('span'); after.className = 'flow-after'; after.textContent = tool.after;
+  title.append(before, arrow, after);
+  card.append(icon(tool), title);
   const label = statusLabel(tool);
+  card.setAttribute('aria-label', tool.title + ': ' + tool.before + ' to ' + tool.after + (label ? '. ' + label : ''));
   if (label) {
     const status = document.createElement('span');
     status.className = 'status' + (tool.isNew ? ' new' : '');

@@ -33,3 +33,7 @@ Paid value must come from successful repeated tasks, less repair work and reliab
 ## Purpose-led labels
 
 The homepage says "Humanize AI-written text" with "Convert AI drafts into clearer, more natural writing." Every feature title explicitly uses AI: "AI text in Word", "AI text in slides", "AI text in spreadsheets", "AI file metadata", "AI writing check", and the other focused tasks. The shared catalog supplies the homepage boxes, top menu and individual page headings, so wording stays consistent everywhere. These are tasks for refining AI drafts inside supported formats. Keep the short descriptions, simple boxes and one primary action.
+
+## Input to outcome cards
+
+The homepage boxes now show only the input, an arrow and the outcome beneath the icon, such as "AI Word draft → Clearer Word text" and "Wordy AI text → Plain wording". Repeated "AI text in..." titles and explanatory paragraphs are absent from the visible cards. `before` and `after` live in the shared tool catalog; the existing detailed title/description remain available on the focused task page and in the menu. Soon/Research/New remain visible and included in accessible card labels. On narrow screens the same sequence stacks vertically with a down arrow.
