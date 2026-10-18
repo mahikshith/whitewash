@@ -2,7 +2,7 @@
 
 18 October 2026. The useful result of this review is five working tools: refine Word text, refine slide text, refine spreadsheet prose, clear Office properties, and check writing for reviewable phrases. These are bounded local tools, not a general Office editor or a model-powered rewrite service.
 
-The homepage now states the purpose: **Make AI drafts clearer.** File cards name the text task rather than calling Whitewash a Word, presentation or spreadsheet editor.
+The homepage now states the purpose: **Humanize AI-written text.** Every feature title explicitly says AI; file cards name the AI-text task rather than calling Whitewash a general Office editor.
 
 ## Coverage and branches
 

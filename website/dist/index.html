@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Make AI drafts clearer. Refine wording inside your text, documents, slides and spreadsheets.">
+<meta name="description" content="Humanize AI-written text. Convert AI drafts into clearer, more natural writing in your text, documents, slides and spreadsheets.">
 <meta name="theme-color" content="#14795c">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Whitewash — All tools</title>
@@ -21,7 +21,7 @@
 </header>
 <div id="content" tabindex="-1">
 <main id="home-view" class="home">
-  <div class="home-heading"><h1>Make AI drafts clearer.</h1><p>Refine the wording in your text, documents, slides and spreadsheets.</p></div>
+  <div class="home-heading"><h1>Humanize AI-written text.</h1><p>Convert AI drafts into clearer, more natural writing.</p></div>
   <div id="tool-grid" class="tool-grid" aria-label="All writing tools"></div>
 </main>
 <main id="tool-view" class="tool-page" hidden>
@@ -29,8 +29,8 @@
   <div class="tool-heading"><h1 id="page-title"></h1><p id="page-description"></p></div>
   <section id="file-entry" class="file-entry" hidden><button class="primary large" id="select-file">Select text file</button><p>TXT or Markdown · up to 400 KB</p></section>
   <section id="editor" class="editor" aria-label="Text workspace">
-    <div class="input-toolbar"><label for="draft">Your text</label><span id="document-name"></span><button id="upload" class="text-button">Upload TXT / MD</button><button id="sample" class="text-button">Try sample</button></div>
-    <textarea id="draft" placeholder="Paste your text here…" spellcheck="false" maxlength="100000" aria-describedby="input-count"></textarea>
+    <div class="input-toolbar"><label for="draft">Your AI text</label><span id="document-name"></span><button id="upload" class="text-button">Upload TXT / MD</button><button id="sample" class="text-button">Try sample</button></div>
+    <textarea id="draft" placeholder="Paste your AI text here…" spellcheck="false" maxlength="100000" aria-describedby="input-count"></textarea>
     <div class="input-bottom"><span id="input-count">0 words</span><button id="undo-replace" class="text-button" hidden>Undo replace</button><button id="clear" class="text-button">Clear</button></div>
     <div class="primary-row"><button id="run" class="primary" disabled>Clean text</button></div>
     <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Text</option><option value="md">Markdown</option></select></label><div id="cleanup-settings" class="options-content"><label><input type="checkbox" id="spaces" checked> Regular spaces</label><label><input type="checkbox" id="soft-hyphens" checked> Remove soft hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>May affect word boundaries.</small></label><label><input type="checkbox" id="punctuation"> Plain punctuation <small>Spaced dashes, apostrophes and ellipses.</small></label></div><label for="locks">Keep these phrases exactly</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One phrase per line"></textarea><small>Up to 50 case-sensitive phrases.</small></div></details>
