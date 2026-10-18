@@ -20,3 +20,9 @@ Use the same persisted project ID on updates. Keep credentials in session memory
 ## Dark-mode update
 
 18 October 2026: private deployment `appgdep_6ad4214ac9348191b248109884fc4860` succeeded at the same URL. Version: `appgprj_6ad3dd2e0cb08191a5da67d8ea9ee005~appgver_219fe1eb317881919623a21b42e60096`. Sites source: `37032e18379ec52152aba28c3ef5c11f980bb37f`; GitHub implementation: `2c07d29`. All twelve website source files matched the deployment checkout. The live browser showed the dark theme and working appearance control. No audience change was made.
+
+## Tool-directory redesign
+
+18 October 2026: deployment `appgdep_6ad42a6ce75c8191940872f92bf26102` succeeded at the same owner-private URL. Version: `appgprj_6ad3dd2e0cb08191a5da67d8ea9ee005~appgver_c67a188af470819193130c520671e78d`. Fresh Sites source: `926a73a7fbb08f6d623d63544fe603a847666199`; GitHub implementation: `d3f329c`. All fifteen website files matched the publishing checkout, and each packaged browser asset was byte-compared with the tested source. The live browser confirmed all twelve directory entries, the consistent font and a focused Clean text page.
+
+Automatic approval review initially rejected cached opening metadata as stale. That helper was cancelled before input execution. Recovery validated both repository states, refreshed source metadata with the official helper's full sync/package flow, and used only its newly pushed commit and newly verified archive. The parent GitHub and Sites source repositories have different Git histories; do not substitute one repository's SHA for the other.
