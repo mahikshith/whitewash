@@ -23,3 +23,11 @@ The full-page screenshot endpoint was unavailable; viewport screenshots were ava
 ## Dark-mode update
 
 Sixteen tests now pass (the original twelve plus four appearance tests). Theme checks cover device defaults before controls load, saved-choice precedence, explicit toggling, invalid saved values and disabled storage. Browser checks verified keyboard toggling, preference persistence after reload, retained edit selections, dark dialog colors, mobile control visibility and no horizontal overflow at a reported 334 CSS px. Application text now discloses the saved appearance preference; drafts remain memory-only.
+
+## Tool-directory redesign
+
+Twenty-three tests pass: processing/Unicode/protection checks, theme behavior, tool routes and availability, and UTF-8 file validation. Synthetic byte fixtures verify BOM/Markdown/multilingual preservation and reject invalid encoding, binary data, unsupported formats, oversized bytes and oversized text before processing.
+
+Browser checks verified the 12-tile directory, distinct Clean text/Light edit/Character check pages, one-action results, collapsed optional review, rejection restoring source spans, stale results hidden after input changes, Home navigation preserving the draft and choices, and a PDF status page with no processing form. Light/dark layouts and a narrow viewport were checked. At the reported 334 CSS px mobile width there was no horizontal overflow; the primary action was within the first viewport. One consistent sans-serif family was confirmed.
+
+Browser file uploads were not retried after the user declined the earlier upload-automation request. Only synthetic local-byte unit tests were used for file validation in this redesign; the new selection-to-result UI flow is not browser-verified. No workaround for the denied upload action was attempted. Competitive conversion/retention, paid outputs, model inference and provider watermark verification remain untested.
