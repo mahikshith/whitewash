@@ -8,6 +8,8 @@
 | [ui-teardown.md](ui-teardown.md) | How the drag → wheel → drop → result flow works in Open-Tangerine and og-converter, with geometry, timings, colours and a web translation |
 | [conversion-research.md](conversion-research.md) | What iLovePDF, Smallpdf, PDF24, CloudConvert and the open-source browser converters offer, and which of those can run fully in a browser |
 | [copy-audit.md](copy-audit.md) | Why the current site reads as machine-written, line by line |
+| [audio-archives-synthid.md](audio-archives-synthid.md) | Browser audio and archive libraries compared, why video is out, and the SynthID removal repos with the decision not to build it |
+| [later.md](later.md) | Parked ideas, including AI features with your own key or paid credits |
 
 ## Sources
 

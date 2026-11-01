@@ -15,7 +15,7 @@ The old homepage was 13 identical tiles under a generic tagline, with "AI" in ne
 
 ## The wheel
 
-Drag a file over the homepage and a glass radial wheel opens under the cursor. It offers only what fits the file: Polish, AI tells, Clean and quick conversions for text; Polish, Wipe info and conversions for Office files; Word, Polish, JPG, Wipe info and Pages for a PDF; Merge for several PDFs; JPG, PNG, WebP, PDF, Wipe info and Resize for images. "More" opens the full converter. Drop on an option to run it. Dropping on the middle, or outside, keeps the wheel open so you can pick with the pointer or the arrow keys.
+Drag a file over the homepage and a glass radial wheel opens under the cursor. It offers only what fits the file: Polish, AI tells, Clean and quick conversions for text; Polish, Wipe info and conversions for Office files; Word, Polish, JPG, Wipe info and Pages for a PDF; Merge for several PDFs; JPG, PNG, WebP, PDF, Wipe info and Resize for images; other audio formats for a sound file, MP3, M4A or WAV for a video; Open plus other archive formats for an archive; and ZIP for any set of several files. "More" opens the full converter. Drop on an option to run it. Dropping on the middle, or outside, keeps the wheel open so you can pick with the pointer or the arrow keys.
 
 Measurements come from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)): 62 px inner radius, 150 px outer, 6 px gaps, 12 px corners, a spring open with a staggered fan-out, and a 6 px outward nudge on hover. The code is our own.
 

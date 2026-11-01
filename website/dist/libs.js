@@ -33,3 +33,18 @@ export const fontBytes = (name) => once('font:' + name, () => fetch(new URL('fon
   if (!r.ok) throw new Error('Couldn’t load the PDF font.');
   return r.arrayBuffer();
 }));
+export const media = () => once('media', () => import('./vendor/media/mediabunny.min.mjs'));
+// MP3, FLAC and AAC encoders are only registered when the browser can't encode them itself.
+export const mediaEncoder = (codec) => once('encoder:' + codec, async () => {
+  const mb = await media();
+  if (await mb.canEncodeAudio(codec)) return;
+  if (codec === 'mp3') (await import('./vendor/media/mp3-encoder.min.mjs')).registerMp3Encoder();
+  else if (codec === 'flac') (await import('./vendor/media/flac-encoder.min.mjs')).registerFlacEncoder();
+  else if (codec === 'aac') (await import('./vendor/media/aac-encoder.min.mjs')).registerAacEncoder();
+});
+export const archive = () => once('archive', async () => {
+  const lib = await import('./vendor/libarchive/libarchive.js');
+  lib.Archive.init({ workerUrl: new URL('libarchive/worker-bundle.js', base) });
+  return lib;
+});
+export const fflate = () => once('fflate', () => import('./vendor/fflate.mjs'));

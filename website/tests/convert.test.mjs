@@ -15,10 +15,16 @@ test('formats come from the extension first, then the MIME type', () => {
   assert.equal(detectFormat({ name: 'Report.DOCX' }), 'docx');
   assert.equal(detectFormat({ name: 'page.htm' }), 'html');
   assert.equal(detectFormat({ name: 'x', type: 'application/pdf' }), 'pdf');
-  assert.equal(detectFormat({ name: 'clip.mp4', type: 'video/mp4' }), null);
+  assert.equal(detectFormat({ name: 'clip.avi', type: 'video/x-msvideo' }), null);
+  assert.equal(detectFormat({ name: 'clip.mp4' }), 'mp4');
+  assert.equal(detectFormat({ name: 'Backup.TAR.GZ' }), 'tgz');
+  assert.equal(detectFormat({ name: 'notes.txt.gz' }), 'gz');
+  assert.equal(detectFormat({ name: 'x', type: 'audio/x-wav' }), 'wav');
+  assert.ok(targets('mp4').includes('mp3') && !targets('mp4').includes('webm'), 'video gives sound only');
+  assert.ok(targets('rar').includes('zip') && !targets('zip').includes('rar'), 'RAR can be read, not written');
   assert.ok(targets('md').includes('pdf') && targets('md').includes('docx') && !targets('md').includes('md'));
   assert.ok(targets('pdf').includes('jpg'));
-  assert.ok(conversionCount() > 120, 'about 150 honest routes');
+  assert.ok(conversionCount() > 240, 'about 250 routes with audio and archives');
 });
 
 test('CSV quoting, delimiters and round trips', () => {
@@ -141,4 +147,13 @@ test('images in a PDF lose their camera details', async () => {
   const bytes = await imagesToPdf([{ bytes: new Uint8Array(fs.readFileSync(url)), type: 'image/jpeg' }]);
   const raw = Buffer.from(bytes).toString('latin1');
   assert.ok(!raw.includes('Canon') && !raw.includes('GPS'), 'no EXIF in the PDF');
+});
+
+test('archive names and paths are made safe', async () => {
+  const { safePath, stripArchiveExtension, archiveFormat } = await import('../dist/conv-archive.js');
+  assert.equal(safePath('../../etc/passwd'), 'etc/passwd');
+  assert.equal(safePath('/abs\\win\\file.txt'), 'abs/win/file.txt');
+  assert.equal(stripArchiveExtension('photos.tar.xz'), 'photos');
+  assert.equal(archiveFormat('a.tbz2'), 'tbz2');
+  assert.equal(archiveFormat('a.docx'), null);
 });

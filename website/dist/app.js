@@ -8,6 +8,9 @@ import { showConvert, loadConvert, quickConvertFile } from './convert-ui.js';
 import { showPdf, loadPdf, setPolishHandler } from './pdf-ui.js';
 import { showWipe, loadWipe, quickWipe } from './wipe-ui.js';
 import { PICKER_ACCEPT } from './actions.js';
+import { showArchive, loadArchive } from './archive-ui.js';
+import * as island from './island.js';
+import { formatBytes } from './images.js';
 
 const $ = (id) => document.getElementById(id);
 let active = null;
@@ -120,7 +123,7 @@ function route() {
   const office = ready && active.mode === 'office';
   const image = ready && active.mode === 'image';
   const mode = ready ? active.mode : null;
-  const separate = ['office', 'image', 'convert', 'pdf', 'wipe'].includes(mode);
+  const separate = ['office', 'image', 'convert', 'pdf', 'wipe', 'archive'].includes(mode);
   $('home-view').hidden = !!active;
   $('tool-view').hidden = !ready || separate;
   $('office-view').hidden = !office;
@@ -128,12 +131,14 @@ function route() {
   $('convert-view').hidden = mode !== 'convert';
   $('pdf-view').hidden = mode !== 'pdf';
   $('wipe-view').hidden = mode !== 'wipe';
+  $('archive-view').hidden = mode !== 'archive';
   $('float-orb').hidden = !active;
   showOffice(office ? active : null);
   showImages(image ? active : null);
   showConvert(mode === 'convert' ? active : null);
   showPdf(mode === 'pdf' ? active : null);
   showWipe(mode === 'wipe' ? active : null);
+  showArchive(mode === 'archive' ? active : null);
   $('upcoming-view').hidden = !active || ready;
   $('tools-menu').open = false;
   document.title = active ? active.title + ' · Whitewash' : 'Whitewash: make AI drafts sound like you';
@@ -385,6 +390,7 @@ async function runAction(action, files) {
   if (action.convert) { quickConvert(files, action); return; }
   if (action.to) { for (const file of files) await quickConvertFile(file, action.to); return; }
   if (action.wipe) { quickWipe(files); return; }
+  if (action.zip) { quickZip(files); return; }
   await openTool(action.tool);
   const tool = toolFromHash('#' + action.tool);
   if (tool.mode === 'office') loadOfficeFile(files[0]);
@@ -392,8 +398,21 @@ async function runAction(action, files) {
   else if (tool.mode === 'convert') loadConvert(files);
   else if (tool.mode === 'pdf') loadPdf(files);
   else if (tool.mode === 'wipe') loadWipe(files);
+  else if (tool.mode === 'archive') loadArchive(files);
   else loadFile(files[0]);
 }
+// From the wheel: pack the dropped files into one ZIP and save it.
+async function quickZip(files) {
+  island.progress('Packing a ZIP', files.length + (files.length === 1 ? ' file' : ' files'), null);
+  try {
+    const { writeArchive } = await import('./conv-archive.js');
+    const name = files.length === 1 ? files[0].name.replace(/\.[^.]+$/, '') : 'files';
+    const blob = await writeArchive(files.map((file) => ({ path: file.name, file })), 'zip');
+    island.saveBlob(blob, name + '.zip');
+    island.done('Saved ' + name + '.zip', files.length + (files.length === 1 ? ' file · ' : ' files · ') + formatBytes(blob.size), { label: 'Save again', run: () => island.saveBlob(blob, name + '.zip') });
+  } catch (error) { island.fail('Couldn’t make the ZIP', error.message); }
+}
+
 setPolishHandler(async (text, name) => {
   await openTool('light-edit');
   if (text.length > MAX_CHARACTERS) { notify('That PDF has over 100,000 characters of text. Only the first part was loaded.'); text = text.slice(0, MAX_CHARACTERS); }

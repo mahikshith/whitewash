@@ -4,6 +4,8 @@
 import * as libs from './libs.js';
 import * as docs from './conv-doc.js';
 import * as data from './conv-data.js';
+import { AUDIO_IN, AUDIO_OUT } from './conv-audio.js';
+import { ARCHIVE_IN, ARCHIVE_OUT, EXTENSION, archiveFormat, stripArchiveExtension } from './conv-archive.js';
 
 export const FORMATS = {
   txt: { label: 'TXT', name: 'Plain text', mime: 'text/plain' },
@@ -31,8 +33,33 @@ export const FORMATS = {
   svg: { label: 'SVG', name: 'SVG image', mime: 'image/svg+xml' },
   tiff: { label: 'TIFF', name: 'TIFF image', mime: 'image/tiff' },
   ico: { label: 'ICO', name: 'Icon', mime: 'image/x-icon' },
+  mp3: { label: 'MP3', name: 'MP3 audio', mime: 'audio/mpeg' },
+  wav: { label: 'WAV', name: 'WAV audio', mime: 'audio/wav' },
+  flac: { label: 'FLAC', name: 'FLAC audio (lossless)', mime: 'audio/flac' },
+  ogg: { label: 'OGG', name: 'Ogg audio (Opus)', mime: 'audio/ogg' },
+  opus: { label: 'Opus', name: 'Opus audio', mime: 'audio/opus' },
+  m4a: { label: 'M4A', name: 'M4A audio (AAC)', mime: 'audio/mp4' },
+  aac: { label: 'AAC', name: 'AAC audio', mime: 'audio/aac' },
+  weba: { label: 'WEBA', name: 'WebM audio', mime: 'audio/webm' },
+  mp4: { label: 'MP4', name: 'MP4 video (sound only)', mime: 'video/mp4' },
+  mov: { label: 'MOV', name: 'QuickTime video (sound only)', mime: 'video/quicktime' },
+  mkv: { label: 'MKV', name: 'Matroska video (sound only)', mime: 'video/x-matroska' },
+  webm: { label: 'WebM', name: 'WebM video (sound only)', mime: 'video/webm' },
+  zip: { label: 'ZIP', name: 'ZIP archive', mime: 'application/zip' },
+  '7z': { label: '7Z', name: '7-Zip archive', mime: 'application/x-7z-compressed' },
+  rar: { label: 'RAR', name: 'RAR archive', mime: 'application/vnd.rar' },
+  tar: { label: 'TAR', name: 'TAR archive', mime: 'application/x-tar' },
+  tgz: { label: 'TAR.GZ', name: 'Gzipped TAR archive', mime: 'application/gzip' },
+  tbz2: { label: 'TAR.BZ2', name: 'Bzip2 TAR archive', mime: 'application/x-bzip2' },
+  txz: { label: 'TAR.XZ', name: 'XZ TAR archive', mime: 'application/x-xz' },
+  gz: { label: 'GZ', name: 'Gzip file', mime: 'application/gzip' },
+  bz2: { label: 'BZ2', name: 'Bzip2 file', mime: 'application/x-bzip2' },
+  xz: { label: 'XZ', name: 'XZ file', mime: 'application/x-xz' },
 };
-const ALIASES = { htm: 'html', xhtml: 'html', markdown: 'md', jpeg: 'jpg', text: 'txt', tif: 'tiff' };
+export const FAMILY = (id) => AUDIO_IN.includes(id) ? 'audio' : ARCHIVE_IN.includes(id) ? 'archive' : null;
+const ALIASES = { htm: 'html', xhtml: 'html', markdown: 'md', jpeg: 'jpg', text: 'txt', tif: 'tiff', m4v: 'mp4', oga: 'ogg', wave: 'wav' };
+// MIME types browsers report that differ from the ones above.
+const MIME_ALIASES = { 'audio/mp3': 'mp3', 'audio/x-wav': 'wav', 'audio/wave': 'wav', 'audio/x-flac': 'flac', 'audio/x-m4a': 'm4a', 'audio/m4a': 'm4a', 'application/x-zip-compressed': 'zip', 'application/x-rar-compressed': 'rar', 'application/x-gzip': 'gz', 'application/x-tar': 'tar' };
 
 const DOC_IN = ['txt', 'md', 'html', 'docx', 'odt', 'epub', 'pdf', 'pptx'];
 const DOC_OUT = ['pdf', 'docx', 'md', 'html', 'txt', 'odt', 'rtf', 'epub'];
@@ -44,10 +71,12 @@ const IMAGE_IN = ['jpg', 'png', 'webp', 'gif', 'bmp', 'avif', 'svg'];
 const IMAGE_OUT = ['jpg', 'png', 'webp', 'pdf', 'bmp', 'tiff', 'ico'];
 
 export function detectFormat(file) {
+  const archive = archiveFormat(file.name || '');
+  if (archive) return archive;
   const extension = (file.name || '').includes('.') ? file.name.split('.').pop().toLowerCase() : '';
   const id = ALIASES[extension] || extension;
   if (FORMATS[id]) return id;
-  return Object.keys(FORMATS).find((key) => FORMATS[key].mime === file.type) || null;
+  return MIME_ALIASES[file.type] || Object.keys(FORMATS).find((key) => FORMATS[key].mime === file.type) || null;
 }
 
 export function targets(from) {
@@ -58,13 +87,15 @@ export function targets(from) {
   if (from === 'html' || from === 'md') ['xlsx', 'csv', 'json'].forEach((t) => out.add(t));
   if (SUBS.includes(from)) [...SUBS, 'txt'].forEach((t) => out.add(t));
   if (IMAGE_IN.includes(from)) IMAGE_OUT.forEach((t) => out.add(t));
+  if (AUDIO_IN.includes(from)) AUDIO_OUT.forEach((t) => out.add(t));
+  if (ARCHIVE_IN.includes(from)) ARCHIVE_OUT.forEach((t) => out.add(t));
   out.delete(from);
   return [...out];
 }
 
 export const conversionCount = () => Object.keys(FORMATS).reduce((sum, id) => sum + targets(id).length, 0);
 export const inputFormats = () => Object.keys(FORMATS).filter((id) => targets(id).length);
-export const acceptList = () => inputFormats().map((id) => '.' + id).concat(['.htm', '.jpeg', '.markdown']).join(',');
+export const acceptList = () => inputFormats().map((id) => '.' + (EXTENSION[id] || id)).concat(['.htm', '.jpeg', '.markdown', '.tgz', '.m4v']).join(',');
 
 const baseName = (name) => (name || 'file').replace(/\.[^.]+$/, '') || 'file';
 const text = async (file) => new TextDecoder('utf-8').decode(await file.arrayBuffer()).replace(/^﻿/, '');
@@ -216,6 +247,21 @@ export async function convertFile(file, to, progress) {
   const from = detectFormat(file);
   if (!from) throw new Error('Whitewash doesn’t recognise this file type.');
   if (!targets(from).includes(to)) throw new Error(FORMATS[from].label + ' to ' + FORMATS[to].label + ' isn’t supported.');
+  const family = FAMILY(from);
+  if (family === 'audio') {
+    const { convertAudio } = await import('./conv-audio.js');
+    progress?.('Converting sound');
+    const blob = await convertAudio(file, to, { onProgress: (p) => progress?.('Converting sound ' + Math.round(p * 100) + '%') });
+    return [{ blob, name: baseName(file.name) + '.' + to }];
+  }
+  if (family === 'archive') {
+    const { readArchive, writeArchive } = await import('./conv-archive.js');
+    progress?.('Opening ' + FORMATS[from].label);
+    const entries = await readArchive(file, (n) => progress?.('Unpacked ' + n + (n === 1 ? ' file' : ' files')));
+    progress?.('Packing ' + FORMATS[to].label);
+    const base = stripArchiveExtension(file.name);
+    return [{ blob: await writeArchive(entries, to), name: base + '.' + (EXTENSION[to] || to) }];
+  }
   if (file.size > 60_000_000) throw new Error('That file is over 60 MB.');
   const name = baseName(file.name) + '.' + to;
   const wrap = (content) => [{ blob: content instanceof Blob ? content : new Blob([content], { type: FORMATS[to].mime + (typeof content === 'string' ? ';charset=utf-8' : '') }), name }];

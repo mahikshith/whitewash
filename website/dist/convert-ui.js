@@ -42,7 +42,7 @@ export function loadConvert(list) {
   if (!targets(from).length) return fail('There’s nothing to convert ' + FORMATS[from].label + ' files into yet.');
   render();
   $('convert-pick').textContent = 'Choose a different file';
-  if (active?.to && active.from === from && targets(from).includes(active.to)) run(active.to);
+  if (active?.to && [].concat(active.from).includes(from) && targets(from).includes(active.to)) run(active.to);
 }
 
 function fail(message) {

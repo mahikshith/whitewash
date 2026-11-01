@@ -4,7 +4,7 @@ Product discovery for a web and mobile writing tool that improves clarity, clean
 
 Planned feature: Metadata & Privacy, with inspection, selective removal of supported metadata, and a verified export report. Metadata cleanup does not guarantee removal of statistical text watermarks or external provenance records.
 
-Status: browser-local website with the writing tools, about 150 file conversions, PDF tools and a metadata wiper for photos, PDFs and Office files. Model-assisted rewriting, AI classification and provider watermark checks are research/roadmap items, not connected services. Parked ideas are in [research/later.md](research/later.md).
+Status: browser-local website with the writing tools, about 250 file conversions (documents, data, images, audio, archives), PDF tools and a metadata wiper for photos, PDFs and Office files. Model-assisted rewriting, AI classification and provider watermark checks are research/roadmap items, not connected services. Parked ideas are in [research/later.md](research/later.md).
 
 The product must distinguish Unicode cleanup, writing improvement, statistical AI detection, and provider watermark verification. It must not promise universal detector bypass or certify human authorship from a detector score.
 

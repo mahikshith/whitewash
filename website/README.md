@@ -14,6 +14,8 @@ From this directory, run `python -m http.server 4173 --bind 127.0.0.1 --director
 - Edit text file: local UTF-8 TXT/Markdown selection and drag/drop, followed by automatic local light editing; copy/download. Uploaded originals are never rewritten.
 - A homepage with the paste box in the hero, a drop-anywhere radial wheel and grouped tools. 25 tools work; four planned tools have their own status pages. Tool pages show a floating orb that takes drops and opens the same wheel.
 - Convert: about 150 routes between documents (TXT, MD, HTML, DOCX, ODT, RTF, EPUB, PDF, PPTX in), data (CSV, TSV, JSON, XLSX, ODS), subtitles (SRT, VTT) and images (JPG, PNG, WebP, GIF, BMP, AVIF, SVG in; TIFF and ICO out as well). Documents keep text, headings, lists, links and tables, not page layout. Up to 50 files of one type, 60 MB each.
+- Audio: MP3, WAV, FLAC, OGG, Opus, M4A and AAC into MP3, WAV, FLAC, OGG, Opus and M4A, plus the sound from MP4, MOV, MKV and WebM videos. Up to 1 GB. Tags and cover art carry over. Nothing encodes video.
+- Archives: open ZIP, 7Z, RAR, TAR, TAR.GZ/BZ2/XZ, GZ, BZ2 and XZ, save single files out of them, convert them to ZIP, TAR or TAR.GZ, or pack any files into a new one. Up to 300 MB and 10,000 files.
 - PDF tools: merge, split, organize pages with thumbnails, images to PDF, PDF to images, watermark, page numbers, and PDF text into the Polish tool. Password-protected PDFs are refused with a clear message.
 - Metadata wiper: photos, PDFs and Office files, up to 100 at a time. Lists what it found, removes it, then reopens the copy to confirm nothing is left. Photos are not re-encoded.
 - Images: convert between JPG, PNG and WebP, resize, and strip photo metadata, using the browser canvas. Up to 50 images at a time, 40 MB and 100 megapixels each.
@@ -28,7 +30,7 @@ One UTF-8 file, 400 KB, 100,000 UTF-16 code units, up to 500 suggestions per rev
 
 Markdown is edited as text, not rendered. Both fence types, unclosed fences, indented code, inline-code lines, frontmatter, and heading/link/table/HTML/math-like lines are conservatively retained. This is not a complete Markdown parser or a promise of every dialect's structural fidelity. Mixed-script word boundaries are respected. Word counts are space-delimited estimates and are unsuitable for exact Chinese segmentation.
 
-Light edits are not a factual or grammatical certification. Review them in context. This version does not do general model rewriting, persistent voice profiles, OCR of scanned PDFs, layout-faithful Word ↔ PDF, audio or video conversion, AI classification or keyed watermark verification. It cannot certify human authorship or universal watermark removal. There is no billing flow yet.
+Light edits are not a factual or grammatical certification. Review them in context. This version does not do general model rewriting, persistent voice profiles, OCR of scanned PDFs, layout-faithful Word ↔ PDF, video conversion, SynthID removal, password-protected archives, AI classification or keyed watermark verification. It cannot certify human authorship or universal watermark removal. There is no billing flow yet.
 
 ## Publication and source
 
@@ -40,7 +42,7 @@ The comparison protocol is in [the benchmark plan](../docs/research/benchmark-pl
 
 The homepage, the Tools menu and every page heading read from the shared catalog in `dist/tools.js`, which also defines the Writing / Documents / Images groups. Planned tools stay in the catalog with `state: 'soon'` or `'research'` and appear only under "Coming next". Hash URLs such as `#light-edit`, `#word` and `#image-resize` keep the draft in memory, and old `#studio` links still resolve. `dist/styles.css` is the single stylesheet; `dist/theme.js` applies appearance before paint.
 
-Conversions route through `dist/convert.js` (formats, routes, `convertFile`) to the engines `conv-doc.js`, `conv-data.js` and `conv-pdf.js`. Vendored libraries load on first use through `dist/libs.js`; their licences are in `dist/vendor/licenses/`. Photo metadata and the BMP/TIFF/ICO encoders are `image-meta.js` and `image-codecs.js`. The pages are `convert-ui.js`, `pdf-ui.js` and `wipe-ui.js`, sharing `files.js`.
+Audio is `conv-audio.js` (Mediabunny); archives are `conv-archive.js` (libarchive.js to read, fflate and our TAR writer to write) with their page in `archive-ui.js`. Conversions route through `dist/convert.js` (formats, routes, `convertFile`) to the engines `conv-doc.js`, `conv-data.js` and `conv-pdf.js`. Vendored libraries load on first use through `dist/libs.js`; their licences are in `dist/vendor/licenses/`. Photo metadata and the BMP/TIFF/ICO encoders are `image-meta.js` and `image-codecs.js`. The pages are `convert-ui.js`, `pdf-ui.js` and `wipe-ui.js`, sharing `files.js`.
 
 The drop-anywhere wheel lives in `dist/wheel.js` (events and drawing), `dist/wheel-geometry.js` (angles, hit-testing, segment paths) and `dist/actions.js` (which options fit which files). Image conversion uses the canvas in `dist/images.js` and `dist/image-ui.js`; batches download as one ZIP built with the existing `office-zip.js`. The status pill is `dist/island.js`. See [design](../docs/ui-design.md) and [research](../research/README.md).
 

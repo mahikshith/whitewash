@@ -23,13 +23,22 @@ Vendored and lazy-loaded from `dist/vendor/`: pdf-lib, @pdf-lib/fontkit, pdf.js 
 - **Document engine** (`conv-doc.js`): every input becomes a block list (headings, paragraphs, lists, code, quotes, tables, links, bold/italic), and every output is written from it. In: TXT, MD, HTML, DOCX, ODT, EPUB, PDF (text layer), PPTX. Out: PDF, DOCX, MD, HTML, TXT, ODT, RTF, EPUB.
 - **Data engine** (`conv-data.js`): CSV, TSV, JSON, XLSX, ODS in; those plus Markdown, HTML, PDF and DOCX tables out. Tables in HTML or Markdown can come out as spreadsheets.
 - Subtitles SRT ↔ VTT ↔ text. Images JPG, PNG, WebP, GIF, BMP, AVIF, SVG in; JPG, PNG, WebP, PDF, BMP, TIFF, ICO out. PDF → JPG/PNG/WebP, one image per page.
-- About 150 conversion routes in total. Counted honestly: no audio or video.
+- About 150 conversion routes from this phase. Counted honestly: no video.
 - PDF tools: merge, split (ranges or every page), organize (thumbnail grid: move, rotate, delete), images → PDF, PDF → images, watermark, page numbers, PDF text → Polish.
 - **Metadata wiper**: photos (EXIF incl. GPS and serials, XMP, IPTC, C2PA, AI prompt chunks), PDFs (Info dictionary, XMP, PieceInfo, document ID) and Word/PowerPoint/Excel properties. Each copy is reopened and checked before it is offered.
 - Every new PDF is written with no producer, creator or dates. Images placed into PDFs have their camera details stripped first.
 - The wheel offers conversions, merge and wipe for each file type, and a floating orb on tool pages accepts drops too.
 
 Word ↔ PDF keeps text, headings, lists, links and tables, not page layout. That is stated in the tool descriptions.
+
+## Phase 2b: audio and archives (shipped)
+
+See [audio-archives-synthid.md](audio-archives-synthid.md).
+
+- **Audio** with Mediabunny (MPL-2.0) plus its MP3, FLAC and AAC encoder add-ons, loaded only when the browser can't encode that codec itself. In: MP3, WAV, FLAC, OGG, Opus, M4A, AAC, WebM audio, and the sound track of MP4, MOV, MKV and WebM videos. Out: MP3, WAV, FLAC, OGG (Opus), Opus, M4A. Title, artist and cover art carry over.
+- **Archives**: libarchive.js opens ZIP, 7Z, RAR, TAR, TAR.GZ, TAR.BZ2, TAR.XZ, GZ, BZ2 and XZ. fflate and our own TAR writer make ZIP, TAR and TAR.GZ. New archives record a fixed 1980 date for every file. The wheel offers "ZIP" for any set of dropped files.
+- The CSP adds `blob:` to `worker-src`, because the audio encoders start their workers from blobs.
+- About 250 conversion routes in total.
 
 ## Phase 3: heavier tools (WASM)
 
@@ -44,7 +53,8 @@ Adds `'wasm-unsafe-eval'` to the CSP. Each library is lazy-loaded and comes with
 ## Not building
 
 - **Word ↔ PDF with layout.** It needs a LibreOffice WASM build of tens of MB plus server headers, and the output still breaks. This is the conversion people search for most, so the site should say plainly that it isn't offered.
-- **Video and audio conversion.** ffmpeg.wasm is about 30 MB, crashes on phones and pulls in GPL parts.
+- **Video conversion.** Encoding video needs ffmpeg.wasm (about 30 MB, crashes on phones, GPL parts, special server headers) or a server. Removed from scope on 1 November 2026. Reading a video for its sound is fine and shipped.
+- **SynthID removal.** See [audio-archives-synthid.md](audio-archives-synthid.md): not built, by decision.
 - **"Compress PDF"** unless it actually resamples images. Anything else saves a few percent and would be a misleading label.
 - **Matching CloudConvert's 200+ formats.** They run servers.
 

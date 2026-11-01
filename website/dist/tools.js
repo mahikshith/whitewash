@@ -1,9 +1,10 @@
 export const groups = [
   { id: 'writing', title: 'Writing', blurb: 'Paste a draft, get a cleaner one back.' },
-  { id: 'convert', title: 'Convert', blurb: 'Documents, PDFs, spreadsheets, subtitles and images. About 150 conversions, all on your device.' },
+  { id: 'convert', title: 'Convert', blurb: 'Documents, PDFs, spreadsheets, subtitles, images, audio and archives. About 250 conversions, all on your device.' },
   { id: 'pdf', title: 'PDF', blurb: 'Merge, split, reorder and stamp PDFs without uploading them.' },
   { id: 'documents', title: 'Office files and privacy', blurb: 'Fix the words inside Office files, or wipe the hidden info from any file.' },
   { id: 'images', title: 'Images', blurb: 'Convert and shrink photos.' },
+  { id: 'media', title: 'Audio and archives', blurb: 'Convert sound files, and open, convert or make ZIP, 7Z and TAR archives.' },
 ];
 
 export const tools = [
@@ -31,6 +32,9 @@ export const tools = [
   { id: 'presentations', group: 'documents', title: 'Polish slide decks', description: 'Polishes the text on your .pptx slides. Notes and layouts are left alone.', state: 'ready', icon: 'file', label: 'P', mode: 'office', action: 'Choose a slide deck', accept: '.pptx' },
   { id: 'spreadsheets', group: 'documents', title: 'Polish spreadsheets', description: 'Polishes long text cells in an .xlsx. Formulas and numbers stay as they are.', state: 'ready', icon: 'file', label: 'X', mode: 'office', action: 'Choose a spreadsheet', accept: '.xlsx' },
   { id: 'image-convert', group: 'images', title: 'Convert images', description: 'JPG, PNG and WebP into each other, a whole batch at once. More formats in Convert.', state: 'ready', icon: 'image', mode: 'image', action: 'Choose images' },
+  { id: 'audio-convert', group: 'media', title: 'Convert audio', description: 'MP3, WAV, FLAC, OGG, Opus and M4A into each other. Title, artist and cover art come along.', state: 'ready', icon: 'audio', mode: 'convert', action: 'Choose audio', isNew: true },
+  { id: 'video-to-audio', group: 'media', title: 'Video to MP3', description: 'Pull the sound out of an MP4, MOV, MKV or WebM video. The video itself is never re-encoded.', state: 'ready', icon: 'audio', label: 'MP4', mode: 'convert', from: ['mp4', 'mov', 'mkv', 'webm'], to: 'mp3', action: 'Choose a video', isNew: true },
+  { id: 'archives', group: 'media', title: 'Open and make archives', description: 'Unpack ZIP, 7Z, RAR and TAR files, switch between them, or pack any files into one.', state: 'ready', icon: 'archive', mode: 'archive', action: 'Choose files', isNew: true },
   { id: 'image-resize', group: 'images', title: 'Resize images', description: 'Make photos smaller in pixels and in file size.', state: 'ready', icon: 'resize', mode: 'image', action: 'Choose images' },
   { id: 'ai-humanizer', group: 'writing', title: 'Rewrite in your voice', description: 'A full AI rewrite that sounds like you, with your own API key or built-in credits.', state: 'soon', icon: 'sparkle' },
   { id: 'ocr', group: 'pdf', title: 'Read text from scans', description: 'Turn scanned pages and photos of text into real text.', state: 'soon', icon: 'eye' },
@@ -38,7 +42,7 @@ export const tools = [
   { id: 'watermarks', group: 'writing', title: 'Watermark checks', description: 'Check text for the statistical watermarks some AI providers add.', state: 'research', icon: 'shield' },
 ];
 
-const ALIASES = { 'image-clean': 'metadata', pdf: 'pdf-merge' };
+const ALIASES = { 'image-clean': 'metadata', pdf: 'pdf-merge', zip: 'archives', audio: 'audio-convert' };
 
 export function toolFromHash(hash) {
   const [path, query = ''] = hash.replace(/^#/, '').split('?');

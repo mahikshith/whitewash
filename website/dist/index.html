@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Paste an AI draft and get it back without the filler. Convert documents, PDFs, spreadsheets and images, and wipe hidden metadata. Everything runs in your browser.">
 <meta name="theme-color" content="#17171a">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Whitewash: make AI drafts sound like you</title>
 <script src="./theme.js"></script>
 <link rel="icon" href="./mark.svg" type="image/svg+xml">
@@ -137,6 +137,22 @@
   </section>
   <input id="wipe-input" type="file" multiple hidden accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.docx,.pptx,.xlsx,.txt,.md">
 </main>
+<main id="archive-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="archive-title"></h1><p id="archive-description"></p></div>
+  <section class="panel" aria-label="Archives">
+    <div class="office-entry"><button id="archive-pick" class="primary large">Choose files</button><p>One archive to open (ZIP, 7Z, RAR, TAR, TAR.GZ, GZ and more), or any files to pack · up to 300 MB · or drop them here</p></div>
+    <section id="archive-output" class="office-output" hidden aria-live="polite">
+      <h2 id="archive-summary"></h2>
+      <ul id="archive-list" class="image-results file-list"></ul>
+      <div id="archive-targets" class="target-chips"><p id="archive-targets-label">Save as</p><div id="archive-chips"></div></div>
+      <div class="image-buttons"><button class="text-button" id="archive-again">Choose other files</button></div>
+    </section>
+    <p id="archive-error" class="office-error" role="alert" hidden></p>
+    <p class="image-note">Everything is unpacked and packed in this tab. RAR files can be opened but not made, because the format is closed. Password-protected archives aren’t supported yet. New archives record every file date as 1 January 1980, so they don’t show when you made them.</p>
+  </section>
+  <input id="archive-input" type="file" multiple hidden>
+</main>
 <main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#light-edit">Polish a draft instead</a></div></main>
 </div>
 <footer class="footer"><span>Runs in your browser. Your text and files never leave this tab.</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
@@ -177,6 +193,8 @@
 <symbol id="grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/><rect x="14" y="15" width="7" height="6" rx="1.5"/></symbol>
 <symbol id="stamp" viewBox="0 0 24 24"><path d="M9 12V8a3 3 0 1 1 6 0v4M5 12h14l1 5H4zM6 21h12"/></symbol>
 <symbol id="hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></symbol>
+<symbol id="audio" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+<symbol id="archive" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 3v2M12 7v2M12 11v2M10.5 15h3v3h-3z"/></symbol>
 <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 </body>

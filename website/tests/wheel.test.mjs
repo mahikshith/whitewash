@@ -56,8 +56,12 @@ test('the wheel only offers what fits the files', () => {
   assert.ok(pngs.some((a) => a.convert === 'image/jpeg'));
   assert.ok(ids([{ name: 'a.pdf' }, { name: 'b.pdf' }]).includes('merge'));
   assert.ok(ids([{ name: 'a.pdf' }]).includes('to-docx'));
-  assert.deepEqual(ids([{ name: 'a.docx' }, { name: 'b.jpg' }]), ['wipe']);
-  assert.match(wheelActions([{ name: 'a.txt' }, { name: 'b.csv' }]).reason, /one type/);
+  assert.deepEqual(ids([{ name: 'a.docx' }, { name: 'b.jpg' }]), ['wipe', 'zip']);
+  assert.deepEqual(ids([{ name: 'a.txt' }, { name: 'b.csv' }]), ['zip'], 'mixed files can always be zipped');
+  assert.ok(ids([{ name: 'song.flac' }]).includes('to-mp3') && !ids([{ name: 'song.flac' }]).includes('to-flac'));
+  assert.equal(ids([{ name: 'clip.mov' }])[0], 'to-mp3');
+  assert.equal(ids([{ name: 'backup.rar' }])[0], 'open');
+  assert.equal(fileKind({ name: 'x.7z' }), 'archive');
   assert.match(wheelActions([{ name: 'a.xyz' }]).reason, /can’t open/);
   assert.match(wheelActions(Array.from({ length: 51 }, () => ({ name: 'x.jpg' }))).reason, /50/);
   for (const files of [[{ name: 'a.txt' }], [{ name: 'a.pdf' }], [{ name: 'a.jpg' }], [{ name: 'a.csv' }]]) assert.ok(wheelActions(files).actions.length <= 8);
