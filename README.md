@@ -18,4 +18,4 @@ The [website guide](website/README.md) covers running, testing and current limit
 
 Open the [private website preview](https://whitewash-studio.astute-newt-2147.chatgpt.site). [Validation](docs/validation.md) and [deployment details](docs/deployment.md) record completed checks and operational limits.
 
-The [implementation roadmap](docs/implementation-roadmap.md) separates working tools from the next model, document and metadata features. The [tool-first design](docs/ui-design.md) provides a directory, distinct task pages and a single primary processing action. Light/dark appearance remembers the local preference.
+The [implementation roadmap](docs/implementation-roadmap.md) separates working tools from the next model, document and metadata features. The [design notes](docs/ui-design.md) cover the new homepage, the drop-anywhere wheel and the image tools. The [research folder](research/README.md) holds the converter teardown, the conversion-site survey and the phased plan.

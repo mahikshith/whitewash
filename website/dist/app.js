@@ -1,7 +1,10 @@
 import { proposeEdits, applyEdits, inspectCharacters, inspectWriting, wordCount, MAX_CHARACTERS } from './engine.js';
-import { tools, toolFromHash, statusLabel } from './tools.js';
+import { tools, groups, toolFromHash, statusLabel } from './tools.js';
 import { readTextFile } from './uploads.js';
-import { showOffice } from './office-ui.js';
+import { showOffice, loadOfficeFile } from './office-ui.js';
+import { showImages, loadImages, quickConvert } from './image-ui.js';
+import { initWheel, openPicker } from './wheel.js';
+import { PICKER_ACCEPT } from './actions.js';
 
 const $ = (id) => document.getElementById(id);
 let active = null;
@@ -24,7 +27,7 @@ function notify(message) {
 
 function icon(tool) {
   const wrapper = document.createElement('span');
-  wrapper.className = 'tool-icon ' + tool.color;
+  wrapper.className = 'tool-icon';
   wrapper.setAttribute('aria-hidden', 'true');
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -34,30 +37,54 @@ function icon(tool) {
   return wrapper;
 }
 
-for (const tool of tools) {
-  const card = document.createElement('a');
-  card.href = '#' + tool.id;
-  card.className = 'tool-card';
-  card.dataset.tool = tool.id;
-  const title = document.createElement('h2'); title.className = 'tool-flow';
-  const before = document.createElement('span'); before.className = 'flow-before'; before.textContent = tool.before;
-  const arrow = document.createElement('span'); arrow.className = 'flow-arrow'; arrow.textContent = '→'; arrow.setAttribute('aria-hidden', 'true');
-  const after = document.createElement('span'); after.className = 'flow-after'; after.textContent = tool.after;
-  title.append(before, arrow, after);
-  card.append(icon(tool), title);
+function statusChip(tool) {
   const label = statusLabel(tool);
-  card.setAttribute('aria-label', tool.title + ': ' + tool.before + ' to ' + tool.after + (label ? '. ' + label : ''));
-  if (label) {
-    const status = document.createElement('span');
-    status.className = 'status' + (tool.isNew ? ' new' : '');
-    status.textContent = label; card.append(status);
+  if (!label) return null;
+  const status = document.createElement('span');
+  status.className = 'status' + (tool.isNew ? ' new' : '');
+  status.textContent = label;
+  return status;
+}
+
+for (const group of groups) {
+  const ready = tools.filter((tool) => tool.group === group.id && tool.state === 'ready');
+  const section = document.createElement('section');
+  section.className = 'tool-group'; section.id = group.id;
+  const heading = document.createElement('div'); heading.className = 'group-heading';
+  const title = document.createElement('h2'); title.textContent = group.title;
+  const blurb = document.createElement('p'); blurb.textContent = group.blurb;
+  heading.append(title, blurb);
+  const grid = document.createElement('div'); grid.className = 'tool-grid';
+  for (const tool of ready) {
+    const card = document.createElement('a');
+    card.href = '#' + tool.id; card.className = 'tool-card'; card.dataset.tool = tool.id;
+    const name = document.createElement('h3'); name.textContent = tool.title;
+    const text = document.createElement('p'); text.textContent = tool.description;
+    card.append(icon(tool), name, text);
+    const status = statusChip(tool);
+    if (status) card.append(status);
+    grid.append(card);
   }
-  $('tool-grid').append(card);
-  const link = document.createElement('a');
-  link.href = '#' + tool.id;
-  link.append(document.createTextNode(tool.title));
-  if (label) { const status = document.createElement('span'); status.className = 'status'; status.textContent = label; link.append(status); }
-  $('tool-menu-list').append(link);
+  section.append(heading, grid);
+  $('tool-groups').append(section);
+  const menuGroup = document.createElement('div'); menuGroup.className = 'menu-group';
+  const menuTitle = document.createElement('p'); menuTitle.textContent = group.title;
+  menuGroup.append(menuTitle);
+  for (const tool of tools.filter((item) => item.group === group.id)) {
+    const link = document.createElement('a');
+    link.href = '#' + tool.id;
+    link.append(document.createTextNode(tool.title));
+    const status = statusChip(tool);
+    if (status) link.append(status);
+    menuGroup.append(link);
+  }
+  $('tool-menu-list').append(menuGroup);
+}
+for (const tool of tools.filter((item) => item.state !== 'ready')) {
+  const item = document.createElement('li');
+  const link = document.createElement('a'); link.href = '#' + tool.id; link.textContent = tool.title;
+  item.append(link, document.createTextNode(' ' + tool.description));
+  $('coming-list').append(item);
 }
 
 function counts() {
@@ -65,6 +92,8 @@ function counts() {
   $('run').disabled = !$('draft').value.length;
   $('document-name').textContent = filename;
   $('undo-replace').hidden = !previous;
+  const hero = $('hero-draft').value.trim().length > 0;
+  $('hero-run').disabled = !hero; $('hero-check').disabled = !hero;
 }
 
 function invalidate() {
@@ -86,14 +115,17 @@ function route() {
   active = toolFromHash(location.hash);
   const ready = active?.state === 'ready';
   const office = ready && active.mode === 'office';
+  const image = ready && active.mode === 'image';
   $('home-view').hidden = !!active;
-  $('tool-view').hidden = !ready || office;
+  $('tool-view').hidden = !ready || office || image;
   $('office-view').hidden = !office;
+  $('image-view').hidden = !image;
   showOffice(office ? active : null);
+  showImages(image ? active : null);
   $('upcoming-view').hidden = !active || ready;
   $('tools-menu').open = false;
-  document.title = active ? active.title + ' — Whitewash' : 'Whitewash — All tools';
-  if (ready && !office) {
+  document.title = active ? active.title + ' · Whitewash' : 'Whitewash: make AI drafts sound like you';
+  if (ready && !office && !image) {
     $('page-title').textContent = active.title;
     $('page-description').textContent = active.description;
     $('run').textContent = active.action;
@@ -104,11 +136,13 @@ function route() {
   } else if (active && !ready) {
     $('upcoming-title').textContent = active.title;
     $('upcoming-description').textContent = active.state === 'research'
-      ? 'This tool is still in research.'
-      : 'Not available yet. You can use the text tools today.';
-    $('upcoming-status').textContent = active.state === 'research' ? 'In research' : 'Coming soon';
+      ? active.description + ' We’re still working out whether this can be done honestly, so it isn’t built yet.'
+      : active.description + ' Not built yet. The writing tools work today.';
+    $('upcoming-status').textContent = active.state === 'research' ? 'Still researching' : 'Coming soon';
   }
-  window.scrollTo(0, 0);
+  const section = !active && location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
+  if (section?.classList.contains('tool-group')) section.scrollIntoView();
+  else window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (event) => {
@@ -150,7 +184,7 @@ function renderResult() {
   $('edit-count').textContent = selected.size + (selected.size === 1 ? ' edit' : ' edits');
   $('copy').disabled = !resultText;
   $('download').disabled = !resultText;
-  $('changes-title').textContent = 'Review changes (' + edits.length + ')';
+  $('changes-title').textContent = 'See changes (' + edits.length + ')';
   $('keep-all').disabled = selected.size === edits.length;
   $('reject-all').disabled = !selected.size;
 }
@@ -185,16 +219,16 @@ function processDraft() {
     if (active.mode === 'writing') {
       const items = inspectWriting($('draft').value, $('format').value, $('locks').value.split(/\r?\n/).filter(Boolean));
       $('character-report').replaceChildren();
-      const intro = document.createElement('p'); intro.textContent = 'Editorial notes only. These phrases do not establish AI authorship.';
+      const intro = document.createElement('p'); intro.textContent = 'Stock phrases worth a second look. Finding them proves nothing about who wrote the text.';
       $('character-report').append(intro);
       for (const item of items) {
         const row = document.createElement('div'); row.className = 'office-change';
         const phrase = document.createElement('p'); phrase.textContent = item.text;
-        const note = document.createElement('small'); note.textContent = item.note + ' Position ' + item.position + '.';
+        const note = document.createElement('small'); note.textContent = item.note + ' Character ' + item.position.toLocaleString() + '.';
         row.append(phrase, note); $('character-report').append(row);
       }
-      if (!items.length) { const p = document.createElement('p'); p.textContent = 'No matching phrases found.'; $('character-report').append(p); }
-      $('edit-count').textContent = items.length + ' notes'; $('changes-panel').hidden = true;
+      if (!items.length) { const p = document.createElement('p'); p.textContent = 'Nothing flagged. No stock phrases found.'; $('character-report').append(p); }
+      $('edit-count').textContent = items.length === 1 ? '1 flag' : items.length + ' flags'; $('changes-panel').hidden = true;
     } else if (inspecting) {
       const items = inspectCharacters($('draft').value);
       $('character-report').replaceChildren();
@@ -205,7 +239,7 @@ function processDraft() {
         const count = document.createElement('span'); count.textContent = '× ' + item.count;
         row.append(code, name, count); $('character-report').append(row);
       }
-      if (!items.length) { const p = document.createElement('p'); p.textContent = 'No special characters found.'; $('character-report').append(p); }
+      if (!items.length) { const p = document.createElement('p'); p.textContent = 'No hidden characters.'; $('character-report').append(p); }
       $('edit-count').textContent = '';
       $('changes-panel').hidden = true;
     } else {
@@ -226,7 +260,7 @@ $('draft').addEventListener('input', invalidate);
 $('draft').addEventListener('paste', (event) => {
   const text = event.clipboardData?.getData('text/plain');
   if (text && $('draft').value.length - ($('draft').selectionEnd - $('draft').selectionStart) + text.length > MAX_CHARACTERS) {
-    event.preventDefault(); notify('Paste a smaller section. The limit is 100,000 characters.');
+    event.preventDefault(); notify('That’s over 100,000 characters. Paste a smaller piece.');
   }
 });
 for (const id of ['format', 'spaces', 'soft-hyphens', 'zero-width', 'punctuation']) $(id).addEventListener('change', invalidate);
@@ -249,7 +283,7 @@ $('reject-all').addEventListener('click', () => { selected.clear(); changes(); }
 $('copy').addEventListener('click', async () => {
   if ($('output').hidden || ['inspect', 'writing'].includes(active?.mode)) return;
   try { await navigator.clipboard.writeText(resultText); notify('Copied.'); }
-  catch { notify('Clipboard unavailable. Use Download instead.'); }
+  catch { notify('Couldn’t copy. Use Download instead.'); }
 });
 $('download').addEventListener('click', () => {
   if ($('output').hidden || ['inspect', 'writing'].includes(active?.mode)) return;
@@ -266,7 +300,7 @@ async function loadFile(file) {
   const target = active.id;
   try {
     const input = await readTextFile(file);
-    if (revision !== version || active?.id !== target) { notify('The draft changed. Select the file again.'); return; }
+    if (revision !== version || active?.id !== target) { notify('The text changed while the file was loading. Try again.'); return; }
     replace(input.text, input.name, input.format, true);
     processDraft();
   } catch (error) { notify(error.message); }
@@ -281,7 +315,7 @@ $('tool-view').addEventListener('dragleave', (event) => { if (!$('tool-view').co
 $('tool-view').addEventListener('drop', (event) => {
   event.preventDefault(); $('tool-view').classList.remove('drop-active');
   if (event.dataTransfer.files.length === 1) loadFile(event.dataTransfer.files[0]);
-  else notify('Drop one text file at a time.');
+  else notify('One text file at a time, please.');
 });
 
 function dialog(title, paragraphs) {
@@ -291,17 +325,17 @@ function dialog(title, paragraphs) {
   $('info-dialog').showModal();
 }
 $('privacy').addEventListener('click', () => dialog('Privacy', [
-  'The working text and Office tools run in this tab. No draft or file is sent to a model, detector or processing server. Only your appearance preference is stored locally.',
-  'Home and tool navigation keep the in-tab draft. Reloading or closing the tab clears it. Hosting access logs, downloaded files and your clipboard are separate.',
+  'Everything happens in this browser tab. Your text and files are never uploaded, there’s no account, and there are no analytics.',
+  'The only thing saved is whether you picked light or dark mode. Reloading the page clears your draft. The site host still sees ordinary page requests, like any website.',
 ]));
 $('help').addEventListener('click', () => dialog('Help', [
-  'Choose a tool, add text, then use its main button. File processing accepts one UTF-8 TXT or Markdown file, up to 400 KB and 100,000 characters. Originals are preserved.',
-  'Light edit uses English phrase rules. Review changes is optional; reject any edit before copying or downloading. Options protect exact phrases and control cleanup.',
-  'Markdown protection is conservative, not a full renderer. Joiners and direction controls are retained. Character counts do not determine human authorship or statistical watermarks.',
-  'Office tools accept one DOCX, PPTX or XLSX up to 10 MB; expanded package limit 30 MB, 1,000 parts, 5 MB per XML part, 100,000 editable characters and 500 edits. Encrypted, signed and macro-enabled files are rejected. ZIP64 is unsupported. English phrase edits use rules, not a model.',
-  'Office copies preserve untouched package payloads. Edited XML is reserialized and checked for structural changes. A shorter phrase can alter line wrapping. Spreadsheet first-row labels, formulas, numbers and short cells remain unchanged. Review the copy in your Office app.',
-  'Metadata cleaning clears standard core/custom properties, selected application properties and ZIP dates/comments. It does not scrub comments, revisions, embedded media, visible content or statistical watermarks. It is not complete anonymization.',
-  'Tools marked Soon or Research are not available. PDF editing, AI rewriting, AI classification and provider watermark checks remain unconnected.',
+  'Paste text or drop a file, pick what you want done, then copy or download the result. Your original is never changed.',
+  'Polishing uses a list of English phrase rules, not an AI model. Open “See changes” to undo any edit you don’t like.',
+  'Text files: .txt or .md, up to 400 KB. Office files: .docx, .pptx or .xlsx, up to 10 MB. Password-protected, signed and macro files won’t open.',
+  'Office files keep their formatting. Only body text, slide text and long spreadsheet cells get edited. Formulas, numbers, header rows, notes and footnotes are left alone. Shorter wording can move line breaks, so give the copy a quick look.',
+  'Remove file info clears author, company, app and date fields. Comments, tracked changes and images inside the file stay.',
+  'Images: JPG, PNG, WebP, GIF, BMP or AVIF, up to 40 MB each and 50 at a time. Saved copies drop location and camera data. GIFs lose their animation.',
+  'Nothing here can prove who wrote a text or remove AI watermarks. Be wary of any tool that says it can.',
 ]));
 $('close-dialog').addEventListener('click', () => $('info-dialog').close());
 $('info-dialog').addEventListener('click', (event) => {
@@ -309,6 +343,53 @@ $('info-dialog').addEventListener('click', (event) => {
   const box = $('info-dialog').getBoundingClientRect();
   if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) $('info-dialog').close();
 });
+
+// Home: the hero box hands its draft to the full tool page.
+async function openTool(id) {
+  if (location.hash !== '#' + id) {
+    const changed = new Promise((resolve) => window.addEventListener('hashchange', resolve, { once: true }));
+    location.hash = id;
+    await changed;
+  }
+}
+async function heroRun(id) {
+  const text = $('hero-draft').value;
+  if (!text.trim()) return;
+  await openTool(id);
+  replace(text, '', 'txt', false);
+  processDraft();
+}
+$('hero-draft').addEventListener('input', counts);
+$('hero-run').addEventListener('click', () => heroRun('light-edit'));
+$('hero-check').addEventListener('click', () => heroRun('writing-check'));
+$('hero-draft').addEventListener('keydown', (event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) heroRun('light-edit'); });
+$('hero-sample').addEventListener('click', () => {
+  $('hero-draft').value = 'It is important to note that, at this point in time, our team has the ability to utilize customer feedback on a daily basis in order to ship a seamless experience.\n\nI hope this helps!';
+  counts(); $('hero-draft').focus();
+});
+
+// Files from the wheel go straight to the right tool.
+async function runAction(action, files) {
+  if (action.convert) { quickConvert(files, action); return; }
+  await openTool(action.tool);
+  const tool = toolFromHash('#' + action.tool);
+  if (tool.mode === 'office') loadOfficeFile(files[0]);
+  else if (tool.mode === 'image') loadImages(files);
+  else loadFile(files[0]);
+}
+initWheel({ isActive: () => !$('home-view').hidden, onRun: runAction, onReject: notify });
+$('pick-input').accept = PICKER_ACCEPT;
+$('pick-any').addEventListener('click', () => $('pick-input').click());
+$('pick-input').addEventListener('change', () => {
+  const files = [...$('pick-input').files];
+  $('pick-input').value = '';
+  if (!files.length) return;
+  const box = $('pick-any').getBoundingClientRect();
+  openPicker(files, box.left + box.width / 2, box.top + box.height / 2);
+});
+// A file dropped outside a drop area should never replace the page.
+document.addEventListener('dragover', (event) => { if (!event.defaultPrevented && [...(event.dataTransfer?.types || [])].includes('Files')) event.preventDefault(); });
+document.addEventListener('drop', (event) => { if (!event.defaultPrevented) event.preventDefault(); });
 
 counts();
 route();

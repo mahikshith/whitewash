@@ -1,17 +1,26 @@
+export const groups = [
+  { id: 'writing', title: 'Writing', blurb: 'Paste a draft, get a cleaner one back.' },
+  { id: 'documents', title: 'Documents', blurb: 'Fix the words inside Office files. The layout stays put.' },
+  { id: 'images', title: 'Images', blurb: 'Convert, shrink and clean up photos.' },
+];
+
 export const tools = [
-  { id: 'word', before: 'AI Word draft', after: 'Clearer Word text', title: 'AI text in Word', description: 'Polish AI-written wording in DOCX files.', state: 'ready', icon: 'file', color: 'blue', label: 'W', mode: 'office', action: 'Select Word file', accept: '.docx', isNew: true },
-  { id: 'presentations', before: 'AI slides', after: 'Clearer slides', title: 'AI text in slides', description: 'Refine AI-written text in PPTX slides.', state: 'ready', icon: 'file', color: 'orange', label: 'P', mode: 'office', action: 'Select presentation', accept: '.pptx', isNew: true },
-  { id: 'spreadsheets', before: 'AI prose cells', after: 'Clearer prose', title: 'AI text in spreadsheets', description: 'Refine AI prose. Keep XLSX formulas.', state: 'ready', icon: 'file', color: 'green', label: 'X', mode: 'office', action: 'Select spreadsheet', accept: '.xlsx', isNew: true },
-  { id: 'metadata', before: 'AI file properties', after: 'Cleaned copy', title: 'AI file metadata', description: 'Clear Office author and app properties.', state: 'ready', icon: 'shield', color: 'blue', mode: 'office', action: 'Select Office file', accept: '.docx,.pptx,.xlsx', isNew: true },
-  { id: 'writing-check', before: 'AI-style phrases', after: 'Writing notes', title: 'AI writing check', description: 'Find filler and leftover AI-assistant phrases.', state: 'ready', icon: 'search', color: 'green', mode: 'writing', action: 'Check AI wording', isNew: true },
-  { id: 'text-file', before: 'AI text file', after: 'Polished text file', title: 'AI text in files', description: 'Polish AI drafts in TXT or Markdown.', state: 'ready', icon: 'file', color: 'blue', label: 'TXT', mode: 'polish', action: 'Polish AI text', isNew: true },
-  { id: 'clean-text', before: 'Messy AI text', after: 'Clean text', title: 'AI text cleanup', description: 'Clean copy-paste spacing in AI text.', state: 'ready', icon: 'clean', color: 'green', mode: 'clean', action: 'Clean AI text' },
-  { id: 'light-edit', before: 'Wordy AI text', after: 'Plain wording', title: 'AI text polish', description: 'Simplify wordy phrases in AI drafts.', state: 'ready', icon: 'edit', color: 'blue', mode: 'polish', action: 'Polish AI text' },
-  { id: 'characters', before: 'AI text', after: 'Character report', title: 'AI character check', description: 'Find invisible characters in AI text.', state: 'ready', icon: 'search', color: 'amber', mode: 'inspect', action: 'Check characters' },
-  { id: 'ai-humanizer', before: 'AI draft', after: 'Natural writing', title: 'AI humanizer', description: 'Rewrite AI text in your tone and voice.', state: 'soon', icon: 'sparkle', color: 'green' },
-  { id: 'pdf', before: 'AI PDF draft', after: 'Clearer PDF text', title: 'AI text in PDFs', description: 'Refine AI-written wording in PDF files.', state: 'soon', icon: 'file', color: 'red', label: 'PDF' },
-  { id: 'ai-detector', before: 'Text', after: 'AI signals', title: 'AI detector', description: 'Review AI-writing signals.', state: 'soon', icon: 'search', color: 'amber' },
-  { id: 'watermarks', before: 'AI text', after: 'Watermark checks', title: 'AI watermark tools', description: 'Research statistical watermarks in AI text.', state: 'research', icon: 'shield', color: 'gray' },
+  { id: 'light-edit', group: 'writing', title: 'Polish a draft', description: 'Cuts wordy phrases like “in order to” and “at this point in time”. You see every change.', state: 'ready', icon: 'edit', mode: 'polish', action: 'Polish it' },
+  { id: 'writing-check', group: 'writing', title: 'Spot AI tells', description: 'Flags stock phrases such as “it is important to note” and “I hope this helps”.', state: 'ready', icon: 'search', mode: 'writing', action: 'Check it' },
+  { id: 'clean-text', group: 'writing', title: 'Clean pasted text', description: 'Fixes the odd spaces and hidden hyphens that come along when you copy from a chatbot or a PDF.', state: 'ready', icon: 'clean', mode: 'clean', action: 'Clean it' },
+  { id: 'characters', group: 'writing', title: 'Find hidden characters', description: 'Lists the invisible characters in your text and how many of each.', state: 'ready', icon: 'eye', mode: 'inspect', action: 'Show them' },
+  { id: 'text-file', group: 'writing', title: 'Polish a text file', description: 'Drop a .txt or .md file and get an edited copy back.', state: 'ready', icon: 'file', label: 'TXT', mode: 'polish', action: 'Polish it' },
+  { id: 'word', group: 'documents', title: 'Word documents', description: 'Polishes the text in a .docx and keeps the formatting.', state: 'ready', icon: 'file', label: 'W', mode: 'office', action: 'Choose a Word file', accept: '.docx' },
+  { id: 'presentations', group: 'documents', title: 'Slide decks', description: 'Polishes the text on your .pptx slides. Notes and layouts are left alone.', state: 'ready', icon: 'file', label: 'P', mode: 'office', action: 'Choose a slide deck', accept: '.pptx' },
+  { id: 'spreadsheets', group: 'documents', title: 'Spreadsheets', description: 'Polishes long text cells in an .xlsx. Formulas and numbers stay as they are.', state: 'ready', icon: 'file', label: 'X', mode: 'office', action: 'Choose a spreadsheet', accept: '.xlsx' },
+  { id: 'metadata', group: 'documents', title: 'Remove file info', description: 'Strips the author, company and app fields hidden in Office files.', state: 'ready', icon: 'shield', mode: 'office', action: 'Choose an Office file', accept: '.docx,.pptx,.xlsx' },
+  { id: 'image-convert', group: 'images', title: 'Convert images', description: 'Turn JPG, PNG and WebP into each other. Works on a whole batch at once.', state: 'ready', icon: 'image', mode: 'image', action: 'Choose images', isNew: true },
+  { id: 'image-resize', group: 'images', title: 'Resize images', description: 'Make photos smaller in pixels and in file size.', state: 'ready', icon: 'resize', mode: 'image', action: 'Choose images', isNew: true },
+  { id: 'image-clean', group: 'images', title: 'Remove photo info', description: 'Strips location, camera and date data from photos before you share them.', state: 'ready', icon: 'pin', mode: 'image', action: 'Choose photos', isNew: true },
+  { id: 'pdf', group: 'documents', title: 'PDF tools', description: 'Merge, split and reorder PDFs, and pull the text out to polish.', state: 'soon', icon: 'file', label: 'PDF' },
+  { id: 'ai-humanizer', group: 'writing', title: 'Rewrite in your voice', description: 'A full rewrite that sounds like you, not a template.', state: 'soon', icon: 'sparkle' },
+  { id: 'ai-detector', group: 'writing', title: 'AI detector', description: 'Show which parts of a text read as machine-written, and why.', state: 'soon', icon: 'search' },
+  { id: 'watermarks', group: 'writing', title: 'Watermark checks', description: 'Check text for the statistical watermarks some AI providers add.', state: 'research', icon: 'shield' },
 ];
 
 export function toolFromHash(hash) {

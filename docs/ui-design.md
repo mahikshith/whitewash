@@ -1,39 +1,28 @@
-# Tool-first design
+# Design
 
+1 November 2026. Replaces the tool-directory design from 18 October.
 
+## Why it changed
 
-18 October 2026. This replaces the earlier editorial landing-page direction.
+The old homepage was 13 identical tiles under a generic tagline, with "AI" in nearly every label. The main job, pasting a draft and fixing it, took a click to reach, and a third of the tiles were placeholders. See [the copy audit](../research/copy-audit.md).
 
+## Layout
 
+- **Hero with the paste box in it.** "Make it sound like you wrote it." The draft box sits beside the headline. "Polish it" and "Spot AI tells" hand the draft to the full tool page and run it.
+- **Drop band with the orb.** Says plainly that a file can be dropped anywhere on the page. "Choose a file" opens the same wheel for touch and keyboard users.
+- **Grouped tools.** Writing, Documents, Images. Each card has an icon, a plain title and one sentence.
+- **Coming next.** Unbuilt tools are listed once, in a box at the bottom, with their own status pages.
 
-The homepage is a tool directory, immediately below the header. Every tile opens one focused task page with one primary action. All tools are also available in the header menu. There is one system sans-serif font, no decorative hero, no repeated feature sections and no permanent changes sidebar.
+## The wheel
 
+Drag a file over the homepage and a glass radial wheel opens under the cursor. It offers only what fits the file: Polish, AI tells, Clean and Hidden for text; Polish and Strip info for Office files; JPG, PNG, WebP, Strip info and Resize for images. Drop on an option to run it. Dropping on the middle, or outside, keeps the wheel open so you can pick with the pointer or the arrow keys.
 
+Measurements come from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)): 62 px inner radius, 150 px outer, 6 px gaps, 12 px corners, a spring open with a staggered fan-out, and a 6 px outward nudge on hover. The code is our own.
 
-Nine task pages now work, including bounded Office prose refinement, defined Office-property removal and writing review. New shipped tools appear first in the shared catalog. Planned PDF, model rewriting, classification and watermark capabilities remain visible with explicit Soon or Research labels and their own status pages. They do not accept files or simulate processing.
+A browser only sees a drag once it reaches the tab, and only learns file names on drop. So the wheel uses MIME types during the drag and checks again on drop. If the type is unknown during the drag (Markdown often is), a plain "Drop it anywhere" screen shows instead and the wheel opens on drop.
 
+Quick image conversions download straight away and report in a status pill at the top of the screen. Everything else opens the matching tool page with the file already loaded.
 
+## Look
 
-Review is optional and collapsed after a result. Defaults allow one processing action, followed by copy/download; protected phrases and cleanup preferences remain in Options. Originals and current choices stay in memory when navigating. A reload still clears the draft. File processing performs the supported local task after selection, with validation and an unchanged original file.
-
-
-
-## Reference observations
-
-
-
-[iLovePDF's homepage](https://www.ilovepdf.com/) puts task choices in a grid, and its [compression page](https://www.ilovepdf.com/compress_pdf) centers a single file-selection action. [QuillBot](https://quillbot.com/ai-humanizer) and [Grammarly](https://www.grammarly.com/ai-humanizer) offer direct writing actions. The adopted principle is separation of tool discovery and task execution; branding, copy and visual assets are not copied. These observations do not establish conversion or retention performance.
-
-
-
-Paid value must come from successful repeated tasks, less repair work and reliable document handling. This redesign changes discovery and interaction; it does not turn planned model/document features into working services or establish willingness to pay.
-
-
-
-## Purpose-led labels
-
-The homepage says "Humanize AI-written text" with "Convert AI drafts into clearer, more natural writing." Every feature title explicitly uses AI: "AI text in Word", "AI text in slides", "AI text in spreadsheets", "AI file metadata", "AI writing check", and the other focused tasks. The shared catalog supplies the homepage boxes, top menu and individual page headings, so wording stays consistent everywhere. These are tasks for refining AI drafts inside supported formats. Keep the short descriptions, simple boxes and one primary action.
-
-## Input to outcome cards
-
-The homepage boxes now show only the input, an arrow and the outcome beneath the icon, such as "AI Word draft → Clearer Word text" and "Wordy AI text → Plain wording". Repeated "AI text in..." titles and explanatory paragraphs are absent from the visible cards. `before` and `after` live in the shared tool catalog; the existing detailed title/description remain available on the focused task page and in the menu. Soon/Research/New remain visible and included in accessible card labels. On narrow screens the same sequence stacks vertically with a down arrow.
+Warm paper background, near-black ink, and a lime accent used for highlights, the active wheel segment and "New" labels. Big rounded corners (24–28 px on panels, pill buttons). Headings in Bricolage Grotesque, body in the system sans-serif. Dark mode swaps the primary button to lime.

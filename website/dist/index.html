@@ -3,64 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Humanize AI-written text. Convert AI drafts into clearer, more natural writing in your text, documents, slides and spreadsheets.">
-<meta name="theme-color" content="#14795c">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Whitewash — All tools</title>
+<meta name="description" content="Paste an AI draft and get it back without the filler. Polish text, Word, slides and spreadsheets, convert images. Everything runs in your browser.">
+<meta name="theme-color" content="#17171a">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Whitewash: make AI drafts sound like you</title>
 <script src="./theme.js"></script>
 <link rel="icon" href="./mark.svg" type="image/svg+xml">
+<link rel="preload" href="./fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="./styles.css">
 <script type="module" src="./app.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#content">Skip to content</a>
 <header class="header">
-  <a class="brand" href="#home" aria-label="Whitewash home"><img src="./mark.svg" width="29" height="29" alt="">whitewash<span>.</span></a>
-  <details id="tools-menu" class="tools-menu"><summary>All tools <svg aria-hidden="true"><use href="#chevron"/></svg></summary><nav id="tool-menu-list" aria-label="All tools"></nav></details>
+  <a class="brand" href="#home" aria-label="Whitewash home"><img src="./mark.svg" width="28" height="28" alt="">whitewash</a>
+  <details id="tools-menu" class="tools-menu"><summary>Tools <svg aria-hidden="true"><use href="#chevron"/></svg></summary><nav id="tool-menu-list" aria-label="All tools"></nav></details>
   <button id="theme-toggle" class="theme-button" aria-label="Dark mode" aria-pressed="false" title="Switch to dark mode"><span id="theme-icon" aria-hidden="true">☾</span></button>
 </header>
 <div id="content" tabindex="-1">
 <main id="home-view" class="home">
-  <div class="home-heading"><h1>Humanize AI-written text.</h1><p>Convert AI drafts into clearer, more natural writing.</p></div>
-  <div id="tool-grid" class="tool-grid" aria-label="All writing tools"></div>
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Free · No sign-up · Nothing gets uploaded</p>
+      <h1>Make it sound like <span class="highlight">you</span> wrote it.</h1>
+      <p class="lede">Paste an AI draft. Whitewash cuts the filler, flags the stock phrases and shows you every change before you keep it.</p>
+    </div>
+    <div class="hero-box">
+      <label class="sr-only" for="hero-draft">Your draft</label>
+      <textarea id="hero-draft" placeholder="Paste your draft here…" maxlength="100000" spellcheck="false"></textarea>
+      <div class="hero-actions">
+        <button type="button" class="text-button" id="hero-sample">Try an example</button>
+        <button type="button" class="ghost" id="hero-check" disabled>Spot AI tells</button>
+        <button type="button" class="primary" id="hero-run" disabled>Polish it</button>
+      </div>
+    </div>
+  </section>
+  <section class="drop-band" aria-labelledby="drop-title">
+    <div class="orb" aria-hidden="true"><span></span></div>
+    <div class="drop-copy"><h2 id="drop-title">Got a file? Drop it anywhere on this page.</h2><p>Word, slides, spreadsheets, text files and images. A wheel pops up with what you can do with it.</p></div>
+    <button class="pill" id="pick-any">Choose a file</button>
+    <input id="pick-input" type="file" multiple hidden>
+  </section>
+  <div id="tool-groups" class="tool-groups"></div>
+  <section class="coming"><h2>Coming next</h2><ul id="coming-list"></ul></section>
 </main>
 <main id="tool-view" class="tool-page" hidden>
   <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
   <div class="tool-heading"><h1 id="page-title"></h1><p id="page-description"></p></div>
-  <section id="file-entry" class="file-entry" hidden><button class="primary large" id="select-file">Select text file</button><p>TXT or Markdown · up to 400 KB</p></section>
-  <section id="editor" class="editor" aria-label="Text workspace">
-    <div class="input-toolbar"><label for="draft">Your AI text</label><span id="document-name"></span><button id="upload" class="text-button">Upload TXT / MD</button><button id="sample" class="text-button">Try sample</button></div>
-    <textarea id="draft" placeholder="Paste your AI text here…" spellcheck="false" maxlength="100000" aria-describedby="input-count"></textarea>
-    <div class="input-bottom"><span id="input-count">0 words</span><button id="undo-replace" class="text-button" hidden>Undo replace</button><button id="clear" class="text-button">Clear</button></div>
-    <div class="primary-row"><button id="run" class="primary" disabled>Clean text</button></div>
-    <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Text</option><option value="md">Markdown</option></select></label><div id="cleanup-settings" class="options-content"><label><input type="checkbox" id="spaces" checked> Regular spaces</label><label><input type="checkbox" id="soft-hyphens" checked> Remove soft hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>May affect word boundaries.</small></label><label><input type="checkbox" id="punctuation"> Plain punctuation <small>Spaced dashes, apostrophes and ellipses.</small></label></div><label for="locks">Keep these phrases exactly</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One phrase per line"></textarea><small>Up to 50 case-sensitive phrases.</small></div></details>
-    <section id="output" class="output" aria-labelledby="output-title" hidden><div class="output-header"><h2 id="output-title">Result</h2><span id="edit-count"></span><button id="copy" class="text-button">Copy</button><button id="download" class="text-button">Download</button></div><div id="result" class="result" tabindex="0"></div><div id="character-report" class="character-report" hidden></div><details id="changes-panel" class="changes-panel"><summary id="changes-title">Review changes</summary><div class="review-actions"><button id="keep-all" class="text-button">Keep all</button><button id="reject-all" class="text-button">Reject all</button></div><div id="changes"></div></details></section>
+  <section id="file-entry" class="panel file-entry" hidden><button class="primary large" id="select-file">Choose a text file</button><p>.txt or .md · up to 400 KB · or drop it here</p></section>
+  <section id="editor" class="panel editor" aria-label="Text workspace">
+    <div class="input-toolbar"><label for="draft">Your text</label><span id="document-name"></span><button id="upload" class="text-button">Open a file</button><button id="sample" class="text-button">Try an example</button></div>
+    <textarea id="draft" placeholder="Paste your draft here…" spellcheck="false" maxlength="100000" aria-describedby="input-count"></textarea>
+    <div class="input-bottom"><span id="input-count">0 words</span><button id="undo-replace" class="text-button" hidden>Undo</button><button id="clear" class="text-button">Clear</button></div>
+    <div class="primary-row"><button id="run" class="primary" disabled>Polish it</button></div>
+    <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Plain text</option><option value="md">Markdown</option></select></label><div id="cleanup-settings" class="options-content"><label><input type="checkbox" id="spaces" checked> Turn non-breaking spaces into normal ones</label><label><input type="checkbox" id="soft-hyphens" checked> Remove hidden hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>Can join words in some languages.</small></label><label><input type="checkbox" id="punctuation"> Plain punctuation <small>Swaps em dashes, curly quotes and … for keyboard versions.</small></label></div><label for="locks">Never change these phrases</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One per line"></textarea><small>Up to 50. Case matters.</small></div></details>
+    <section id="output" class="output" aria-labelledby="output-title" hidden><div class="output-header"><h2 id="output-title">Result</h2><span id="edit-count"></span><button id="copy" class="text-button">Copy</button><button id="download" class="text-button">Download</button></div><div id="result" class="result" tabindex="0"></div><div id="character-report" class="character-report" hidden></div><details id="changes-panel" class="changes-panel"><summary id="changes-title">See changes</summary><div class="review-actions"><button id="keep-all" class="text-button">Keep all</button><button id="reject-all" class="text-button">Undo all</button></div><div id="changes"></div></details></section>
   </section>
   <input id="file-input" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
 </main>
 <main id="office-view" class="tool-page" hidden>
   <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
   <div class="tool-heading"><h1 id="office-title"></h1><p id="office-description"></p></div>
-  <section class="office-workspace" aria-label="Document workspace">
-    <div class="office-entry"><p id="office-filename" hidden></p><button id="office-action" class="primary large">Select file</button><p id="office-limits"></p><button id="office-another" class="text-button" hidden>Choose another file</button></div>
-    <details id="office-options" class="options"><summary>Options</summary><div class="options-content"><label>Editing <select id="office-mode"><option value="polish">Light edit</option><option value="clean">Character cleanup only</option></select></label><label><input type="checkbox" id="office-punctuation"> Plain punctuation</label><label for="office-locks">Keep these phrases exactly</label><textarea id="office-locks" rows="2" maxlength="2000" placeholder="One phrase per line"></textarea></div></details>
-    <section id="office-output" class="office-output" hidden><h2 id="office-summary" tabindex="-1"></h2><p id="office-scope"></p><details id="office-review"><summary id="office-review-title">Review changes</summary><div id="office-changes"></div></details></section>
+  <section class="panel office-workspace" aria-label="Document workspace">
+    <div class="office-entry"><p id="office-filename" hidden></p><button id="office-action" class="primary large">Choose a file</button><p id="office-limits"></p><button id="office-another" class="text-button" hidden>Choose another file</button></div>
+    <details id="office-options" class="options"><summary>Options</summary><div class="options-content"><label>Edits <select id="office-mode"><option value="polish">Polish wording</option><option value="clean">Only fix odd characters</option></select></label><label><input type="checkbox" id="office-punctuation"> Plain punctuation</label><label for="office-locks">Never change these phrases</label><textarea id="office-locks" rows="2" maxlength="2000" placeholder="One per line"></textarea></div></details>
+    <section id="office-output" class="office-output" hidden><h2 id="office-summary" tabindex="-1"></h2><p id="office-scope"></p><details id="office-review"><summary id="office-review-title">See changes</summary><div id="office-changes"></div></details></section>
     <p id="office-error" class="office-error" role="alert" hidden></p>
   </section>
   <input id="office-input" type="file" accept=".docx,.pptx,.xlsx" hidden>
 </main>
-<main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#clean-text">Use text tools</a></div></main>
+<main id="image-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="image-title"></h1><p id="image-description"></p></div>
+  <section class="panel image-workspace" aria-label="Image workspace">
+    <div class="office-entry"><button id="image-pick" class="primary large">Choose images</button><p>JPG, PNG, WebP, GIF, BMP or AVIF · up to 50 at once · or drop them here</p></div>
+    <div class="image-settings">
+      <label id="image-format-field">Save as <select id="image-format"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option><option value="keep">Same as original</option></select></label>
+      <label id="image-size-field">Longest side <input id="image-longest" type="number" min="16" max="20000" step="1" value="1600"> px</label>
+      <label id="image-quality-field">Quality <input id="image-quality" type="range" min="40" max="100" value="88"> <output id="image-quality-value" for="image-quality">88</output></label>
+    </div>
+    <section id="image-output" class="office-output" hidden aria-live="polite"><h2 id="image-summary"></h2><ul id="image-results" class="image-results"></ul><div class="image-buttons"><button class="primary" id="image-download">Download</button><button class="text-button" id="image-again">Choose more</button></div></section>
+    <p id="image-error" class="office-error" role="alert" hidden></p>
+    <p class="image-note">Every saved copy is fresh pixels only, so location, camera and date data never come along. GIFs keep their first frame.</p>
+  </section>
+  <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif" multiple hidden>
+</main>
+<main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#light-edit">Polish a draft instead</a></div></main>
 </div>
-<footer class="footer"><span>Local file & text processing</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
+<footer class="footer"><span>Runs in your browser. Your text and files never leave this tab.</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
-<dialog id="info-dialog"><div class="dialog-header"><h2 id="dialog-title"></h2><button id="close-dialog" class="icon-button" aria-label="Close dialog">×</button></div><div id="dialog-content"></div></dialog>
+<div id="drop-scrim" class="drop-scrim" hidden><p id="scrim-text">Drop it anywhere</p></div>
+<div id="wheel" class="wheel" role="dialog" aria-modal="true" aria-label="Choose what to do with your file" tabindex="-1" hidden>
+  <div class="wheel-disc"></div>
+  <svg id="wheel-svg" viewBox="0 0 340 340" width="340" height="340" aria-hidden="true"></svg>
+  <div class="wheel-hub" aria-live="polite"><strong id="wheel-label"></strong><span id="wheel-sub"></span></div>
+  <p id="wheel-keys" class="wheel-keys"></p>
+</div>
+<div id="island" class="island" role="status" aria-live="polite" hidden>
+  <span class="island-dot" aria-hidden="true"></span>
+  <div class="island-text"><strong id="island-title"></strong><span id="island-detail"></span></div>
+  <button id="island-action" class="island-button" hidden></button>
+  <button id="island-close" class="island-close" aria-label="Dismiss">×</button>
+  <span id="island-bar" class="island-bar" aria-hidden="true"></span>
+</div>
+<dialog id="info-dialog"><div class="dialog-header"><h2 id="dialog-title"></h2><button id="close-dialog" class="icon-button" aria-label="Close">×</button></div><div id="dialog-content"></div></dialog>
 <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
-<symbol id="file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/></symbol>
+<symbol id="file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/></symbol>
 <symbol id="clean" viewBox="0 0 24 24"><path d="m15 3 6 6M16 4 5 15l4 4L20 8M4 14l6 6M3 20h5M15 15h6M15 19h4"/></symbol>
-<symbol id="edit" viewBox="0 0 24 24"><path d="m16 3 5 5-12 12-6 1 1-6zM14 5l5 5M3 7h6M3 3h5"/></symbol>
-<symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M8 10h5M10.5 7.5v5"/></symbol>
+<symbol id="edit" viewBox="0 0 24 24"><path d="m16 3 5 5-12 12-6 1 1-6zM14 5l5 5"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="sparkle" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5zM20 2v4M18 4h4"/></symbol>
 <symbol id="shield" viewBox="0 0 24 24"><path d="m12 2 8 4v6c0 5-8 10-8 10S4 17 4 12V6zM9 11l2 2 4-4"/></symbol>
+<symbol id="image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+<symbol id="resize" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="m4 4 16 16"/></symbol>
 <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 </body>

@@ -73,7 +73,7 @@ test('inspector reports counts without claiming watermark detection', () => {
 
 test('unsupported files and oversized inputs fail visibly', () => {
   assert.equal(validateFile('REPORT.MD', 100), 'md');
-  assert.throws(() => validateFile('report.pdf', 100), /Office and PDF/);
+  assert.throws(() => validateFile('report.pdf', 100), /have their own tools/);
   assert.throws(() => validateFile('report.txt', 400001), /400 KB/);
   assert.throws(() => proposeEdits('a'.repeat(100001)), /100,000/);
   assert.throws(() => proposeEdits('x\u00a0'.repeat(501)), /500 suggestions/);

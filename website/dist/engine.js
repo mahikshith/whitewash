@@ -175,14 +175,14 @@ export function inspectWriting(text, format = 'txt', locks = []) {
       findings.push({ text: match[0], position: match.index + 1, note });
     }
   };
-  add(/(?<![\p{L}\p{N}_])(?:it is (?:important|worthwhile) to note that|it should be noted that|in today's fast-paced world|in the modern era)(?![\p{L}\p{N}_])/giu, 'Consider starting with the point itself.');
-  add(/(?<![\p{L}\p{N}_])(?:as an ai(?: language model)?|i hope this helps|let me know if you (?:have|need)|here is the (?:revised|rewritten) (?:text|version))(?![\p{L}\p{N}_])/giu, 'Check whether this assistant-style aside belongs in the final draft.');
-  add(/(?<![\p{L}\p{N}_])(?:seamless(?:ly)?|game-changing|cutting-edge|unparalleled)(?![\p{L}\p{N}_])/giu, 'Consider a concrete detail that supports this description.');
+  add(/(?<![\p{L}\p{N}_])(?:it is (?:important|worthwhile) to note that|it should be noted that|in today's fast-paced world|in the modern era)(?![\p{L}\p{N}_])/giu, 'Filler opener. Lead with the point instead.');
+  add(/(?<![\p{L}\p{N}_])(?:as an ai(?: language model)?|i hope this helps|let me know if you (?:have|need)|here is the (?:revised|rewritten) (?:text|version))(?![\p{L}\p{N}_])/giu, 'Chatbot leftover. You probably want to cut it.');
+  add(/(?<![\p{L}\p{N}_])(?:seamless(?:ly)?|game-changing|cutting-edge|unparalleled)(?![\p{L}\p{N}_])/giu, 'Hype word. A concrete detail would say more.');
   return findings.sort((a, b) => a.position - b.position);
 }
 
 export function validateFile(name, size) {
-  if (!/\.(txt|md|markdown)$/i.test(name)) throw new Error('Choose a UTF-8 .txt or .md file. Office and PDF editing are not available yet.');
-  if (size > MAX_FILE_BYTES) throw new Error('Choose a file smaller than 400 KB (100,000 characters).');
+  if (!/\.(txt|md|markdown)$/i.test(name)) throw new Error('Choose a .txt or .md file. Word, slide and spreadsheet files have their own tools.');
+  if (size > MAX_FILE_BYTES) throw new Error('Text files can be up to 400 KB.');
   return /\.(md|markdown)$/i.test(name) ? 'md' : 'txt';
 }

@@ -12,7 +12,8 @@ From this directory, run `python -m http.server 4173 --bind 127.0.0.1 --director
 - Unicode inspection with counts and positions. Emoji/script joiners and direction controls are retained. No compatibility normalization or stripping non-ASCII text.
 - Exact user-locked phrases, numbers, URLs/email, quotations and conservative code protection.
 - Edit text file: local UTF-8 TXT/Markdown selection and drag/drop, followed by automatic local light editing; copy/download. Uploaded originals are never rewritten.
-- A 13-tool homepage, shared top menu and dedicated task URLs. Nine tools work; future tools have clearly labeled status pages. The mobile layout keeps the primary action visible.
+- A homepage with the paste box in the hero, a drop-anywhere radial wheel and grouped tools. Twelve tools work; four planned tools have their own status pages.
+- Images: convert between JPG, PNG and WebP, resize, and strip photo metadata, using the browser canvas. Up to 50 images at a time, 40 MB and 100 megapixels each.
 - Refine Word, slide and spreadsheet text: local DOCX/PPTX/XLSX copies, light English phrase edits or character cleanup, protected text and structural/output verification. Main-body/table text for Word; slide text for PowerPoint; long prose cells for spreadsheets.
 - Office metadata: clear standard core/custom property children, selected application fields and ZIP dates/extras/comments; list removed properties and verify the copy. Comments, revisions, embedded media and visible content remain.
 - Writing check: flag specific filler, promotional and assistant-style phrases; no authorship percentage. Optional plain punctuation; inspect Unicode tags/variation selectors while retaining them.
@@ -34,9 +35,9 @@ The comparison protocol is in [the benchmark plan](../docs/research/benchmark-pl
 
 ## UI structure
 
-The directory and top menu share `dist/tools.js`. Add new shipped tools first and set `isNew`; do not label planned tools ready. Hash task URLs such as `#clean-text`, `#light-edit`, `#characters` and `#text-file` keep the draft in memory. Old `#studio` links resolve to their matching task. `dist/styles.css` is the single stylesheet; `dist/theme.js` applies appearance before paint.
+The homepage, the Tools menu and every page heading read from the shared catalog in `dist/tools.js`, which also defines the Writing / Documents / Images groups. Planned tools stay in the catalog with `state: 'soon'` or `'research'` and appear only under "Coming next". Hash URLs such as `#light-edit`, `#word` and `#image-resize` keep the draft in memory, and old `#studio` links still resolve. `dist/styles.css` is the single stylesheet; `dist/theme.js` applies appearance before paint.
 
-No decorative hero or separate feature bar. One consistent sans-serif font, short tool descriptions, one primary action per task, and advanced controls behind Options. See [design decisions](../docs/ui-design.md).
+The drop-anywhere wheel lives in `dist/wheel.js` (events and drawing), `dist/wheel-geometry.js` (angles, hit-testing, segment paths) and `dist/actions.js` (which options fit which files). Image conversion uses the canvas in `dist/images.js` and `dist/image-ui.js`; batches download as one ZIP built with the existing `office-zip.js`. The status pill is `dist/island.js`. See [design](../docs/ui-design.md) and [research](../research/README.md).
 
 ## Office limits and validation
 
@@ -48,4 +49,3 @@ Word fields/known code/headings/links/revisions are skipped; headers, footnotes,
 
 Run `npm test` for synthetic engine/package checks. With python-docx, python-pptx, openpyxl and Node installed, `python ../scripts/check-office-roundtrips.py` generates representative fixtures under ignored `.research/qa`, processes them and independently reopens all six edited/metadata copies. It checks library readability and structural/content invariants, not visual rendering in Microsoft Office. No browser file upload automation was used after the prior declined upload permission.
 
-Homepage cards use the catalog `before` and `after` fields to show input → outcome without an extra description. Task pages keep their title/description; availability badges remain visible and accessible.

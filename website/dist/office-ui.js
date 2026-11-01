@@ -15,13 +15,13 @@ export function showOffice(tool) {
   $('office-description').textContent = tool.description;
   $('office-input').accept = tool.accept;
   $('office-options').hidden = tool.id === 'metadata';
-  $('office-limits').textContent = tool.accept.toUpperCase().replaceAll('.', '').replaceAll(',', ' / ') + ' · up to 10 MB · processed on your device';
+  $('office-limits').textContent = tool.accept.toUpperCase().replaceAll('.', '').replaceAll(',', ', ') + ' · up to 10 MB · or drop it here';
   updateAction();
 }
 
 function updateAction() {
   $('office-action').disabled = false;
-  $('office-action').textContent = output ? 'Download cleaned copy' : source ? 'Apply options' : active?.action || 'Select file';
+  $('office-action').textContent = output ? 'Download the new copy' : source ? 'Run again' : active?.action || 'Choose a file';
   $('office-another').hidden = !source;
 }
 
@@ -30,7 +30,7 @@ async function run() {
   const version = ++generation, tool = active, input = source;
   output = null;
   $('office-output').hidden = true; $('office-error').hidden = true;
-  $('office-action').disabled = true; $('office-action').textContent = 'Processing…';
+  $('office-action').disabled = true; $('office-action').textContent = 'Working…';
   try {
     const result = await processOffice(input.bytes, input.name, {
       metadata: tool.id === 'metadata', mode: $('office-mode').value,
@@ -41,13 +41,13 @@ async function run() {
     const report = result.report;
     const rows = tool.id === 'metadata' ? report.properties : report.edits;
     $('office-summary').textContent = tool.id === 'metadata'
-      ? rows.length + ' properties removed'
-      : rows.length ? rows.length + (rows.length === 1 ? ' edit applied' : ' edits applied') : 'No matching edits. Original content retained.';
+      ? (rows.length ? 'Removed ' + rows.length + (rows.length === 1 ? ' field' : ' fields') : 'No info fields found. The file was already clean.')
+      : rows.length ? rows.length + (rows.length === 1 ? ' edit made' : ' edits made') : 'Nothing to change. This one already reads fine.';
     $('office-scope').textContent = tool.id === 'metadata'
-      ? 'Core and custom properties cleared; selected app properties and ZIP dates cleared. Comments, revisions and embedded media remain.'
-      : tool.id === 'word' ? 'Main body and tables. Fields, links, tracked revisions, code, headers and footnotes are kept.'
-        : tool.id === 'presentations' ? 'Slide text only. Notes, masters, fields and links are kept.'
-          : 'Prose cells only. Formulas, numbers, first-row labels and short cells are kept.';
+      ? 'Author, company, app and date fields are gone. Comments, tracked changes and images inside the file are still there.'
+      : tool.id === 'word' ? 'Edited the body text and tables. Headers, footnotes, links, fields and tracked changes were left alone.'
+        : tool.id === 'presentations' ? 'Edited the text on your slides. Speaker notes, layouts, fields and links were left alone.'
+          : 'Edited long text cells only. Formulas, numbers, header rows and short cells were left alone.';
     $('office-changes').replaceChildren();
     for (const item of rows) {
       const row = document.createElement('div'); row.className = 'office-change';
@@ -58,7 +58,7 @@ async function run() {
     }
     $('office-review').hidden = !rows.length;
     $('office-review').open = false;
-    $('office-review-title').textContent = 'Review changes (' + rows.length + ')';
+    $('office-review-title').textContent = 'See changes (' + rows.length + ')';
     $('office-output').hidden = false;
     $('office-summary').focus();
   } catch (error) {
@@ -68,14 +68,14 @@ async function run() {
   } finally { if (generation === version) updateAction(); }
 }
 
-async function load(file) {
+export async function loadOfficeFile(file) {
   if (!file || !active) return;
   const version = ++generation, tool = active;
   output = null; source = null;
   $('office-output').hidden = true; $('office-filename').hidden = true; $('office-error').hidden = true;
   try {
-    if (!tool.accept.split(',').some((extension) => file.name.toLowerCase().endsWith(extension))) throw new Error('Choose ' + tool.accept + ' for this tool.');
-    if (file.size > 10_000_000) throw new Error('Choose a file smaller than 10 MB.');
+    if (!tool.accept.split(',').some((extension) => file.name.toLowerCase().endsWith(extension))) throw new Error('This tool takes ' + tool.accept.replaceAll(',', ', ') + ' files.');
+    if (file.size > 10_000_000) throw new Error('That file is over 10 MB.');
     const bytes = new Uint8Array(await file.arrayBuffer());
     if (generation !== version || active?.id !== tool.id) return;
     source = { bytes, name: file.name };
@@ -97,13 +97,13 @@ $('office-action').addEventListener('click', () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 $('office-another').addEventListener('click', () => $('office-input').click());
-$('office-input').addEventListener('change', () => load($('office-input').files[0]));
+$('office-input').addEventListener('change', () => loadOfficeFile($('office-input').files[0]));
 for (const id of ['office-mode', 'office-punctuation', 'office-locks']) $(id).addEventListener('input', () => {
   generation++; output = null; $('office-output').hidden = true; updateAction();
 });
 $('office-view').addEventListener('dragover', (event) => { if ([...event.dataTransfer.types].includes('Files')) event.preventDefault(); });
 $('office-view').addEventListener('drop', (event) => {
   event.preventDefault();
-  if (event.dataTransfer.files.length === 1) load(event.dataTransfer.files[0]);
-  else { $('office-error').textContent = 'Choose one Office file at a time.'; $('office-error').hidden = false; }
+  if (event.dataTransfer.files.length === 1) loadOfficeFile(event.dataTransfer.files[0]);
+  else { $('office-error').textContent = 'One file at a time, please.'; $('office-error').hidden = false; }
 });
