@@ -8,6 +8,7 @@ const PRESETS = {
   'image-convert': { format: 'image/webp', longest: 0, fields: ['format', 'quality'] },
   'image-resize': { format: 'keep', longest: 1600, fields: ['size', 'format', 'quality'] },
   'image-clean': { format: 'keep', longest: 0, fields: ['quality'], suffix: '-clean' },
+  'image-compress': { format: 'keep', longest: 2560, quality: 72, fields: ['size', 'format', 'quality'], suffix: '-small', squeeze: true },
 };
 
 function settings() {
@@ -17,6 +18,7 @@ function settings() {
     quality: Number($('image-quality').value) / 100,
     longest: preset.fields.includes('size') ? Math.max(16, Math.min(20000, Number($('image-longest').value) || 0)) : 0,
     suffix: preset.suffix || '',
+    squeeze: !!preset.squeeze,
   };
 }
 
@@ -27,6 +29,7 @@ export function showImages(tool) {
     sources = []; results = [];
     $('image-format').value = preset.format;
     $('image-longest').value = preset.longest || 1600;
+    $('image-quality').value = preset.quality || 88; $('image-quality-value').textContent = $('image-quality').value;
     $('image-output').hidden = true; $('image-error').hidden = true;
     for (const field of ['format', 'size', 'quality']) $('image-' + field + '-field').hidden = !preset.fields.includes(field);
   }
@@ -40,7 +43,11 @@ async function convertAll(files, options, onStep) {
   const done = [], failed = [];
   for (const [i, file] of files.entries()) {
     onStep?.(i, file);
-    try { done.push(await convertImage(file, options)); }
+    try {
+      const item = await convertImage(file, options);
+      if (options.squeeze) { const { squeeze } = await import('./image-squeeze.js'); item.blob = await squeeze(item.blob, options.quality); }
+      done.push(item);
+    }
     catch (error) { failed.push(error.message); }
   }
   uniqueNames(done.map((item) => item.name)).forEach((name, i) => { done[i].name = name; });

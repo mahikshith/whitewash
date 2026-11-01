@@ -40,22 +40,27 @@ See [audio-archives-synthid.md](audio-archives-synthid.md).
 - The CSP adds `blob:` to `worker-src`, because the audio encoders start their workers from blobs.
 - About 250 conversion routes in total.
 
-## Phase 3: heavier tools (WASM)
+## Phase 3: menu, info cards and the tools people pay for (shipped)
 
-Adds `'wasm-unsafe-eval'` to the CSP. Each library is lazy-loaded and comes with a size warning.
+- **Menu.** The header has a grouped "Tools" mega menu (tabs on the left, tools on the right) with a search box that understands "pdf to word", "jpg 2 png", "compress pdf" or just "mp3". Ctrl/⌘K or `/` opens it. Four quick links sit beside it.
+- **Clear notes.** Every conversion and every wheel action has a short "You get / Keeps / Drops / Note" card (`notes.js`): beside the wheel, and under the converter's format chips on hover or focus.
+- **PDF:** compress (re-saves the photos inside at a lower resolution with canvas, then a lossless qpdf pass; never returns a bigger file), sign (draw, click to place), password protect (AES-256) and unlock (qpdf WASM in a worker), repair (qpdf, with a pdf-lib rebuild as fallback because this qpdf build can't run its own xref reconstruction).
+- **OCR** for photos and scanned PDFs (Tesseract.js 7, English, about 15 MB, downloaded once on first use). Gives text, a hand-off to Polish, and a searchable PDF.
+- **Image compression** with MozJPEG and OxiPNG (@jsquash).
+- The wheel now offers Shrink and Sign for a PDF, Shrink and Text (OCR) for an image.
+- The CSP gains `'wasm-unsafe-eval'`. Still no `'unsafe-eval'`.
 
-- Better image compression (MozJPEG, WebP, OxiPNG via @jsquash).
-- HEIC → JPG (native decoding first, libheif as a fallback).
-- OCR for scanned PDFs and images (Tesseract.js, English first, about 6–9 MB).
-- PDF password protect and unlock (qpdf WASM).
-- Real redaction that burns pages to images, never boxes drawn over live text.
+Skipped in this phase:
+
+- **HEIC → JPG.** heic2any needs `new Function` (embind), which the CSP forbids. Revisit with a libheif build that doesn't, or Safari's native decoding.
+- **Real redaction.** Needs page rasterising plus a box-drawing UI; next candidate.
+- **PDF → Excel** (table detection) and **Office ↔ PDF with layout** (see below).
 
 ## Not building
 
 - **Word ↔ PDF with layout.** It needs a LibreOffice WASM build of tens of MB plus server headers, and the output still breaks. This is the conversion people search for most, so the site should say plainly that it isn't offered.
 - **Video conversion.** Encoding video needs ffmpeg.wasm (about 30 MB, crashes on phones, GPL parts, special server headers) or a server. Removed from scope on 1 November 2026. Reading a video for its sound is fine and shipped.
 - **SynthID removal.** See [audio-archives-synthid.md](audio-archives-synthid.md): not built, by decision.
-- **"Compress PDF"** unless it actually resamples images. Anything else saves a few percent and would be a misleading label.
 - **Matching CloudConvert's 200+ formats.** They run servers.
 
 ## Open questions for the owner

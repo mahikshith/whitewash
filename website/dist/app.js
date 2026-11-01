@@ -11,6 +11,7 @@ import { PICKER_ACCEPT } from './actions.js';
 import { showArchive, loadArchive } from './archive-ui.js';
 import * as island from './island.js';
 import { initMenu } from './menu.js';
+import { showOcr, loadOcr, setOcrPolishHandler } from './ocr-ui.js';
 import { FORMATS } from './convert.js';
 import { routeNote } from './notes.js';
 import { formatBytes } from './images.js';
@@ -125,7 +126,7 @@ function route() {
   const office = ready && active.mode === 'office';
   const image = ready && active.mode === 'image';
   const mode = ready ? active.mode : null;
-  const separate = ['office', 'image', 'convert', 'pdf', 'wipe', 'archive'].includes(mode);
+  const separate = ['office', 'image', 'convert', 'pdf', 'wipe', 'archive', 'ocr'].includes(mode);
   $('home-view').hidden = !!active;
   $('tool-view').hidden = !ready || separate;
   $('office-view').hidden = !office;
@@ -134,6 +135,7 @@ function route() {
   $('pdf-view').hidden = mode !== 'pdf';
   $('wipe-view').hidden = mode !== 'wipe';
   $('archive-view').hidden = mode !== 'archive';
+  $('ocr-view').hidden = mode !== 'ocr';
   $('float-orb').hidden = !active;
   showOffice(office ? active : null);
   showImages(image ? active : null);
@@ -141,6 +143,7 @@ function route() {
   showPdf(mode === 'pdf' ? active : null);
   showWipe(mode === 'wipe' ? active : null);
   showArchive(mode === 'archive' ? active : null);
+  showOcr(mode === 'ocr' ? active : null);
   $('upcoming-view').hidden = !active || ready;
   $('tools-menu').open = false;
   document.title = active ? active.title + ' · Whitewash' : 'Whitewash: make AI drafts sound like you';
@@ -401,6 +404,7 @@ async function runAction(action, files) {
   else if (tool.mode === 'pdf') loadPdf(files);
   else if (tool.mode === 'wipe') loadWipe(files);
   else if (tool.mode === 'archive') loadArchive(files);
+  else if (tool.mode === 'ocr') loadOcr(files);
   else loadFile(files[0]);
 }
 // From the wheel: pack the dropped files into one ZIP and save it.
@@ -415,12 +419,14 @@ async function quickZip(files) {
   } catch (error) { island.fail('Couldn’t make the ZIP', error.message); }
 }
 
-setPolishHandler(async (text, name) => {
+async function polishExtracted(text, name) {
   await openTool('light-edit');
-  if (text.length > MAX_CHARACTERS) { notify('That PDF has over 100,000 characters of text. Only the first part was loaded.'); text = text.slice(0, MAX_CHARACTERS); }
+  if (text.length > MAX_CHARACTERS) { notify('That file has over 100,000 characters of text. Only the first part was loaded.'); text = text.slice(0, MAX_CHARACTERS); }
   replace(text, name, 'txt', true);
   processDraft();
-});
+}
+setPolishHandler(polishExtracted);
+setOcrPolishHandler(polishExtracted);
 initWheel({ isActive: (event) => !$('home-view').hidden || !!event?.target?.closest?.('#float-orb'), anchor: () => $('home-view').hidden ? $('float-orb') : null, onRun: runAction, onReject: notify });
 $('pick-input').accept = PICKER_ACCEPT;
 $('float-input').accept = PICKER_ACCEPT;

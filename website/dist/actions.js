@@ -42,7 +42,7 @@ function single(format) {
   if (AUDIO.includes(format)) return [...['mp3', 'wav', 'flac', 'm4a', 'ogg'].filter((f) => f !== format).slice(0, 4).map((f) => to(f)), more];
   if (VIDEO.includes(format)) return [to('mp3', 'Save the sound as MP3'), to('m4a', 'Save the sound as M4A'), to('wav', 'Save the sound as WAV'), more];
   if (ARCHIVES.includes(format)) return [{ id: 'open', label: 'Open', hint: 'See and save what’s inside', tool: 'archives' }, ...['zip', 'tgz', 'tar'].filter((f) => f !== format).map((f) => to(f)), more];
-  if (format === 'pdf') return [to('docx'), { id: 'pdf-polish', label: 'Polish', hint: 'Polish the text in this PDF', tool: 'pdf-polish' }, to('jpg', 'Save each page as a JPG'), wipe, { id: 'organize', label: 'Pages', hint: 'Reorder, rotate or delete pages', tool: 'pdf-organize' }, more];
+  if (format === 'pdf') return [to('docx'), { id: 'pdf-polish', label: 'Polish', hint: 'Polish the text in this PDF', tool: 'pdf-polish' }, { id: 'compress', label: 'Shrink', hint: 'Make the file smaller for email', tool: 'pdf-compress' }, { id: 'sign', label: 'Sign', hint: 'Draw your signature on it', tool: 'pdf-sign' }, wipe, { id: 'organize', label: 'Pages', hint: 'Reorder, rotate or delete pages', tool: 'pdf-organize' }, more];
   return null;
 }
 
@@ -55,8 +55,9 @@ export function wheelActions(files) {
   if (files.length > 50) return { actions: [], reason: 'Drop up to 50 files at a time.' };
   if (formats.every((f) => IMAGES.includes(f))) {
     const actions = ['jpg', 'png', 'webp'].filter((f) => f !== same).map((f) => ({ ...to(f), convert: FORMATS[f].mime }));
-    actions.push({ id: 'to-pdf', label: 'PDF', hint: files.length > 1 ? 'Put them all in one PDF' : 'Make a PDF', tool: 'images-to-pdf' }, wipe, { id: 'resize', label: 'Resize', hint: 'Pick a new size', tool: 'image-resize' });
+    actions.push({ id: 'to-pdf', label: 'PDF', hint: files.length > 1 ? 'Put them all in one PDF' : 'Make a PDF', tool: 'images-to-pdf' }, wipe, { id: 'squeeze', label: 'Shrink', hint: 'Much smaller files, same look', tool: 'image-compress' });
     if (files.length > 1) actions.push(zip(files.length));
+    else actions.push({ id: 'ocr', label: 'Text', hint: 'Read the words in this image', tool: 'ocr' });
     actions.push(more);
     return { actions, kind: 'image' };
   }

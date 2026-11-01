@@ -125,6 +125,16 @@
       <label data-for="pdf-watermark">Text <input id="pdf-wm-text" class="text-input" value="DRAFT" maxlength="60"></label>
       <label data-for="pdf-watermark">Strength <input id="pdf-wm-opacity" type="range" min="5" max="60" value="18"></label>
       <label data-for="pdf-numbers">Where <select id="pdf-num-pos"><option value="bottom-center">Bottom middle</option><option value="bottom-right">Bottom right</option><option value="bottom-left">Bottom left</option><option value="top-center">Top middle</option><option value="top-right">Top right</option></select></label>
+      <label data-for="pdf-protect">Password <input id="pdf-pass" class="text-input" type="password" autocomplete="new-password" minlength="4"></label>
+      <label data-for="pdf-protect">Type it again <input id="pdf-pass2" class="text-input" type="password" autocomplete="new-password"></label>
+      <label data-for="pdf-protect" class="check"><input type="checkbox" id="pdf-allow-print" checked> Allow printing</label>
+      <label data-for="pdf-protect" class="check"><input type="checkbox" id="pdf-allow-copy"> Allow copying text</label>
+      <label data-for="pdf-unlock">Password <input id="pdf-unlock-pass" class="text-input" type="password" autocomplete="current-password"></label>
+      <label data-for="pdf-compress">Strength <select id="pdf-level"><option value="light">Light · photos stay sharp</option><option value="balanced" selected>Balanced · good for email</option><option value="strong">Strong · smallest, softer photos</option></select></label>
+      <div data-for="pdf-sign" class="sign-pad-wrap"><span>Draw your signature</span><canvas id="sign-pad" width="560" height="180" aria-label="Signature pad: draw with a mouse, finger or pen"></canvas><button type="button" class="text-button" id="sign-clear">Clear</button></div>
+      <label data-for="pdf-sign">Page <select id="sign-page"></select></label>
+      <label data-for="pdf-sign">Size <input id="sign-size" type="range" min="10" max="60" value="28"></label>
+      <div data-for="pdf-sign" class="sign-preview-wrap"><span>Click the page to move the signature</span><div id="sign-preview" class="sign-preview"><img id="sign-page-img" alt="Page preview"><img id="sign-ghost" class="sign-ghost" alt="" hidden></div></div>
       <label data-for="pdf-numbers">Style <select id="pdf-num-format"><option value="n / total">1 / 12</option><option value="n">1</option><option value="Page n of total">Page 1 of 12</option></select></label>
     </div>
     <div class="primary-row"><button id="pdf-run" class="primary" disabled>Go</button></div>
@@ -160,6 +170,21 @@
     <p class="image-note">Everything is unpacked and packed in this tab. RAR files can be opened but not made, because the format is closed. Password-protected archives aren’t supported yet. New archives record every file date as 1 January 1980, so they don’t show when you made them.</p>
   </section>
   <input id="archive-input" type="file" multiple hidden>
+</main>
+<main id="ocr-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="ocr-title"></h1><p id="ocr-description"></p></div>
+  <section class="panel" aria-label="Read text from scans">
+    <div class="office-entry"><button id="ocr-pick" class="primary large">Choose a scan or photo</button><p>JPG, PNG, WebP or a scanned PDF · English · up to 50 pages · or drop it here</p></div>
+    <section id="ocr-output" class="office-output" hidden aria-live="polite">
+      <h2 id="ocr-summary"></h2>
+      <textarea id="ocr-text" class="ocr-text" rows="12" spellcheck="false" aria-label="Text found"></textarea>
+      <div class="image-buttons"><button class="primary" id="ocr-polish">Polish this text</button><button class="text-button" id="ocr-copy">Copy</button><button class="text-button" id="ocr-save">Save as .txt</button><button class="text-button" id="ocr-pdf">Save searchable PDF</button></div>
+    </section>
+    <p id="ocr-error" class="office-error" role="alert" hidden></p>
+    <p class="image-note">The text reader downloads once (about 7 MB) and then runs in this tab. Clear, straight scans at a normal size work best. Handwriting mostly won’t work. Check names and numbers before you rely on them.</p>
+  </section>
+  <input id="ocr-input" type="file" multiple hidden accept="image/jpeg,image/png,image/webp,image/bmp,image/gif,.pdf,application/pdf">
 </main>
 <main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#light-edit">Polish a draft instead</a></div></main>
 </div>
@@ -204,6 +229,11 @@
 <symbol id="hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></symbol>
 <symbol id="audio" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
 <symbol id="archive" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 3v2M12 7v2M12 11v2M10.5 15h3v3h-3z"/></symbol>
+<symbol id="compress" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></symbol>
+<symbol id="pen" viewBox="0 0 24 24"><path d="M3 21c3-1 5-4 7-4s1 3 4 3 4-2 7-2M15 4l4 4-8 8H7v-4z"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></symbol>
+<symbol id="wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8-1.5-1.5a4 4 0 0 1-5-5L13 2l1.5 4.5zM3 21l4-4"/></symbol>
 <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 </body>

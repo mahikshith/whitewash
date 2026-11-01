@@ -40,7 +40,7 @@ export function searchAll(query, limit = 12) {
   }
   const terms = q.split(/\s+/).filter((t) => t && !STOP.has(t));
   const scored = tools.filter((tool) => tool.state === 'ready').map((tool) => {
-    const title = normal(tool.title), body = normal(tool.description + ' ' + (groups.find((g) => g.id === tool.group)?.title || ''));
+    const title = normal(tool.title + ' ' + (tool.tags || '')), body = normal(tool.description + ' ' + (groups.find((g) => g.id === tool.group)?.title || ''));
     let score = 0;
     for (const term of terms) {
       if (title.split(/\W+/).some((w) => w.startsWith(term))) score += 3;
@@ -49,6 +49,10 @@ export function searchAll(query, limit = 12) {
     }
     return { tool, score };
   }).filter((r) => r.score > 0).sort((a, b) => b.score - a.score);
+  // A tool whose name or tags match ("zip", "compress pdf") leads; plain
+  // format suggestions ("mp3 → wav") follow.
+  const strong = scored.filter((r) => r.score >= 3 * terms.length);
+  if (!pair) results.unshift(...strong.map(({ tool }) => ({ kind: 'tool', tool })));
   for (const { tool } of scored) results.push({ kind: 'tool', tool });
   // A route that has its own tool page shows as that tool, not twice.
   const covered = (r) => r.kind === 'route' && tools.some((t) => t.state === 'ready' && [].concat(t.from).includes(r.from) && t.to === r.to);

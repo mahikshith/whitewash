@@ -12,13 +12,15 @@ From this directory, run `python -m http.server 4173 --bind 127.0.0.1 --director
 - Unicode inspection with counts and positions. Emoji/script joiners and direction controls are retained. No compatibility normalization or stripping non-ASCII text.
 - Exact user-locked phrases, numbers, URLs/email, quotations and conservative code protection.
 - Edit text file: local UTF-8 TXT/Markdown selection and drag/drop, followed by automatic local light editing; copy/download. Uploaded originals are never rewritten.
-- A homepage with the paste box in the hero, a drop-anywhere radial wheel and grouped tools. 25 tools work; four planned tools have their own status pages. Tool pages show a floating orb that takes drops and opens the same wheel.
+- A homepage with the paste box in the hero, a drop-anywhere radial wheel and grouped tools. 35 tools work; four planned tools have their own status pages. Tool pages show a floating orb that takes drops and opens the same wheel.
 - Convert: about 150 routes between documents (TXT, MD, HTML, DOCX, ODT, RTF, EPUB, PDF, PPTX in), data (CSV, TSV, JSON, XLSX, ODS), subtitles (SRT, VTT) and images (JPG, PNG, WebP, GIF, BMP, AVIF, SVG in; TIFF and ICO out as well). Documents keep text, headings, lists, links and tables, not page layout. Up to 50 files of one type, 60 MB each.
 - Audio: MP3, WAV, FLAC, OGG, Opus, M4A and AAC into MP3, WAV, FLAC, OGG, Opus and M4A, plus the sound from MP4, MOV, MKV and WebM videos. Up to 1 GB. Tags and cover art carry over. Nothing encodes video.
 - Archives: open ZIP, 7Z, RAR, TAR, TAR.GZ/BZ2/XZ, GZ, BZ2 and XZ, save single files out of them, convert them to ZIP, TAR or TAR.GZ, or pack any files into a new one. Up to 300 MB and 10,000 files.
-- PDF tools: merge, split, organize pages with thumbnails, images to PDF, PDF to images, watermark, page numbers, and PDF text into the Polish tool. Password-protected PDFs are refused with a clear message.
+- PDF tools: merge, split, organize pages with thumbnails, images to PDF, PDF to images, watermark, page numbers, compress (real photo downsampling), sign (drawn signature), add or remove a password (AES-256, qpdf WASM), repair, and PDF text into the Polish tool.
+- Read text from scans (OCR): photos and scanned PDFs, English, up to 50 pages. Text to copy, polish or save, plus a searchable PDF. Tesseract.js, about 15 MB, loaded on first use.
+- Search and menu: the Tools menu groups every tool and searches tools and conversion routes ("pdf to word", "mp3", "compress"). Every conversion shows what you get, what's kept and what's dropped.
 - Metadata wiper: photos, PDFs and Office files, up to 100 at a time. Lists what it found, removes it, then reopens the copy to confirm nothing is left. Photos are not re-encoded.
-- Images: convert between JPG, PNG and WebP, resize, and strip photo metadata, using the browser canvas. Up to 50 images at a time, 40 MB and 100 megapixels each.
+- Images: convert between JPG, PNG and WebP, resize, compress (MozJPEG, OxiPNG) and strip photo metadata. Up to 50 images at a time, 40 MB and 100 megapixels each.
 - Refine Word, slide and spreadsheet text: local DOCX/PPTX/XLSX copies, light English phrase edits or character cleanup, protected text and structural/output verification. Main-body/table text for Word; slide text for PowerPoint; long prose cells for spreadsheets.
 - Office metadata: clear standard core/custom property children, selected application fields and ZIP dates/extras/comments; list removed properties and verify the copy. Comments, revisions, embedded media and visible content remain.
 - Writing check: flag specific filler, promotional and assistant-style phrases; no authorship percentage. Optional plain punctuation; inspect Unicode tags/variation selectors while retaining them.
@@ -30,7 +32,7 @@ One UTF-8 file, 400 KB, 100,000 UTF-16 code units, up to 500 suggestions per rev
 
 Markdown is edited as text, not rendered. Both fence types, unclosed fences, indented code, inline-code lines, frontmatter, and heading/link/table/HTML/math-like lines are conservatively retained. This is not a complete Markdown parser or a promise of every dialect's structural fidelity. Mixed-script word boundaries are respected. Word counts are space-delimited estimates and are unsuitable for exact Chinese segmentation.
 
-Light edits are not a factual or grammatical certification. Review them in context. This version does not do general model rewriting, persistent voice profiles, OCR of scanned PDFs, layout-faithful Word ↔ PDF, video conversion, SynthID removal, password-protected archives, AI classification or keyed watermark verification. It cannot certify human authorship or universal watermark removal. There is no billing flow yet.
+Light edits are not a factual or grammatical certification. Review them in context. This version does not do general model rewriting, persistent voice profiles, non-English OCR, HEIC photos, redaction, layout-faithful Word ↔ PDF, video conversion, SynthID removal, password-protected archives, AI classification or keyed watermark verification. It cannot certify human authorship or universal watermark removal. There is no billing flow yet.
 
 ## Publication and source
 

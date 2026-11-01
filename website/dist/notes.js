@@ -65,6 +65,10 @@ const TOOL = {
   open: { title: 'Open archive', rows: [['You get', 'A list of what’s inside, to save one file or all of them']] },
   zip: { title: 'Pack into a ZIP', rows: [['You get', 'One ZIP with every file'], ['Drops', 'File dates (set to 1980)']] },
   more: { title: 'More formats', rows: [['You get', 'Every format this file can become']] },
+  compress: { title: 'Shrink PDF', rows: [['You get', 'The same PDF, smaller, with photos re-saved at a lower resolution'], ['Keeps', 'Text, fonts and drawings, sharp and selectable'], ['Note', 'If it can’t get smaller you get the original back']] },
+  sign: { title: 'Sign', rows: [['You get', 'Your drawn signature placed on the page you pick'], ['Note', 'A visible signature, not a certificate-based digital signature']] },
+  squeeze: { title: 'Shrink images', rows: [['You get', 'Smaller files at up to 2560 px, tuned with MozJPEG and OxiPNG'], ['Drops', 'Camera details like location']] },
+  ocr: { title: 'Read the text', rows: [['You get', 'The words in the image as text you can copy, polish or save'], ['Also', 'A searchable PDF of the image'], ['Note', 'English only for now. Clear, straight photos work best']] },
   'to-pdf-images': { title: 'Images → PDF', rows: [['You get', 'One PDF, one image per page'], ['Drops', 'Camera details like location']] },
 };
 

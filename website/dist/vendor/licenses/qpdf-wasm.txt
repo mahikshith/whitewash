@@ -1,0 +1,3 @@
+@neslinesli93/qpdf-wasm 0.3.0 (https://github.com/neslinesli93/qpdf-wasm)
+Licence: ISC, as declared in its package.json. The package ships no licence file.
+The WASM binary is a build of qpdf, licensed under Apache-2.0 (see qpdf.txt).

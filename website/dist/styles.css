@@ -317,14 +317,14 @@ button.orb:hover { transform:scale(1.06); }
 }
 
 /* Side card beside the wheel: what the highlighted option gives you */
-.wheel-info { position:absolute; top:50%; width:250px; transform:translateY(-50%); padding:16px 18px; border-radius:22px; background:var(--glass); color:var(--glass-ink); border:1px solid var(--glass-edge); backdrop-filter:blur(22px) saturate(170%); -webkit-backdrop-filter:blur(22px) saturate(170%); box-shadow:0 20px 50px rgba(0,0,0,.25); pointer-events:none; animation:info-in .18s ease-out; }
+.wheel-info { position:absolute; top:50%; width:250px; transform:translateY(-50%); padding:16px 18px; border-radius:22px; background:rgba(30,30,33,.92); color:#f5f3ee; border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(22px) saturate(170%); -webkit-backdrop-filter:blur(22px) saturate(170%); box-shadow:0 20px 50px rgba(0,0,0,.25); pointer-events:none; animation:info-in .18s ease-out; }
 .wheel[data-side="right"] .wheel-info { left:calc(100% + 8px); }
 .wheel[data-side="left"] .wheel-info { right:calc(100% + 8px); }
 .wheel-info strong { display:block; margin-bottom:8px; font:650 15px/1.2 var(--display, inherit); }
 .wheel-info dl { display:grid; grid-template-columns:auto 1fr; gap:5px 10px; margin:0; font-size:12.5px; line-height:1.4; }
-.wheel-info dt { opacity:.6; white-space:nowrap; }
+.wheel-info dt { opacity:.62; white-space:nowrap; }
 .wheel-info dd { margin:0; }
-.wheel-info small { display:block; margin-top:10px; font-size:11px; opacity:.55; }
+.wheel-info small { display:block; margin-top:10px; font-size:11px; opacity:.6; }
 @keyframes info-in { from { opacity:0; transform:translateY(-50%) translateX(var(--info-shift, 6px)); } }
 .wheel[data-side="left"] .wheel-info { --info-shift:-6px; }
 @media (max-width: 760px) {
@@ -377,3 +377,14 @@ button.orb:hover { transform:scale(1.06); }
   .menu-tabs button[aria-selected="true"] { box-shadow:inset 0 -2px 0 var(--accent, #c8f53b); }
   .menu-panel, .menu-results { grid-template-columns:1fr; }
 }
+
+/* PDF signing */
+.image-settings .check { flex-direction:row; align-items:center; gap:8px; }
+.sign-pad-wrap, .sign-preview-wrap { flex-basis:100%; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+#sign-pad { width:100%; max-width:560px; aspect-ratio:560/180; border:1.5px dashed var(--border); border-radius:16px; background:#fff; touch-action:none; cursor:crosshair; }
+.sign-pad-wrap .text-button { align-self:flex-start; }
+.sign-preview { position:relative; max-width:420px; border:1px solid var(--border); border-radius:10px; overflow:hidden; cursor:crosshair; background:#fff; }
+.sign-preview img#sign-page-img { display:block; width:100%; }
+.sign-ghost { position:absolute; pointer-events:none; height:auto; }
+
+.ocr-text { width:100%; margin:12px 0; padding:14px 16px; border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--ink); font:14px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; resize:vertical; }

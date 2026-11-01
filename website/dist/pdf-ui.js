@@ -6,7 +6,7 @@ import * as island from './island.js';
 const $ = (id) => document.getElementById(id);
 let active = null, items = [], pages = [], last = null, generation = 0, onPolish = null;
 const MULTI = { 'pdf-merge': true, 'images-to-pdf': true };
-const RUN_LABEL = { 'pdf-merge': 'Merge PDFs', 'pdf-split': 'Split PDF', 'pdf-organize': 'Save PDF', 'images-to-pdf': 'Make PDF', 'pdf-to-images': 'Save pages as images', 'pdf-polish': 'Polish the text', 'pdf-watermark': 'Add watermark', 'pdf-numbers': 'Add page numbers' };
+const RUN_LABEL = { 'pdf-protect': 'Add password', 'pdf-unlock': 'Unlock PDF', 'pdf-compress': 'Compress PDF', 'pdf-repair': 'Repair PDF', 'pdf-sign': 'Sign and save', 'pdf-merge': 'Merge PDFs', 'pdf-split': 'Split PDF', 'pdf-organize': 'Save PDF', 'images-to-pdf': 'Make PDF', 'pdf-to-images': 'Save pages as images', 'pdf-polish': 'Polish the text', 'pdf-watermark': 'Add watermark', 'pdf-numbers': 'Add page numbers' };
 const HINT = { 'images-to-pdf': 'JPG, PNG, WebP, GIF or BMP · add as many as you like · or drop them here', 'pdf-merge': 'Add two or more PDFs · or drop them here' };
 
 export const setPolishHandler = (fn) => { onPolish = fn; };
@@ -67,12 +67,13 @@ export async function loadPdf(list) {
   for (const file of accepted) {
     if (file.size > 100_000_000) { showError(file.name + ' is over 100 MB.'); continue; }
     const item = { file, bytes: await readBytes(file) };
-    if (!images) { try { item.pages = await pdf.pageCount(item.bytes); } catch (error) { showError(file.name + ': ' + error.message); continue; } }
+    if (!images && !['pdf-unlock', 'pdf-repair'].includes(active.id)) { try { item.pages = await pdf.pageCount(item.bytes); } catch (error) { showError(file.name + ': ' + error.message); continue; } }
     added.push(item);
   }
   if (version !== generation) return;
   items = MULTI[active.id] ? items.concat(added) : added.slice(0, 1);
   if (active.id === 'pdf-organize' && items[0]) await thumbnails(items[0].bytes, version);
+  if (active.id === 'pdf-sign' && items[0]) { $('sign-page').replaceChildren(...Array.from({ length: items[0].pages }, (_, i) => new Option('Page ' + (i + 1), i))); $('sign-page').value = items[0].pages - 1; await signPreview(); }
   render();
   if (!MULTI[active.id] && items.length && active.id === 'pdf-polish') run();
 }
@@ -151,6 +152,31 @@ async function run() {
       outputs = asPdf(await pdf.watermark(source.bytes, text, { opacity: Number($('pdf-wm-opacity').value) / 100 }), base + '-watermarked.pdf'); summary = 'Watermark added';
     } else if (tool === 'pdf-numbers') {
       outputs = asPdf(await pdf.pageNumbers(source.bytes, { position: $('pdf-num-pos').value, format: $('pdf-num-format').value }), base + '-numbered.pdf'); summary = 'Page numbers added';
+    } else if (tool === 'pdf-protect') {
+      const more = await import('./conv-pdf-more.js');
+      if ($('pdf-pass').value !== $('pdf-pass2').value) throw new Error('The two passwords don’t match.');
+      outputs = asPdf(await more.protect(source.bytes, $('pdf-pass').value, { allowPrint: $('pdf-allow-print').checked, allowCopy: $('pdf-allow-copy').checked }), base + '-protected.pdf');
+      summary = 'Password added (AES-256). Keep it somewhere safe: it can’t be recovered';
+    } else if (tool === 'pdf-unlock') {
+      const more = await import('./conv-pdf-more.js');
+      if (!more.isEncrypted(source.bytes)) throw new Error('This PDF has no password to remove.');
+      outputs = asPdf(await more.unlock(source.bytes, $('pdf-unlock-pass').value), base + '-unlocked.pdf'); summary = 'Password removed';
+    } else if (tool === 'pdf-repair') {
+      const more = await import('./conv-pdf-more.js');
+      outputs = asPdf(await more.repair(source.bytes), base + '-repaired.pdf'); summary = 'Rebuilt the PDF’s structure';
+    } else if (tool === 'pdf-compress') {
+      const more = await import('./conv-pdf-more.js');
+      const result = await more.compress(source.bytes, $('pdf-level').value, (n, total) => { $('pdf-run').textContent = 'Image ' + n + ' of ' + total + '…'; });
+      outputs = asPdf(result.bytes, base + '-compressed.pdf');
+      const saved = Math.round((1 - result.after / result.before) * 100);
+      summary = saved > 0 ? formatBytes(result.before) + ' → ' + formatBytes(result.after) + ' (' + saved + '% smaller, ' + result.images + (result.images === 1 ? ' photo' : ' photos') + ' shrunk)' : 'Already as small as it gets without hurting quality. You get the original back';
+    } else if (tool === 'pdf-sign') {
+      const more = await import('./conv-pdf-more.js');
+      if (!signed) throw new Error('Draw your signature first.');
+      if (!placed) throw new Error('Click the page where the signature should go.');
+      const png = new Uint8Array(await (await new Promise((r) => trimmed().toBlob(r, 'image/png'))).arrayBuffer());
+      outputs = asPdf(await more.sign(source.bytes, png, { page: Number($('sign-page').value), x: placed.x, y: placed.y, width: Number($('sign-size').value) / 100 }), base + '-signed.pdf');
+      summary = 'Signed on page ' + (Number($('sign-page').value) + 1);
     } else if (tool === 'pdf-polish') {
       const { extractText } = await import('./convert.js');
       const text = await extractText(source.file, (step) => { $('pdf-run').textContent = step + '…'; });
@@ -160,7 +186,7 @@ async function run() {
     }
     if (version !== generation) return;
     last = await saveAll(outputs, base + '-pages.zip');
-    $('pdf-summary').textContent = summary + ' · ' + formatBytes(last.blob.size);
+    $('pdf-summary').textContent = summary + (tool === 'pdf-compress' ? '' : ' · ' + formatBytes(last.blob.size));
     $('pdf-output').hidden = false;
   } catch (error) { if (version === generation) showError(error.message); }
   finally { if (version === generation) { $('pdf-run').textContent = RUN_LABEL[tool]; render(); } }
@@ -171,3 +197,47 @@ $('pdf-input').addEventListener('change', () => { const list = [...$('pdf-input'
 $('pdf-run').addEventListener('click', run);
 $('pdf-download').addEventListener('click', () => { if (last) island.saveBlob(last.blob, last.name); });
 dropZone($('pdf-view'), loadPdf);
+
+// ---------- Signature pad and placement ----------
+let signed = false, placed = null, drawing = false;
+const pad = $('sign-pad'), ink = pad.getContext('2d', { willReadFrequently: true });
+function padPoint(event) { const r = pad.getBoundingClientRect(); return [(event.clientX - r.left) * pad.width / r.width, (event.clientY - r.top) * pad.height / r.height]; }
+pad.addEventListener('pointerdown', (event) => { drawing = true; pad.setPointerCapture(event.pointerId); const [x, y] = padPoint(event); ink.beginPath(); ink.moveTo(x, y); ink.lineWidth = 3.2; ink.lineCap = ink.lineJoin = 'round'; ink.strokeStyle = '#0b1f5c'; });
+pad.addEventListener('pointermove', (event) => { if (!drawing) return; const [x, y] = padPoint(event); ink.lineTo(x, y); ink.stroke(); signed = true; });
+pad.addEventListener('pointerup', () => { drawing = false; updateGhost(); });
+$('sign-clear').addEventListener('click', () => { ink.clearRect(0, 0, pad.width, pad.height); signed = false; updateGhost(); });
+
+// The signature cropped to its ink, so the size slider means the signature's width.
+function trimmed() {
+  const { data, width, height } = ink.getImageData(0, 0, pad.width, pad.height);
+  let x0 = width, y0 = height, x1 = 0, y1 = 0;
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (data[(y * width + x) * 4 + 3]) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  const out = document.createElement('canvas');
+  if (x1 < x0) { out.width = out.height = 1; return out; }
+  out.width = x1 - x0 + 8; out.height = y1 - y0 + 8;
+  out.getContext('2d').drawImage(pad, x0 - 4, y0 - 4, out.width, out.height, 0, 0, out.width, out.height);
+  return out;
+}
+
+async function signPreview() {
+  if (!items[0]) return;
+  const { images } = await pdf.renderPages(items[0].bytes, { scale: 1, type: 'image/png', pages: [Number($('sign-page').value) + 1] });
+  const img = $('sign-page-img');
+  if (img.src) URL.revokeObjectURL(img.src);
+  img.src = URL.createObjectURL(images[0].blob);
+  placed = { x: 0.62, y: 0.84 }; updateGhost();
+}
+function updateGhost() {
+  const ghost = $('sign-ghost');
+  ghost.hidden = !(signed && placed);
+  if (ghost.hidden) return;
+  ghost.src = trimmed().toDataURL('image/png');
+  ghost.style.left = Math.min(placed.x, 1 - $('sign-size').value / 100) * 100 + '%'; ghost.style.top = placed.y * 100 + '%'; ghost.style.width = $('sign-size').value + '%';
+}
+$('sign-preview').addEventListener('click', (event) => {
+  const r = $('sign-page-img').getBoundingClientRect();
+  placed = { x: Math.min(0.98, Math.max(0, (event.clientX - r.left) / r.width)), y: Math.min(0.98, Math.max(0, (event.clientY - r.top) / r.height)) };
+  updateGhost();
+});
+$('sign-page').addEventListener('change', signPreview);
+$('sign-size').addEventListener('input', updateGhost);

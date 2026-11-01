@@ -48,3 +48,5 @@ export const archive = () => once('archive', async () => {
   return lib;
 });
 export const fflate = () => once('fflate', () => import('./vendor/fflate.mjs'));
+export const tesseract = () => once('tesseract', () => import('./vendor/tesseract/tesseract.esm.min.js').then((m) => m.default || m));
+export const tesseractPaths = () => ({ workerPath: new URL('tesseract/worker.min.js', base).href, corePath: new URL('tesseract/core/', base).href, langPath: new URL('tesseract/lang/', base).href, gzip: true });
