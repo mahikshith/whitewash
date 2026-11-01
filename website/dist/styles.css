@@ -17,7 +17,7 @@
   --page:#111113; --surface:#1a1a1d; --ink:#f1efe8; --muted:#a3a19a; --faint:#7b7972;
   --border:#2d2d31; --soft:#25252a; --primary:#c8f53b; --primary-ink:#17171a;
   --mark:#3b4a12; --removed:#f0a58c; --focus:#9fb0ff;
-  --glass:rgba(40,40,46,.86); --segment:#2b2b31; --glass-edge:rgba(255,255,255,.12);
+  --glass:rgba(40,40,46,.86); --segment:#35353c; --glass-edge:rgba(255,255,255,.12);
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
 }
 * { box-sizing:border-box; }
@@ -309,7 +309,7 @@ dialog::backdrop { background:rgba(10,10,12,.45); backdrop-filter:blur(4px); }
 
 /* The dial */
 .dial-wrap { display:grid; place-items:center; }
-.dial { position:relative; width:var(--dial-size); height:var(--dial-size); max-width:min(92vw, 520px); max-height:min(92vw, 520px); aspect-ratio:1; user-select:none; -webkit-user-select:none; }
+.dial { position:relative; width:var(--dial-size); height:var(--dial-size); max-width:min(92vw, 560px); max-height:min(92vw, 560px); aspect-ratio:1; user-select:none; -webkit-user-select:none; }
 .dial::before { content:""; position:absolute; inset:4px; border-radius:50%; background:radial-gradient(circle, color-mix(in srgb, var(--surface) 70%, transparent) 30%, color-mix(in srgb, var(--soft) 80%, transparent) 70%); border:1px solid var(--border); box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.5); }
 .dial-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 .dial-seg { cursor:pointer; outline:none; transition:transform .22s cubic-bezier(.3, 1.4, .5, 1); }
@@ -329,17 +329,46 @@ dialog::backdrop { background:rgba(10,10,12,.45); backdrop-filter:blur(4px); }
 .dial-hub:hover { transform:translate(-50%, -50%) scale(1.04); border-color:var(--ink); }
 .dial-hub strong { max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:700 15px/1.2 var(--display); }
 .dial-hub span:last-child { max-width:140px; font-size:11.5px; color:var(--muted); line-height:1.3; }
-.dial-hub-icon { display:grid; place-items:center; width:38px; height:38px; margin-bottom:4px; border-radius:50%; background:var(--accent); color:var(--accent-ink); }
-.dial-hub-icon svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
-.dial[data-state="loaded"] .dial-hub { border-style:solid; border-color:var(--accent); }
+.dial-hub-icon { display:grid; place-items:center; width:34px; height:34px; margin-bottom:2px; color:var(--ink); }
+.dial-hub-icon svg { width:30px; height:30px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.dial[data-state="loaded"] .dial-hub { border-style:solid; border-color:color-mix(in srgb, var(--ink) 45%, transparent); }
 .dial.busy .dial-svg { opacity:.55; pointer-events:none; }
 .dial.busy .dial-hub-icon { animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .drop-active .dial::before { border:2px dashed var(--ink); background:color-mix(in srgb, var(--accent) 22%, var(--surface)); }
 .drop-active .dial-hub { border-color:var(--ink); transform:translate(-50%, -50%) scale(1.06); }
 
+/* Two-layer dial */
+.dial-track { fill:none; stroke:color-mix(in srgb, var(--ink) 4%, transparent); pointer-events:none; opacity:0; transition:opacity .2s; }
+.dial.nested .dial-track { opacity:1; }
+.dial-more { fill:#f4f1ea; opacity:.6; pointer-events:none; }
+.dial-seg.active .dial-more,.dial-seg.open .dial-more { fill:var(--accent-ink); opacity:1; }
+.dial-seg.parent.open:not(.active) path { fill:color-mix(in srgb, var(--segment) 78%, var(--accent)); stroke:color-mix(in srgb, var(--segment) 78%, var(--accent)); }
+.dial-seg.child path { fill:color-mix(in srgb, var(--segment) 88%, var(--surface)); stroke:color-mix(in srgb, var(--segment) 88%, var(--surface)); }
+.dial-seg.child text { font-size:12.5px; }
+.dial-ring.outer .dial-seg.active path { fill:var(--accent); stroke:var(--accent); }
+
+/* Header drop-downs: one column per job */
+.tab-menu { width:max-content; max-width:calc(100vw - 48px); min-width:260px; display:grid; grid-template-columns:repeat(var(--cols, 2), minmax(150px, auto)); gap:4px 18px; padding:16px 18px 12px; }
+.drop-col { display:flex; flex-direction:column; gap:1px; min-width:0; }
+.drop-col h4 { margin:2px 8px 6px; font:650 11px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.drop-link { padding:6px 8px; border-radius:10px; font-size:13.5px; color:var(--ink); text-decoration:none; white-space:nowrap; }
+.drop-link:hover,.drop-link:focus-visible { background:var(--soft); }
+.drop-all { grid-column:1 / -1; margin-top:8px; padding:10px 8px 2px; border-top:1px solid var(--border); font-size:13px; font-weight:650; color:var(--muted); text-decoration:none; }
+.drop-all:hover { color:var(--ink); }
+.menu-suggest { display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:6px 4px; }
+.menu-suggest .menu-blurb { margin:0 6px 0 4px; }
+
+/* Conversion links under a dial: compact chips, not cards */
+.route-row { display:flex; flex-wrap:wrap; gap:8px; }
+.route-chip { display:inline-flex; align-items:center; min-height:36px; padding:6px 14px; border:1px solid var(--border); border-radius:999px; background:var(--surface); font-size:13.5px; font-weight:600; text-decoration:none; transition:border-color .15s, background .15s; }
+.route-chip:hover { border-color:var(--ink); background:var(--accent); color:var(--accent-ink); }
+.tool-section .tool-grid + .route-row { margin-top:10px; }
+
 /* Tool lists under a dial */
-.hub-tools { display:grid; gap:28px; padding-top:8px; }
+.hub-tools { display:flex; flex-wrap:wrap; gap:28px 40px; padding-top:8px; }
+.hub-tools .tool-section { flex:1 1 100%; min-width:0; }
+.hub-tools .tool-section.compact { flex:1 1 460px; }
 .tool-section h2 { margin:0 0 12px; font-size:22px; font-weight:720; }
 .tool-section h2 a { text-decoration:none; }
 .tool-section h2 a:hover { text-decoration:underline; text-underline-offset:4px; }
@@ -395,3 +424,5 @@ dialog::backdrop { background:rgba(10,10,12,.45); backdrop-filter:blur(4px); }
   .editor>#output,.editor>.output-empty { border-left:0; border-top:1px solid var(--border); max-height:none; }
   .editor>#draft { max-height:none; min-height:200px; }
 }
+.tab:nth-child(n+5) .tab-menu { left:auto; right:-8px; }
+:root[data-theme="dark"] .dial-seg.child path { fill:#45454d; stroke:#45454d; }

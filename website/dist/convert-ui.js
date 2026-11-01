@@ -60,7 +60,7 @@ export function showConvert(tool) {
 
 function note(option) {
   if (option?.from) { renderNote($('convert-note'), { title: FORMATS[option.from].name, rows: [['Turns into', targets(option.from).map((t) => FORMATS[t].label).join(', ')]], foot: 'Click to pick it.' }); return; }
-  if (option?.to) { renderNote($('convert-note'), routeNote(from, option.to)); return; }
+  if (option?.to) { renderNote($('convert-note'), routeNote(option.preFrom || from, option.to)); return; }
   if (!from) { renderNote($('convert-note'), { title: 'How it works', rows: [['1', 'Drop a file, or pick its format on the left'], ['2', 'The dial shows everything it can become'], ['3', 'Click one. The new file downloads']], foot: 'Documents keep their headings, lists, tables and links.' }); return; }
   const target = pending && targets(from).includes(pending) ? pending : null;
   if (target) { renderNote($('convert-note'), routeNote(from, target)); return; }
@@ -72,12 +72,14 @@ function render() {
   $('convert-files').hidden = !files.length;
   $('convert-files').replaceChildren(...files.slice(0, 6).map((file) => listRow(file.name, formatBytes(file.size))));
   if (!from) {
-    dial.set(POPULAR.filter((id) => FORMATS[id]).map((id) => ({ id: 'from-' + id, label: FORMATS[id].label, hint: 'Convert a ' + FORMATS[id].name, from: id })), { title: 'Drop a file', sub: 'or pick what it is', icon: 'arrow-up', state: 'idle' });
+    // Two layers: what you have on the inside, what it can become outside.
+    dial.set(POPULAR.filter((id) => FORMATS[id]).map((id) => ({ id: 'from-' + id, label: FORMATS[id].label, hint: 'Convert a ' + FORMATS[id].name, from: id,
+      children: targets(id).slice(0, 10).map((t) => ({ id: 'pre-' + id + '-' + t, label: FORMATS[t].label, hint: 'Make it ' + FORMATS[t].name, preFrom: id, to: t })) })), { title: 'Drop a file', sub: 'or point at what it is', icon: 'plus', state: 'idle' });
   } else {
     const list = targets(from);
     dial.set(list.map((to) => ({ id: 'to-' + to, label: FORMATS[to].label, hint: 'Make it ' + FORMATS[to].name, to, primary: to === pending })),
       files.length ? { title: files.length === 1 ? files[0].name : files.length + ' files', sub: 'click a format', icon: 'check', state: 'loaded' }
-        : { title: FORMATS[from].label, sub: 'drop a file or click here', icon: 'arrow-up', state: 'idle' });
+        : { title: FORMATS[from].label, sub: 'drop a file or click here', icon: 'plus', state: 'idle' });
   }
   if (!last) $('convert-output').hidden = true;
   $('convert-error').hidden = true;
@@ -104,6 +106,7 @@ function fail(message) {
 }
 
 function pickOption(option) {
+  if (option.preFrom) { from = option.preFrom; files = []; last = null; pending = option.to; render(); openPicker(); return; }
   if (option.from) { choose(option.from); return; }
   if (!files.length) { pending = option.to; render(); openPicker(); return; }
   run(option.to);

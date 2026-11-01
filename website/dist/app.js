@@ -1,5 +1,6 @@
 import { proposeEdits, applyEdits, inspectCharacters, inspectWriting, wordCount, MAX_CHARACTERS } from './engine.js';
-import { toolFromHash, sectionFromHash, sections } from './tools.js';
+import { toolFromHash } from './tools.js';
+import { sectionFromHash, sectionOf } from './sections.js';
 import { readTextFile } from './uploads.js';
 import { showOffice, loadOfficeFile } from './office-ui.js';
 import { showImages, loadImages, quickConvert } from './image-ui.js';
@@ -80,7 +81,7 @@ function route() {
   const separate = ['office', 'image', 'convert', 'pdf', 'wipe', 'archive', 'ocr'].includes(mode);
   $('hub-view').hidden = !!active;
   showHub(active ? false : section ? section.id : null);
-  for (const link of document.querySelectorAll('.tab-link')) link.classList.toggle('current', link.dataset.section === (section?.id || sections.find((s) => active && s.tools.includes(active.id))?.id));
+  for (const link of document.querySelectorAll('.tab-link')) link.classList.toggle('current', link.dataset.section === sectionOf(location.hash)?.id);
   $('tool-view').hidden = !ready || separate;
   $('office-view').hidden = !office;
   $('image-view').hidden = !image;

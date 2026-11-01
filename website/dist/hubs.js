@@ -3,8 +3,9 @@
 // dial's segments open tools. After a file is dropped: they do things to it,
 // in one click.
 import { createDial } from './dial.js';
-import { sections, tools } from './tools.js';
-import { idleOptions, sectionActions, PICKER_ACCEPT } from './actions.js';
+import { tools } from './tools.js';
+import { sections, sectionDial } from './sections.js';
+import { wheelActions, PICKER_ACCEPT } from './actions.js';
 import { actionNote, renderNote } from './notes.js';
 import { dropZone, formatBytes } from './files.js';
 
@@ -13,13 +14,13 @@ let current = undefined, files = [], hooks = null, dial = null;
 
 const HOME = {
   title: 'Drop a file. Pick one thing. Done.',
-  lede: 'Humanize AI drafts and documents, convert anything, shrink PDFs, wipe hidden metadata. One click, and nothing leaves your device.',
+  lede: 'Humanize AI drafts and documents, convert anything, shrink PDFs, wipe hidden metadata. Point at the dial to see everything it does.',
 };
 
 function idleNote() {
   const section = sections.find((s) => s.id === current);
-  if (!section) return { title: 'How it works', rows: [['1', 'Drop any file on the dial, or click the middle'], ['2', 'The dial shows what you can do with it'], ['3', 'Click one. You get the finished file']], foot: 'Word, PowerPoint, Excel, PDF, text, images, audio, archives.' };
-  return { title: section.title, rows: [['Drop', section.blurb]], foot: 'Or point at the dial to see each tool.' };
+  if (!section) return { title: 'How it works', rows: [['1', 'Drop any file on the dial, or click the +'], ['2', 'The dial shows what you can do with it'], ['3', 'Click one. You get the finished file']], foot: 'Word, PowerPoint, Excel, PDF, text, images, audio, archives.' };
+  return { title: section.title, rows: [['Drop', section.blurb]], foot: 'Point at the dial: each job opens its options in the outer ring.' };
 }
 
 function loadedNote() {
@@ -29,26 +30,28 @@ function loadedNote() {
 
 function hover(option) {
   if (!option) { renderNote($('hub-info'), files.length ? loadedNote() : idleNote()); return; }
+  if (option.children) { renderNote($('hub-info'), { title: option.label, rows: [['Does', option.hint], ['Options', option.children.map((c) => c.label).join(', ')]], foot: option.nav ? 'Click to open the page, or point at an option.' : 'Point at an option in the outer ring.' }); return; }
   if (option.nav) {
     const tool = option.toolId && tools.find((t) => t.id === option.toolId);
-    const section = sections.find((s) => '#' + s.id === option.nav || s.href === option.nav);
-    renderNote($('hub-info'), tool ? { title: tool.title, rows: [['Does', tool.description]], foot: 'Click to open it.' } : section ? { title: section.title, rows: [['Does', section.blurb]], foot: 'Click to open it.' } : { title: option.label, rows: [['Does', option.hint]] });
+    renderNote($('hub-info'), tool ? { title: tool.title, rows: [['Does', tool.description]], foot: 'Click to open it.' } : { title: option.hint || option.label, rows: [['Does', option.description || option.hint]], foot: 'Click to open it.' });
     return;
   }
   if (option.pick) { renderNote($('hub-info'), { title: option.hint, rows: [['Then', 'The dial shows what you can do with it']], foot: 'Or drop it anywhere on this page.' }); return; }
   renderNote($('hub-info'), actionNote(option, files));
 }
 
+const IDLE = { title: 'Drop a file', sub: 'or click to choose', icon: 'plus', state: 'idle' };
+
 function refresh() {
   $('hub-error').hidden = true;
   if (!files.length) {
-    dial.set(idleOptions(current), { title: 'Drop a file', sub: 'or click to choose', icon: 'arrow-up', state: 'idle' });
+    dial.set(sectionDial(current), IDLE);
   } else {
-    const result = sectionActions(current, files);
+    const result = wheelActions(files);
     if (!result.actions.length) {
       $('hub-error').textContent = result.reason; $('hub-error').hidden = false;
       files = [];
-      dial.set(idleOptions(current), { title: 'Drop a file', sub: 'or click to choose', icon: 'arrow-up', state: 'idle' });
+      dial.set(sectionDial(current), IDLE);
     } else {
       dial.set(result.actions.map((a, i) => ({ ...a, primary: i === 0 && !!a.humanize })), { title: files.length === 1 ? files[0].name : files.length + ' files', sub: 'click a segment · or here to change', icon: 'check', state: 'loaded' });
     }
@@ -58,31 +61,41 @@ function refresh() {
   hover(null);
 }
 
-function card(tool) {
+function card(leaf) {
   const link = document.createElement('a');
-  link.href = '#' + tool.id; link.className = 'tool-card';
+  link.href = leaf.href; link.className = 'tool-card';
   const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); icon.setAttribute('aria-hidden', 'true');
-  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', '#' + tool.icon); icon.append(use);
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', '#' + leaf.icon); icon.append(use);
   const body = document.createElement('span');
-  const title = document.createElement('strong'); title.textContent = tool.title;
-  const text = document.createElement('small'); text.textContent = tool.description;
+  const title = document.createElement('strong'); title.textContent = leaf.title;
+  const text = document.createElement('small'); text.textContent = leaf.description;
   body.append(title, text); link.append(icon, body);
   return link;
 }
 
+// The section's tools as cards, one row per job. The homepage shows none:
+// every tool lives on its own section page.
 function renderTools() {
   const box = $('hub-tools');
   box.replaceChildren();
   const section = sections.find((s) => s.id === current);
-  const groups = section ? [section] : sections;
-  for (const group of groups) {
+  box.hidden = !section;
+  if (!section) return;
+  const loose = section.items.filter((item) => !item.children);
+  const rows = [...(loose.length ? [{ label: section.title + ' tools', children: loose }] : []), ...section.items.filter((item) => item.children)];
+  for (const row of rows) {
     const wrap = document.createElement('section'); wrap.className = 'tool-section';
-    const head = document.createElement('h2');
-    if (section) head.textContent = 'Every ' + group.title + ' tool';
-    else { const a = document.createElement('a'); a.href = group.href || '#' + group.id; a.textContent = group.title; head.append(a); }
-    const grid = document.createElement('div'); grid.className = 'tool-grid';
-    grid.append(...group.tools.map((id) => card(tools.find((t) => t.id === id))));
-    wrap.append(head, grid); box.append(wrap);
+    const head = document.createElement('h2'); head.textContent = row.label;
+    wrap.append(head);
+    const toolsIn = row.children.filter((leaf) => leaf.toolId), routes = row.children.filter((leaf) => !leaf.toolId);
+    if (toolsIn.length) { const grid = document.createElement('div'); grid.className = 'tool-grid'; grid.append(...toolsIn.map(card)); wrap.append(grid); }
+    wrap.classList.toggle('compact', !toolsIn.length);
+    if (routes.length) {
+      const chips = document.createElement('div'); chips.className = 'route-row';
+      chips.append(...routes.map((leaf) => { const a = document.createElement('a'); a.href = leaf.href; a.className = 'route-chip'; a.textContent = leaf.title; a.title = leaf.description; return a; }));
+      wrap.append(chips);
+    }
+    box.append(wrap);
   }
 }
 

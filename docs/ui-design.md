@@ -10,9 +10,9 @@ The old homepage was 13 identical tiles under a generic tagline, with "AI" in ne
 
 The product is one idea: drop a file, click one thing, get the finished file back. Every page that takes files is a big dial beside a short explanation.
 
-- **Header tabs.** Humanize, Convert, PDF, Compress, Audio, Archives, Privacy. Hovering a tab opens a dropdown that lists every tool in it. Search (Ctrl/⌘K or `/`) sits on the right.
-- **Homepage.** Headline and a "How it works" card on the left, the big dial on the right. Before a file, the dial's segments open each section (plus "Paste text"). After a drop, they become what you can do with that file. Tool cards for every section sit below.
-- **Section pages** (`#humanize`, `#pdf`, `#compress`, `#audio`, `#archive`, `#privacy`) use the same layout. Before a file, segments open that section's tools or ask for a file type; after a drop, they run that section's actions. `#pdf` shows all 15 PDF tools instead of landing on Merge.
+- **Header tabs, one per kind of file.** Humanize, PDF, Word, Excel, PowerPoint, Images, Audio, Archives (`sections.js`). Hovering a tab drops down every option for that format, in columns by job (From PDF, To PDF, Pages…). Clicking it opens that format's page. Search (Ctrl/⌘K or `/`) sits on the right and only searches; it is not a second tool list.
+- **Homepage.** Headline and a "How it works" card on the left, the big dial on the right, and nothing else. Before a file, the inner ring holds the eight tabs and the outer ring shows the hovered tab's jobs. After a drop, the dial shows what you can do with that file. Tool cards live only on each format page.
+- **Format pages** (`#humanize`, `#pdf`, `#word`, `#excel`, `#powerpoint`, `#images`, `#audio`, `#archive`) use the same layout: jobs on the inner ring, their options on the outer ring, then the tools as cards and the conversions as compact chips below.
 - **Convert.** Formats on the left, the dial of targets in the middle, notes and results on the right. Pick a format or drop a file, then click a target. If you click a target first, the picker opens and the conversion runs as soon as the file arrives.
 - **Editor.** Draft and result side by side, so the page fits a laptop screen without scrolling.
 - No hero paste box, no example text, no floating orb.
@@ -28,7 +28,7 @@ Quotes, numbers, URLs and code are never touched.
 
 ## The dial
 
-`dial.js` draws it: 96 px inner radius, 236 px outer, 7 px gaps, 14 px corners, a staggered fan-out and a 7 px outward nudge on hover. Pointer, touch, keyboard (Tab, arrows, Enter) and file drops all work. The middle button opens the file picker. The first Humanize segment is lit as the primary action. Measurements started from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)); the code is our own.
+`dial.js` draws it. With nothing nested it is one ring (92 to 254 px). With nested jobs it has two layers: the jobs on an inner ring (86 to 170 px) and, around the job you point at, its options on an outer ring (178 to 254 px). One job stays open when nothing is pointed at, so the outer ring is never empty. On touch, the first tap opens a job and the second opens its page. The middle is a plain + (no coloured circle). Pointer, touch, keyboard (Tab, arrows, Enter) and file drops all work. The middle button opens the file picker. The first Humanize segment is lit as the primary action. Measurements started from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)); the code is our own.
 
 Beside the dial, a card says what the highlighted segment gives you, what it keeps and what it drops.
 

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WHEEL, segmentAngles, hitTest, segmentPath, clampCentre } from '../dist/wheel-geometry.js';
-import { fileKind, wheelActions, sectionActions, idleOptions } from '../dist/actions.js';
+import { fileKind, wheelActions } from '../dist/actions.js';
 import { outputType, outputName, fitWithin, uniqueNames, formatBytes } from '../dist/images.js';
 
 test('segment 0 sits at 12 o’clock and the rest go clockwise', () => {
@@ -81,16 +81,13 @@ test('image output names, types and sizes', () => {
   assert.equal(formatBytes(1_500_000), '1.5 MB');
 });
 
-test('section dials only offer that section’s jobs', () => {
-  const ids = (section, files) => sectionActions(section, files).actions.map((a) => a.id);
-  assert.equal(ids('pdf', [{ name: 'a.pdf' }]).length, 14);
-  assert.ok(ids('pdf', [{ name: 'a.pdf' }]).includes('compress'));
-  assert.deepEqual(ids('humanize', [{ name: 'a.pptx' }]), ['humanize', 'edit']);
-  assert.match(sectionActions('humanize', [{ name: 'a.mp3' }]).reason, /Word/);
-  assert.ok(ids('compress', [{ name: 'a.jpg' }]).includes('squeeze'));
-  assert.equal(ids('audio', [{ name: 'a.mov' }])[0], 'to-mp3');
-  assert.equal(ids('archive', [{ name: 'a.zip' }])[0], 'open');
-  assert.deepEqual(ids('privacy', [{ name: 'a.docx' }]), ['wipe', 'fix']);
-  assert.equal(idleOptions(null).length, 8);
-  assert.ok(idleOptions('pdf').every((o) => o.nav.startsWith('#')));
+test('a PDF gets a two-layer dial: jobs inside, options outside', () => {
+  const actions = wheelActions([{ name: 'a.pdf' }]).actions;
+  assert.deepEqual(actions.map((a) => a.id), ['humanize', 'to-docx', 'compress', 'edit', 'convert', 'pages', 'secure', 'fix', 'wipe']);
+  const child = (group, id) => actions.find((a) => a.id === group).children.find((c) => c.id === id);
+  assert.equal(child('secure', 'sign').tool, 'pdf-sign');
+  assert.equal(child('pages', 'split').tool, 'pdf-split');
+  assert.equal(child('convert', 'to-png').to, 'png');
+  assert.ok(actions.every((a) => a.icon), 'every inner segment has an icon');
+  for (const files of [[{ name: 'a.docx' }], [{ name: 'a.jpg' }], [{ name: 'a.mp3' }], [{ name: 'a.zip' }]]) assert.ok(wheelActions(files).actions.length <= 8);
 });
