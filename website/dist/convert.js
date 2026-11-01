@@ -1,0 +1,249 @@
+// The conversion map: which formats go to which, and how. Every route runs on
+// this device with the engines in conv-doc.js, conv-data.js, conv-pdf.js and
+// the browser canvas.
+import * as libs from './libs.js';
+import * as docs from './conv-doc.js';
+import * as data from './conv-data.js';
+
+export const FORMATS = {
+  txt: { label: 'TXT', name: 'Plain text', mime: 'text/plain' },
+  md: { label: 'Markdown', name: 'Markdown', mime: 'text/markdown' },
+  html: { label: 'HTML', name: 'Web page', mime: 'text/html' },
+  docx: { label: 'Word', name: 'Word document', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+  odt: { label: 'ODT', name: 'OpenDocument text', mime: 'application/vnd.oasis.opendocument.text' },
+  rtf: { label: 'RTF', name: 'Rich text', mime: 'application/rtf' },
+  epub: { label: 'EPUB', name: 'E-book', mime: 'application/epub+zip' },
+  pdf: { label: 'PDF', name: 'PDF', mime: 'application/pdf' },
+  pptx: { label: 'PowerPoint', name: 'Slide deck', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' },
+  csv: { label: 'CSV', name: 'Comma-separated values', mime: 'text/csv' },
+  tsv: { label: 'TSV', name: 'Tab-separated values', mime: 'text/tab-separated-values' },
+  json: { label: 'JSON', name: 'JSON', mime: 'application/json' },
+  xlsx: { label: 'Excel', name: 'Excel workbook', mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+  ods: { label: 'ODS', name: 'OpenDocument spreadsheet', mime: 'application/vnd.oasis.opendocument.spreadsheet' },
+  srt: { label: 'SRT', name: 'Subtitles', mime: 'application/x-subrip' },
+  vtt: { label: 'VTT', name: 'Web subtitles', mime: 'text/vtt' },
+  jpg: { label: 'JPG', name: 'JPEG image', mime: 'image/jpeg' },
+  png: { label: 'PNG', name: 'PNG image', mime: 'image/png' },
+  webp: { label: 'WebP', name: 'WebP image', mime: 'image/webp' },
+  gif: { label: 'GIF', name: 'GIF image', mime: 'image/gif' },
+  bmp: { label: 'BMP', name: 'Bitmap image', mime: 'image/bmp' },
+  avif: { label: 'AVIF', name: 'AVIF image', mime: 'image/avif' },
+  svg: { label: 'SVG', name: 'SVG image', mime: 'image/svg+xml' },
+  tiff: { label: 'TIFF', name: 'TIFF image', mime: 'image/tiff' },
+  ico: { label: 'ICO', name: 'Icon', mime: 'image/x-icon' },
+};
+const ALIASES = { htm: 'html', xhtml: 'html', markdown: 'md', jpeg: 'jpg', text: 'txt', tif: 'tiff' };
+
+const DOC_IN = ['txt', 'md', 'html', 'docx', 'odt', 'epub', 'pdf', 'pptx'];
+const DOC_OUT = ['pdf', 'docx', 'md', 'html', 'txt', 'odt', 'rtf', 'epub'];
+const DATA_IN = ['csv', 'tsv', 'json', 'xlsx', 'ods'];
+const DATA_OUT = ['xlsx', 'csv', 'tsv', 'json', 'ods', 'md', 'html', 'pdf', 'docx'];
+const TABLE_ONLY = ['csv', 'tsv', 'json', 'xlsx', 'ods'];
+const SUBS = ['srt', 'vtt'];
+const IMAGE_IN = ['jpg', 'png', 'webp', 'gif', 'bmp', 'avif', 'svg'];
+const IMAGE_OUT = ['jpg', 'png', 'webp', 'pdf', 'bmp', 'tiff', 'ico'];
+
+export function detectFormat(file) {
+  const extension = (file.name || '').includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+  const id = ALIASES[extension] || extension;
+  if (FORMATS[id]) return id;
+  return Object.keys(FORMATS).find((key) => FORMATS[key].mime === file.type) || null;
+}
+
+export function targets(from) {
+  const out = new Set();
+  if (DOC_IN.includes(from)) DOC_OUT.forEach((t) => out.add(t));
+  if (from === 'pdf') ['jpg', 'png', 'webp'].forEach((t) => out.add(t));
+  if (DATA_IN.includes(from)) DATA_OUT.forEach((t) => out.add(t));
+  if (from === 'html' || from === 'md') ['xlsx', 'csv', 'json'].forEach((t) => out.add(t));
+  if (SUBS.includes(from)) [...SUBS, 'txt'].forEach((t) => out.add(t));
+  if (IMAGE_IN.includes(from)) IMAGE_OUT.forEach((t) => out.add(t));
+  out.delete(from);
+  return [...out];
+}
+
+export const conversionCount = () => Object.keys(FORMATS).reduce((sum, id) => sum + targets(id).length, 0);
+export const inputFormats = () => Object.keys(FORMATS).filter((id) => targets(id).length);
+export const acceptList = () => inputFormats().map((id) => '.' + id).concat(['.htm', '.jpeg', '.markdown']).join(',');
+
+const baseName = (name) => (name || 'file').replace(/\.[^.]+$/, '') || 'file';
+const text = async (file) => new TextDecoder('utf-8').decode(await file.arrayBuffer()).replace(/^﻿/, '');
+const bytesOf = async (file) => new Uint8Array(await file.arrayBuffer());
+
+// ---------- Subtitles ----------
+export function parseSubtitles(source) {
+  const cues = [];
+  for (const block of source.replace(/\r\n?/g, '\n').replace(/^WEBVTT[^\n]*\n/, '').split(/\n{2,}/)) {
+    const lines = block.split('\n').filter((l) => l.trim());
+    const at = lines.findIndex((l) => l.includes('-->'));
+    if (at < 0) continue;
+    const [start, end] = lines[at].split('-->').map((s) => s.trim().split(/\s+/)[0]);
+    cues.push({ start: normaliseTime(start), end: normaliseTime(end), text: lines.slice(at + 1).join('\n') });
+  }
+  if (!cues.length) throw new Error('No subtitles found in this file.');
+  return cues;
+}
+function normaliseTime(time) {
+  const parts = time.replace(',', '.').split(':');
+  if (parts.length === 2) parts.unshift('00');
+  const [h, m, s] = parts;
+  const [whole, ms = '0'] = s.split('.');
+  return h.padStart(2, '0') + ':' + m.padStart(2, '0') + ':' + whole.padStart(2, '0') + '.' + ms.padEnd(3, '0').slice(0, 3);
+}
+export const writeSrt = (cues) => cues.map((c, i) => (i + 1) + '\n' + c.start.replace('.', ',') + ' --> ' + c.end.replace('.', ',') + '\n' + c.text).join('\n\n') + '\n';
+export const writeVtt = (cues) => 'WEBVTT\n\n' + cues.map((c) => c.start + ' --> ' + c.end + '\n' + c.text).join('\n\n') + '\n';
+
+// ---------- Documents and tables ----------
+async function readDoc(file, from, progress) {
+  if (from === 'txt') return docs.blocksFromText(await text(file));
+  if (from === 'md') { const md = await libs.marked(); return docs.blocksFromHtml(md.parse(await text(file), { gfm: true })); }
+  if (from === 'html') return docs.blocksFromHtml(await text(file));
+  if (from === 'docx') {
+    const mammoth = await libs.mammoth();
+    const result = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() }, { convertImage: mammoth.images.imgElement(() => ({ src: '' })) });
+    return docs.blocksFromHtml(result.value);
+  }
+  if (from === 'odt') return docs.blocksFromHtml(await docs.htmlFromOdt(await bytesOf(file)));
+  if (from === 'epub') return docs.blocksFromHtml(await docs.htmlFromEpub(await bytesOf(file)));
+  if (from === 'pptx') return docs.blocksFromHtml(await docs.htmlFromPptx(await bytesOf(file)));
+  if (from === 'pdf') {
+    const { textPages } = await import('./conv-pdf.js');
+    const doc = docs.blocksFromPdfText(await textPages(await bytesOf(file), (n, total) => progress?.('Reading page ' + n + ' of ' + total)));
+    if (!doc.blocks.length) throw new Error('No text found. This PDF may be scanned images; text recognition (OCR) isn’t available yet.');
+    return doc;
+  }
+  if (DATA_IN.includes(from)) return docs.blocksFromTable(await readTable(file, from));
+  throw new Error('Can’t read ' + from + ' files yet.');
+}
+
+export async function readTable(file, from) {
+  if (from === 'csv' || from === 'tsv') return { sheets: [{ name: baseName(file.name), rows: data.parseDelimited(await text(file), from === 'tsv' ? '\t' : undefined) }] };
+  if (from === 'json') return data.parseJson(await text(file));
+  if (from === 'xlsx') return data.readXlsx(await bytesOf(file));
+  if (from === 'ods') return data.readOds(await bytesOf(file));
+  if (from === 'html') return data.tableFromHtml(docs.inertHtml(await text(file)));
+  if (from === 'md') return data.tableFromMarkdown(await text(file));
+  throw new Error('Can’t read a table from ' + from + '.');
+}
+
+async function writeDoc(doc, to) {
+  if (to === 'txt') return docs.toText(doc);
+  if (to === 'md') return docs.toMarkdown(doc);
+  if (to === 'html') return docs.toHtml(doc);
+  if (to === 'docx') return docs.toDocx(doc);
+  if (to === 'odt') return docs.toOdt(doc);
+  if (to === 'rtf') return docs.toRtf(doc);
+  if (to === 'epub') return docs.toEpub(doc);
+  if (to === 'pdf') return docs.toPdf(doc, libs);
+  throw new Error('Can’t write ' + to + '.');
+}
+
+function writeTable(table, to) {
+  if (to === 'csv') return data.writeDelimited(table.sheets[0].rows, ',');
+  if (to === 'tsv') return data.writeDelimited(table.sheets[0].rows, '\t');
+  if (to === 'json') return data.writeJson(table);
+  if (to === 'xlsx') return data.writeXlsx(table);
+  if (to === 'ods') return data.writeOds(table);
+  if (to === 'md') return data.writeMarkdown(table);
+  return null;
+}
+
+// ---------- Images ----------
+async function decodeImage(file, from) {
+  if (from === 'svg') {
+    const url = URL.createObjectURL(new Blob([await file.arrayBuffer()], { type: 'image/svg+xml' }));
+    try {
+      const image = new Image();
+      image.src = url;
+      await image.decode().catch(() => { throw new Error('Couldn’t draw this SVG.'); });
+      let width = image.naturalWidth || 1024, height = image.naturalHeight || 1024;
+      const scale = Math.max(1, 1024 / Math.max(width, height));
+      return { source: image, width: Math.round(width * scale), height: Math.round(height * scale) };
+    } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
+  }
+  try { const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' }); return { source: bitmap, width: bitmap.width, height: bitmap.height }; }
+  catch { throw new Error('Couldn’t read this image. It may be damaged or use a format this browser can’t open.'); }
+}
+
+function canvasFor(image, width = image.width, height = image.height, background) {
+  if (width * height > 100_000_000) throw new Error('That image is over 100 megapixels.');
+  const canvas = document.createElement('canvas');
+  canvas.width = width; canvas.height = height;
+  const context = canvas.getContext('2d');
+  if (background) { context.fillStyle = background; context.fillRect(0, 0, width, height); }
+  context.imageSmoothingQuality = 'high';
+  context.drawImage(image.source, 0, 0, width, height);
+  return { canvas, context };
+}
+const toBlob = (canvas, type, quality) => new Promise((resolve, reject) => canvas.toBlob((blob) => blob && blob.type === type ? resolve(blob) : reject(new Error('This browser can’t save ' + FORMATS[Object.keys(FORMATS).find((k) => FORMATS[k].mime === type)]?.label + ' files.')), type, quality));
+
+async function writeImage(file, from, to) {
+  const image = await decodeImage(file, from);
+  try {
+    if (to === 'jpg' || to === 'png' || to === 'webp') return await toBlob(canvasFor(image, undefined, undefined, to === 'jpg' ? '#fff' : null).canvas, FORMATS[to].mime, 0.9);
+    const codecs = await import('./image-codecs.js');
+    if (to === 'bmp' || to === 'tiff') {
+      const { context, canvas } = canvasFor(image);
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+      return new Blob([to === 'bmp' ? codecs.encodeBMP(pixels) : codecs.encodeTIFF(pixels)], { type: FORMATS[to].mime });
+    }
+    if (to === 'ico') {
+      const sizes = [16, 32, 48, 64, 128, 256].filter((s) => s <= Math.max(image.width, image.height) || s <= 48);
+      const pngs = [];
+      for (const size of sizes) {
+        const scale = Math.min(size / image.width, size / image.height);
+        const canvas = document.createElement('canvas'); canvas.width = canvas.height = size;
+        const context = canvas.getContext('2d'); context.imageSmoothingQuality = 'high';
+        const w = image.width * scale, h = image.height * scale;
+        context.drawImage(image.source, (size - w) / 2, (size - h) / 2, w, h);
+        pngs.push({ width: size, height: size, bytes: new Uint8Array(await (await toBlob(canvas, 'image/png')).arrayBuffer()) });
+      }
+      return new Blob([codecs.encodeICO(pngs)], { type: FORMATS.ico.mime });
+    }
+    if (to === 'pdf') {
+      const keepPng = from === 'png' || from === 'svg' || from === 'gif' || from === 'webp' || from === 'bmp' || from === 'avif';
+      const bytes = from === 'jpg' ? await bytesOf(file) : new Uint8Array(await (await toBlob(canvasFor(image, undefined, undefined, keepPng ? null : '#fff').canvas, keepPng ? 'image/png' : 'image/jpeg', 0.92)).arrayBuffer());
+      const { imagesToPdf } = await import('./conv-pdf.js');
+      return new Blob([await imagesToPdf([{ bytes, type: from === 'jpg' ? 'image/jpeg' : keepPng ? 'image/png' : 'image/jpeg' }])], { type: FORMATS.pdf.mime });
+    }
+  } finally { image.source.close?.(); }
+  throw new Error('Can’t make ' + to + ' from an image.');
+}
+
+// ---------- Entry point ----------
+// Returns [{ blob, name }]. Most routes give one file; PDF → images gives one per page.
+export async function convertFile(file, to, progress) {
+  const from = detectFormat(file);
+  if (!from) throw new Error('Whitewash doesn’t recognise this file type.');
+  if (!targets(from).includes(to)) throw new Error(FORMATS[from].label + ' to ' + FORMATS[to].label + ' isn’t supported.');
+  if (file.size > 60_000_000) throw new Error('That file is over 60 MB.');
+  const name = baseName(file.name) + '.' + to;
+  const wrap = (content) => [{ blob: content instanceof Blob ? content : new Blob([content], { type: FORMATS[to].mime + (typeof content === 'string' ? ';charset=utf-8' : '') }), name }];
+
+  if (IMAGE_IN.includes(from)) return wrap(await writeImage(file, from, to));
+  if (from === 'pdf' && ['jpg', 'png', 'webp'].includes(to)) {
+    const { renderPages } = await import('./conv-pdf.js');
+    const { images } = await renderPages(await bytesOf(file), { type: FORMATS[to].mime, scale: 2, onPage: (n, total) => progress?.('Drawing page ' + n + ' of ' + total) });
+    return images.map((image) => ({ blob: image.blob, name: baseName(file.name) + '-page-' + String(image.page).padStart(String(images.length).length, '0') + '.' + to }));
+  }
+  if (SUBS.includes(from)) {
+    const cues = parseSubtitles(await text(file));
+    return wrap(to === 'srt' ? writeSrt(cues) : to === 'vtt' ? writeVtt(cues) : cues.map((c) => c.text).join('\n') + '\n');
+  }
+  if (TABLE_ONLY.includes(to) || (DATA_IN.includes(from) && to === 'md')) {
+    const table = await readTable(file, from);
+    return wrap(writeTable(table, to));
+  }
+  progress?.('Reading ' + FORMATS[from].label);
+  const doc = await readDoc(file, from, progress);
+  if (!doc.title) doc.title = baseName(file.name);
+  progress?.('Writing ' + FORMATS[to].label);
+  return wrap(await writeDoc(doc, to));
+}
+
+// Text for the polish tool, from any document format.
+export async function extractText(file, progress) {
+  const from = detectFormat(file);
+  if (!DOC_IN.includes(from)) throw new Error('Can’t pull text out of this file.');
+  return docs.toText(await readDoc(file, from, progress));
+}

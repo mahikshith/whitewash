@@ -2,7 +2,7 @@
 
 Humanizing AI text stays the main feature. File conversion comes second. Everything runs in the browser.
 
-## Phase 1: new look, new words, drop-anywhere wheel
+## Phase 1: new look, new words, drop-anywhere wheel (shipped)
 
 Ships with no new libraries.
 
@@ -16,15 +16,20 @@ Ships with no new libraries.
 - **Image tools using the canvas** (no library): convert between JPG, PNG and WebP, resize, and strip photo metadata (location, camera). These are real conversions at zero download cost.
 - **Wheel actions for files we already handle:** TXT/MD → humanize; DOCX/PPTX/XLSX → refine text or strip metadata.
 
-## Phase 2: PDF tools
+## Phase 2: converter, PDF tools, metadata wiper (shipped)
 
-Adds pdf-lib (MIT, about 0.5 MB) and pdf.js (Apache-2.0, about 1.5 MB with its worker). Both are vendored and load only when a PDF tool opens. The CSP gains `connect-src 'self'` and `worker-src 'self'`.
+Vendored and lazy-loaded from `dist/vendor/`: pdf-lib, @pdf-lib/fontkit, pdf.js (with worker, cmaps and standard fonts), mammoth and marked, plus Noto Sans fonts for PDF output. The CSP gained `worker-src 'self'`, `connect-src 'self'` and `'wasm-unsafe-eval'`. The SheetJS CDN was blocked, so spreadsheets use our own XLSX/ODS/CSV engine.
 
-- Merge, split, reorder, delete and rotate pages, using a thumbnail grid.
-- Images → PDF and PDF → JPG/PNG.
-- **PDF → text → humanize.** This is the one conversion that feeds the main product.
-- Watermark and page numbers.
-- TXT/Markdown → PDF via a print stylesheet.
+- **Document engine** (`conv-doc.js`): every input becomes a block list (headings, paragraphs, lists, code, quotes, tables, links, bold/italic), and every output is written from it. In: TXT, MD, HTML, DOCX, ODT, EPUB, PDF (text layer), PPTX. Out: PDF, DOCX, MD, HTML, TXT, ODT, RTF, EPUB.
+- **Data engine** (`conv-data.js`): CSV, TSV, JSON, XLSX, ODS in; those plus Markdown, HTML, PDF and DOCX tables out. Tables in HTML or Markdown can come out as spreadsheets.
+- Subtitles SRT ↔ VTT ↔ text. Images JPG, PNG, WebP, GIF, BMP, AVIF, SVG in; JPG, PNG, WebP, PDF, BMP, TIFF, ICO out. PDF → JPG/PNG/WebP, one image per page.
+- About 150 conversion routes in total. Counted honestly: no audio or video.
+- PDF tools: merge, split (ranges or every page), organize (thumbnail grid: move, rotate, delete), images → PDF, PDF → images, watermark, page numbers, PDF text → Polish.
+- **Metadata wiper**: photos (EXIF incl. GPS and serials, XMP, IPTC, C2PA, AI prompt chunks), PDFs (Info dictionary, XMP, PieceInfo, document ID) and Word/PowerPoint/Excel properties. Each copy is reopened and checked before it is offered.
+- Every new PDF is written with no producer, creator or dates. Images placed into PDFs have their camera details stripped first.
+- The wheel offers conversions, merge and wipe for each file type, and a floating orb on tool pages accepts drops too.
+
+Word ↔ PDF keeps text, headings, lists, links and tables, not page layout. That is stated in the tool descriptions.
 
 ## Phase 3: heavier tools (WASM)
 
@@ -35,7 +40,6 @@ Adds `'wasm-unsafe-eval'` to the CSP. Each library is lazy-loaded and comes with
 - OCR for scanned PDFs and images (Tesseract.js, English first, about 6–9 MB).
 - PDF password protect and unlock (qpdf WASM).
 - Real redaction that burns pages to images, never boxes drawn over live text.
-- XLSX ↔ CSV.
 
 ## Not building
 

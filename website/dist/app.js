@@ -4,6 +4,9 @@ import { readTextFile } from './uploads.js';
 import { showOffice, loadOfficeFile } from './office-ui.js';
 import { showImages, loadImages, quickConvert } from './image-ui.js';
 import { initWheel, openPicker } from './wheel.js';
+import { showConvert, loadConvert, quickConvertFile } from './convert-ui.js';
+import { showPdf, loadPdf, setPolishHandler } from './pdf-ui.js';
+import { showWipe, loadWipe, quickWipe } from './wipe-ui.js';
 import { PICKER_ACCEPT } from './actions.js';
 
 const $ = (id) => document.getElementById(id);
@@ -116,16 +119,25 @@ function route() {
   const ready = active?.state === 'ready';
   const office = ready && active.mode === 'office';
   const image = ready && active.mode === 'image';
+  const mode = ready ? active.mode : null;
+  const separate = ['office', 'image', 'convert', 'pdf', 'wipe'].includes(mode);
   $('home-view').hidden = !!active;
-  $('tool-view').hidden = !ready || office || image;
+  $('tool-view').hidden = !ready || separate;
   $('office-view').hidden = !office;
   $('image-view').hidden = !image;
+  $('convert-view').hidden = mode !== 'convert';
+  $('pdf-view').hidden = mode !== 'pdf';
+  $('wipe-view').hidden = mode !== 'wipe';
+  $('float-orb').hidden = !active;
   showOffice(office ? active : null);
   showImages(image ? active : null);
+  showConvert(mode === 'convert' ? active : null);
+  showPdf(mode === 'pdf' ? active : null);
+  showWipe(mode === 'wipe' ? active : null);
   $('upcoming-view').hidden = !active || ready;
   $('tools-menu').open = false;
   document.title = active ? active.title + ' · Whitewash' : 'Whitewash: make AI drafts sound like you';
-  if (ready && !office && !image) {
+  if (ready && !separate) {
     $('page-title').textContent = active.title;
     $('page-description').textContent = active.description;
     $('run').textContent = active.action;
@@ -371,22 +383,39 @@ $('hero-sample').addEventListener('click', () => {
 // Files from the wheel go straight to the right tool.
 async function runAction(action, files) {
   if (action.convert) { quickConvert(files, action); return; }
+  if (action.to) { for (const file of files) await quickConvertFile(file, action.to); return; }
+  if (action.wipe) { quickWipe(files); return; }
   await openTool(action.tool);
   const tool = toolFromHash('#' + action.tool);
   if (tool.mode === 'office') loadOfficeFile(files[0]);
   else if (tool.mode === 'image') loadImages(files);
+  else if (tool.mode === 'convert') loadConvert(files);
+  else if (tool.mode === 'pdf') loadPdf(files);
+  else if (tool.mode === 'wipe') loadWipe(files);
   else loadFile(files[0]);
 }
-initWheel({ isActive: () => !$('home-view').hidden, onRun: runAction, onReject: notify });
-$('pick-input').accept = PICKER_ACCEPT;
-$('pick-any').addEventListener('click', () => $('pick-input').click());
-$('pick-input').addEventListener('change', () => {
-  const files = [...$('pick-input').files];
-  $('pick-input').value = '';
-  if (!files.length) return;
-  const box = $('pick-any').getBoundingClientRect();
-  openPicker(files, box.left + box.width / 2, box.top + box.height / 2);
+setPolishHandler(async (text, name) => {
+  await openTool('light-edit');
+  if (text.length > MAX_CHARACTERS) { notify('That PDF has over 100,000 characters of text. Only the first part was loaded.'); text = text.slice(0, MAX_CHARACTERS); }
+  replace(text, name, 'txt', true);
+  processDraft();
 });
+initWheel({ isActive: (event) => !$('home-view').hidden || !!event?.target?.closest?.('#float-orb'), anchor: () => $('home-view').hidden ? $('float-orb') : null, onRun: runAction, onReject: notify });
+$('pick-input').accept = PICKER_ACCEPT;
+$('float-input').accept = PICKER_ACCEPT;
+function pickFrom(input, ...buttons) {
+  let origin = buttons[0];
+  for (const button of buttons) button.addEventListener('click', () => { origin = button; input.click(); });
+  input.addEventListener('change', () => {
+    const files = [...input.files];
+    input.value = '';
+    if (!files.length) return;
+    const box = origin.getBoundingClientRect();
+    openPicker(files, box.left + box.width / 2, box.top + box.height / 2);
+  });
+}
+pickFrom($('pick-input'), $('pick-any'), $('home-orb'));
+pickFrom($('float-input'), $('float-orb'));
 // A file dropped outside a drop area should never replace the page.
 document.addEventListener('dragover', (event) => { if (!event.defaultPrevented && [...(event.dataTransfer?.types || [])].includes('Files')) event.preventDefault(); });
 document.addEventListener('drop', (event) => { if (!event.defaultPrevented) event.preventDefault(); });

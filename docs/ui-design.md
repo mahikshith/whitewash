@@ -10,18 +10,20 @@ The old homepage was 13 identical tiles under a generic tagline, with "AI" in ne
 
 - **Hero with the paste box in it.** "Make it sound like you wrote it." The draft box sits beside the headline. "Polish it" and "Spot AI tells" hand the draft to the full tool page and run it.
 - **Drop band with the orb.** Says plainly that a file can be dropped anywhere on the page. "Choose a file" opens the same wheel for touch and keyboard users.
-- **Grouped tools.** Writing, Documents, Images. Each card has an icon, a plain title and one sentence.
+- **Grouped tools.** Writing, Convert, PDF, Office files and privacy, Images. Each card has an icon, a plain title and one sentence.
 - **Coming next.** Unbuilt tools are listed once, in a box at the bottom, with their own status pages.
 
 ## The wheel
 
-Drag a file over the homepage and a glass radial wheel opens under the cursor. It offers only what fits the file: Polish, AI tells, Clean and Hidden for text; Polish and Strip info for Office files; JPG, PNG, WebP, Strip info and Resize for images. Drop on an option to run it. Dropping on the middle, or outside, keeps the wheel open so you can pick with the pointer or the arrow keys.
+Drag a file over the homepage and a glass radial wheel opens under the cursor. It offers only what fits the file: Polish, AI tells, Clean and quick conversions for text; Polish, Wipe info and conversions for Office files; Word, Polish, JPG, Wipe info and Pages for a PDF; Merge for several PDFs; JPG, PNG, WebP, PDF, Wipe info and Resize for images. "More" opens the full converter. Drop on an option to run it. Dropping on the middle, or outside, keeps the wheel open so you can pick with the pointer or the arrow keys.
 
 Measurements come from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)): 62 px inner radius, 150 px outer, 6 px gaps, 12 px corners, a spring open with a staggered fan-out, and a 6 px outward nudge on hover. The code is our own.
 
 A browser only sees a drag once it reaches the tab, and only learns file names on drop. So the wheel uses MIME types during the drag and checks again on drop. If the type is unknown during the drag (Markdown often is), a plain "Drop it anywhere" screen shows instead and the wheel opens on drop.
 
-Quick image conversions download straight away and report in a status pill at the top of the screen. Everything else opens the matching tool page with the file already loaded.
+On tool pages a small floating orb sits in the bottom corner. Drop a file on it, or click it, and the wheel opens around it. Drops elsewhere on a tool page go to that tool.
+
+Quick conversions and wipes download straight away and report in a status pill at the top of the screen. Everything else opens the matching tool page with the file already loaded.
 
 ## Look
 

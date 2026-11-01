@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Paste an AI draft and get it back without the filler. Polish text, Word, slides and spreadsheets, convert images. Everything runs in your browser.">
+<meta name="description" content="Paste an AI draft and get it back without the filler. Convert documents, PDFs, spreadsheets and images, and wipe hidden metadata. Everything runs in your browser.">
 <meta name="theme-color" content="#17171a">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Whitewash: make AI drafts sound like you</title>
 <script src="./theme.js"></script>
 <link rel="icon" href="./mark.svg" type="image/svg+xml">
@@ -39,8 +39,8 @@
     </div>
   </section>
   <section class="drop-band" aria-labelledby="drop-title">
-    <div class="orb" aria-hidden="true"><span></span></div>
-    <div class="drop-copy"><h2 id="drop-title">Got a file? Drop it anywhere on this page.</h2><p>Word, slides, spreadsheets, text files and images. A wheel pops up with what you can do with it.</p></div>
+    <button class="orb" id="home-orb" aria-label="Choose a file and pick what to do with it"><span></span></button>
+    <div class="drop-copy"><h2 id="drop-title">Got a file? Drop it anywhere on this page.</h2><p>Documents, PDFs, spreadsheets, subtitles and images. A wheel pops up with what you can do with it: convert, polish, merge or wipe its hidden info.</p></div>
     <button class="pill" id="pick-any">Choose a file</button>
     <input id="pick-input" type="file" multiple hidden>
   </section>
@@ -88,10 +88,61 @@
   </section>
   <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif" multiple hidden>
 </main>
+<main id="convert-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="convert-title"></h1><p id="convert-description"></p></div>
+  <section class="panel" aria-label="Converter">
+    <div class="office-entry"><button id="convert-pick" class="primary large">Choose a file</button><p>Documents, PDFs, spreadsheets, subtitles and images · several files of one type work too · or drop them here</p></div>
+    <ul id="convert-files" class="image-results file-list" hidden></ul>
+    <div id="convert-targets" class="target-chips" hidden><p>Turn it into</p><div id="convert-chips"></div></div>
+    <section id="convert-output" class="office-output" hidden aria-live="polite"><h2 id="convert-summary"></h2><ul id="convert-results" class="image-results"></ul><div class="image-buttons"><button class="primary" id="convert-download">Save again</button><button class="text-button" id="convert-again">Convert another file</button></div></section>
+    <p id="convert-error" class="office-error" role="alert" hidden></p>
+    <p class="image-note">Documents keep their text, headings, lists, links and tables. Exact page layout, fonts and pictures inside documents don’t come along. Scanned PDFs need text recognition, which isn’t built yet. Video and audio aren’t supported.</p>
+  </section>
+  <input id="convert-input" type="file" multiple hidden>
+</main>
+<main id="pdf-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="pdf-title"></h1><p id="pdf-description"></p></div>
+  <section class="panel" aria-label="PDF workspace">
+    <div class="office-entry"><button id="pdf-pick" class="primary large">Choose a PDF</button><p id="pdf-hint"></p></div>
+    <ol id="pdf-files" class="image-results file-list" hidden></ol>
+    <div id="pdf-pages" class="page-grid" hidden></div>
+    <div id="pdf-options" class="image-settings">
+      <label data-for="pdf-split">Pages <input id="pdf-ranges" class="text-input" placeholder="e.g. 1-3, 5 · leave empty for every page"></label>
+      <label data-for="images-to-pdf">Page size <select id="pdf-size"><option value="fit">Same as each image</option><option value="a4">A4</option><option value="letter">US Letter</option></select></label>
+      <label data-for="images-to-pdf">Margin <select id="pdf-margin"><option value="0">None</option><option value="24">Small</option><option value="48">Large</option></select></label>
+      <label data-for="pdf-to-images">Save as <select id="pdf-image-type"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select></label>
+      <label data-for="pdf-to-images">Sharpness <select id="pdf-image-scale"><option value="2">High</option><option value="1">Normal</option><option value="3">Print</option></select></label>
+      <label data-for="pdf-watermark">Text <input id="pdf-wm-text" class="text-input" value="DRAFT" maxlength="60"></label>
+      <label data-for="pdf-watermark">Strength <input id="pdf-wm-opacity" type="range" min="5" max="60" value="18"></label>
+      <label data-for="pdf-numbers">Where <select id="pdf-num-pos"><option value="bottom-center">Bottom middle</option><option value="bottom-right">Bottom right</option><option value="bottom-left">Bottom left</option><option value="top-center">Top middle</option><option value="top-right">Top right</option></select></label>
+      <label data-for="pdf-numbers">Style <select id="pdf-num-format"><option value="n / total">1 / 12</option><option value="n">1</option><option value="Page n of total">Page 1 of 12</option></select></label>
+    </div>
+    <div class="primary-row"><button id="pdf-run" class="primary" disabled>Go</button></div>
+    <section id="pdf-output" class="office-output" hidden aria-live="polite"><h2 id="pdf-summary"></h2><div class="image-buttons"><button class="primary" id="pdf-download">Save again</button></div></section>
+    <p id="pdf-error" class="office-error" role="alert" hidden></p>
+  </section>
+  <input id="pdf-input" type="file" hidden>
+</main>
+<main id="wipe-view" class="tool-page" hidden>
+  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+  <div class="tool-heading"><h1 id="wipe-title"></h1><p id="wipe-description"></p></div>
+  <section class="panel" aria-label="Metadata wiper">
+    <div class="office-entry"><button id="wipe-pick" class="primary large">Choose files</button><p>Photos (JPG, PNG, WebP, GIF), PDFs, and Word, PowerPoint or Excel files · up to 100 at once · or drop them here</p></div>
+    <div class="image-settings"><label><input type="checkbox" id="wipe-keep-color" checked> Keep colour profiles so photos look the same</label><label><input type="checkbox" id="wipe-neutral"> Rename to file-1, file-2…</label></div>
+    <section id="wipe-output" class="office-output" hidden aria-live="polite"><h2 id="wipe-summary"></h2><div id="wipe-results" class="wipe-results"></div><div class="image-buttons"><button class="primary" id="wipe-download">Save again</button><button class="text-button" id="wipe-again">Wipe more files</button></div></section>
+    <p id="wipe-error" class="office-error" role="alert" hidden></p>
+    <p class="image-note">Photos aren’t re-compressed, so quality stays the same. What wiping can’t do: anything visible in a photo or written in a document can still identify you, invisible pixel watermarks such as Google’s SynthID live in the picture itself, and your file name travels separately, so rename it if it gives something away.</p>
+  </section>
+  <input id="wipe-input" type="file" multiple hidden accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.docx,.pptx,.xlsx,.txt,.md">
+</main>
 <main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#light-edit">Polish a draft instead</a></div></main>
 </div>
 <footer class="footer"><span>Runs in your browser. Your text and files never leave this tab.</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
+<button id="float-orb" class="float-orb" aria-label="Drop a file here, or click to choose one" title="Drop a file here" hidden><span></span></button>
+<input id="float-input" type="file" multiple hidden>
 <div id="drop-scrim" class="drop-scrim" hidden><p id="scrim-text">Drop it anywhere</p></div>
 <div id="wheel" class="wheel" role="dialog" aria-modal="true" aria-label="Choose what to do with your file" tabindex="-1" hidden>
   <div class="wheel-disc"></div>
@@ -118,6 +169,14 @@
 <symbol id="image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
 <symbol id="resize" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
 <symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="m4 4 16 16"/></symbol>
+<symbol id="swap" viewBox="0 0 24 24"><path d="M4 8h13l-4-4M20 16H7l4 4"/></symbol>
+<symbol id="table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5M8 7h7"/></symbol>
+<symbol id="merge" viewBox="0 0 24 24"><path d="M6 3v6a6 6 0 0 0 6 6h0a6 6 0 0 1 6 6M18 3v6a6 6 0 0 1-3 5.2"/></symbol>
+<symbol id="split" viewBox="0 0 24 24"><path d="M12 21v-8M12 13 6 7M12 13l6-6M6 3v4h4M18 3v4h-4"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/><rect x="14" y="15" width="7" height="6" rx="1.5"/></symbol>
+<symbol id="stamp" viewBox="0 0 24 24"><path d="M9 12V8a3 3 0 1 1 6 0v4M5 12h14l1 5H4zM6 21h12"/></symbol>
+<symbol id="hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></symbol>
 <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 </body>

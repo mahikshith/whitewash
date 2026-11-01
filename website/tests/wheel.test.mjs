@@ -42,19 +42,25 @@ test('file kinds come from the name first, then the MIME type seen during a drag
   assert.equal(fileKind({ name: 'deck.pptx' }), 'slides');
   assert.equal(fileKind({ type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'word');
   assert.equal(fileKind({ type: 'image/webp' }), 'image');
-  assert.equal(fileKind({ name: 'scan.pdf', type: 'application/pdf' }), 'unknown');
-  assert.equal(fileKind({ name: 'logo.svg', type: 'image/svg+xml' }), 'unknown');
+  assert.equal(fileKind({ name: 'scan.pdf', type: 'application/pdf' }), 'pdf');
+  assert.equal(fileKind({ name: 'data.csv' }), 'other');
+  assert.equal(fileKind({ name: 'mystery.xyz' }), 'unknown');
 });
 
 test('the wheel only offers what fits the files', () => {
-  assert.deepEqual(wheelActions([{ name: 'a.txt' }]).actions.map((a) => a.tool), ['light-edit', 'writing-check', 'clean-text', 'characters']);
-  assert.deepEqual(wheelActions([{ name: 'a.xlsx' }]).actions.map((a) => a.tool), ['spreadsheets', 'metadata']);
+  const ids = (files) => wheelActions(files).actions.map((a) => a.id);
+  assert.deepEqual(ids([{ name: 'a.txt' }]).slice(0, 3), ['polish', 'check', 'clean']);
+  assert.ok(ids([{ name: 'a.xlsx' }]).includes('wipe'));
   const pngs = wheelActions([{ name: 'a.png', type: 'image/png' }, { name: 'b.png', type: 'image/png' }]).actions;
   assert.ok(!pngs.some((a) => a.convert === 'image/png'), 'no PNG to PNG');
   assert.ok(pngs.some((a) => a.convert === 'image/jpeg'));
-  assert.equal(wheelActions([{ name: 'a.docx' }, { name: 'b.docx' }]).actions.length, 0);
-  assert.match(wheelActions([{ name: 'a.pdf' }]).reason, /can’t open/);
+  assert.ok(ids([{ name: 'a.pdf' }, { name: 'b.pdf' }]).includes('merge'));
+  assert.ok(ids([{ name: 'a.pdf' }]).includes('to-docx'));
+  assert.deepEqual(ids([{ name: 'a.docx' }, { name: 'b.jpg' }]), ['wipe']);
+  assert.match(wheelActions([{ name: 'a.txt' }, { name: 'b.csv' }]).reason, /one type/);
+  assert.match(wheelActions([{ name: 'a.xyz' }]).reason, /can’t open/);
   assert.match(wheelActions(Array.from({ length: 51 }, () => ({ name: 'x.jpg' }))).reason, /50/);
+  for (const files of [[{ name: 'a.txt' }], [{ name: 'a.pdf' }], [{ name: 'a.jpg' }], [{ name: 'a.csv' }]]) assert.ok(wheelActions(files).actions.length <= 8);
 });
 
 test('image output names, types and sizes', () => {

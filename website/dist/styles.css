@@ -272,3 +272,52 @@ dialog::backdrop { background:rgba(10,10,12,.45); backdrop-filter:blur(4px); }
   .footer { margin:18px 16px 0; flex-direction:column; align-items:flex-start; gap:10px; }
   .image-results li { flex-direction:column; gap:2px; }
 }
+
+/* Converter, PDF tools and metadata wiper */
+button.orb { border:0; padding:0; cursor:pointer; }
+button.orb:hover { transform:scale(1.06); }
+.float-orb { position:fixed; right:22px; bottom:22px; z-index:40; width:58px; height:58px; border:0; padding:0; border-radius:50%; cursor:pointer; background:radial-gradient(circle at 32% 28%, #fff 0 6%, var(--accent) 26%, #7fd61b 58%, #2f6b10 100%); box-shadow:0 10px 30px color-mix(in srgb, #7fd61b 45%, transparent), inset -6px -8px 14px rgba(0,0,0,.18); animation:float 4.5s ease-in-out infinite; }
+.float-orb span { position:absolute; inset:-8px; border-radius:50%; border:1.5px solid color-mix(in srgb, var(--accent) 70%, transparent); animation:ripple 2.8s ease-out infinite; }
+.float-orb:hover { transform:scale(1.08); }
+.target-chips { padding:18px 24px; border-top:1px solid var(--border); }
+.target-chips p { margin:0 0 10px; font-size:13px; font-weight:650; color:var(--muted); }
+#convert-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { min-height:40px; padding:8px 16px; border:1px solid var(--border); border-radius:999px; background:var(--surface); font-weight:650; font-size:14px; transition:transform .18s cubic-bezier(.3, 1.5, .5, 1), background .15s; }
+.chip:hover:not(:disabled) { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); transform:translateY(-1px); }
+.chip.active { background:var(--ink); color:var(--page); border-color:var(--ink); }
+.file-list { margin:0; padding:4px 24px; border-top:1px solid var(--border); }
+.file-list li { align-items:center; }
+.row-controls { display:flex; gap:4px; flex:none; }
+.icon-button.small { width:30px; height:30px; font-size:14px; }
+.text-input { width:min(320px, 60vw); padding:6px 12px; border:1px solid var(--border); border-radius:10px; background:var(--page); color:var(--ink); }
+.page-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:14px; padding:18px 24px; border-top:1px solid var(--border); }
+.page-grid:empty::before { content:attr(data-loading); color:var(--muted); font-size:13px; }
+.page-card { margin:0; padding:10px; border:1px solid var(--border); border-radius:16px; background:var(--page); text-align:center; }
+.page-card img { display:block; max-width:100%; max-height:160px; margin:0 auto; border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,.12); transition:transform .25s; background:#fff; }
+.page-card figcaption { font-size:12px; color:var(--muted); margin:8px 0 6px; }
+.page-card.deleted img { opacity:.25; }
+.page-card.deleted figcaption { text-decoration:line-through; }
+.page-controls { display:flex; justify-content:center; gap:4px; }
+.wipe-results { display:grid; gap:12px; margin:14px 0 18px; }
+.wipe-card { padding:16px 18px; border:1px solid var(--border); border-radius:18px; background:var(--page); }
+.wipe-card header { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+.wipe-card header strong { overflow-wrap:anywhere; }
+.wipe-card p { margin:10px 0 4px; font-size:13.5px; color:var(--muted); }
+.wipe-card p.ok { color:var(--ink); font-weight:600; }
+.wipe-card p.bad,.status.bad { color:var(--removed); }
+.status.warn { background:#ffe6b8; color:#7a4b00; }
+.found-list { list-style:none; margin:6px 0 0; padding:0; display:grid; gap:6px; font-size:13.5px; }
+.found-list li { overflow-wrap:anywhere; }
+.found-list b { font-weight:650; margin-left:8px; }
+.found-list span:not(.risk) { color:var(--muted); }
+.risk { display:inline-block; min-width:70px; padding:1px 8px; border-radius:999px; font-size:11px; font-weight:700; text-align:center; background:var(--soft); color:var(--muted); }
+.risk.high { background:#ffd9cf; color:#8a2b12; }
+.risk.medium { background:#fff0c2; color:#6d5100; }
+:root[data-theme="dark"] .risk.high { background:#5a2417; color:#ffc9b8; }
+:root[data-theme="dark"] .risk.medium { background:#4d3d0c; color:#ffe39a; }
+:root[data-theme="dark"] .status.warn { background:#4d3d0c; color:#ffe39a; }
+@media (max-width:620px) {
+  .float-orb { right:14px; bottom:14px; width:50px; height:50px; }
+  .target-chips,.file-list,.page-grid { padding-inline:18px; }
+  .page-grid { grid-template-columns:repeat(2, 1fr); }
+}

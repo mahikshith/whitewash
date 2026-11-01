@@ -13,8 +13,10 @@ export function crc32(bytes) {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-export async function readZip(bytes) {
-  if (!(bytes instanceof Uint8Array) || bytes.length > 10_000_000 || bytes.length < 22) fail();
+// Converters pass larger limits: ebooks and workbooks are often bigger than
+// the Office files the editor tools handle.
+export async function readZip(bytes, { maxBytes = 10_000_000, maxEntries = 1000 } = {}) {
+  if (!(bytes instanceof Uint8Array) || bytes.length > maxBytes || bytes.length < 22) fail();
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const u16 = (at) => view.getUint16(at, true);
   const u32 = (at) => view.getUint32(at, true);
@@ -25,7 +27,7 @@ export async function readZip(bytes) {
   if (end < 0 || u32(end) !== 0x06054b50 || u16(end + 4) || u16(end + 6)) fail();
   const count = u16(end + 10);
   let cursor = u32(end + 16);
-  if (!count || count > 1000 || u16(end + 8) !== count || cursor + u32(end + 12) !== end) fail();
+  if (!count || count > maxEntries || u16(end + 8) !== count || cursor + u32(end + 12) !== end) fail();
   const entries = new Map();
   const spans = [];
   let expanded = 0;

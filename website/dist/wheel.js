@@ -8,7 +8,7 @@ const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
 const SIZE = (WHEEL.outer + 20) * 2;
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-let state = null, hooks = null, watchdog = 0, returnFocus = null;
+let state = null, hooks = null, watchdog = 0, returnFocus = null, armed = false;
 
 function describe(files) {
   if (!files.length) return '';
@@ -78,6 +78,7 @@ function open(actions, x, y, mode, files) {
 
 export function close() {
   clearTimeout(watchdog);
+  armed = false;
   $('drop-scrim').hidden = true;
   $('drop-scrim').dataset.wheel = '';
   $('scrim-text').textContent = 'Drop it anywhere';
@@ -104,8 +105,9 @@ export function openPicker(files, x, y) {
 function hasFiles(event) { return [...(event.dataTransfer?.types || [])].includes('Files'); }
 
 function onDragOver(event) {
-  if (!hasFiles(event) || !hooks.isActive()) return;
+  if (!hasFiles(event) || !(state || armed || hooks.isActive(event))) return;
   event.preventDefault();
+  event.stopPropagation();
   event.dataTransfer.dropEffect = 'copy';
   clearTimeout(watchdog);
   watchdog = setTimeout(close, 1200);
@@ -118,13 +120,21 @@ function onDragOver(event) {
   if (!$('drop-scrim').hidden) return;
   const items = [...event.dataTransfer.items].filter((item) => item.kind === 'file').map((item) => ({ type: item.type }));
   const result = items.length && items.every((item) => item.type) ? wheelActions(items) : { actions: [] };
-  if (result.actions.length) open(result.actions, event.clientX, event.clientY, 'drag', items.map(() => ({ name: '' })));
-  else $('drop-scrim').hidden = false;
+  const [x, y] = origin(event);
+  if (result.actions.length) open(result.actions, x, y, 'drag', items.map(() => ({ name: '' })));
+  else { armed = true; $('drop-scrim').hidden = false; }
+}
+
+// Where the wheel opens: on the floating orb when there is one, else under the cursor.
+function origin(event) {
+  const anchor = hooks.anchor?.()?.getBoundingClientRect();
+  return anchor ? [anchor.left + anchor.width / 2, anchor.top + anchor.height / 2] : [event.clientX, event.clientY];
 }
 
 function onDrop(event) {
-  if (!hasFiles(event) || !hooks.isActive()) return;
+  if (!hasFiles(event) || !(state || armed || hooks.isActive(event))) return;
   event.preventDefault();
+  event.stopPropagation();
   const files = [...event.dataTransfer.files];
   const chosen = state?.mode === 'drag' ? state.actions[state.index] : null;
   close();
@@ -132,14 +142,14 @@ function onDrop(event) {
   if (!result.actions.length) { hooks.onReject(result.reason); return; }
   const match = chosen && result.actions.find((action) => action.id === chosen.id);
   if (match) hooks.onRun(match, files);
-  else open(result.actions, event.clientX, event.clientY, 'pick', files);
+  else open(result.actions, ...origin(event), 'pick', files);
 }
 
 export function initWheel(options) {
   hooks = options;
-  document.addEventListener('dragenter', onDragOver);
-  document.addEventListener('dragover', onDragOver);
-  document.addEventListener('drop', onDrop);
+  document.addEventListener('dragenter', onDragOver, true);
+  document.addEventListener('dragover', onDragOver, true);
+  document.addEventListener('drop', onDrop, true);
   document.addEventListener('dragleave', (event) => {
     if (state?.mode === 'pick' || event.relatedTarget) return;
     if (event.clientX <= 0 || event.clientY <= 0 || event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) close();
