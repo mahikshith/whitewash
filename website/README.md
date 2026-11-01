@@ -12,7 +12,7 @@ From this directory, run `python -m http.server 4173 --bind 127.0.0.1 --director
 - Unicode inspection with counts and positions. Emoji/script joiners and direction controls are retained. No compatibility normalization or stripping non-ASCII text.
 - Exact user-locked phrases, numbers, URLs/email, quotations and conservative code protection.
 - Edit text file: local UTF-8 TXT/Markdown selection and drag/drop, followed by automatic local light editing; copy/download. Uploaded originals are never rewritten.
-- A homepage with the paste box in the hero, a drop-anywhere radial wheel and grouped tools. 35 tools work; four planned tools have their own status pages. Tool pages show a floating orb that takes drops and opens the same wheel.
+- Dial first: the homepage, section pages (Humanize, PDF, Compress, Audio, Archives, Privacy) and the converter each show a big dial. Drop a file and click one segment to get the finished file. One-click Humanize returns Word, PowerPoint and Excel files edited in place, and PDFs as Word files. 35 tools work; four planned tools have their own status pages.
 - Convert: about 150 routes between documents (TXT, MD, HTML, DOCX, ODT, RTF, EPUB, PDF, PPTX in), data (CSV, TSV, JSON, XLSX, ODS), subtitles (SRT, VTT) and images (JPG, PNG, WebP, GIF, BMP, AVIF, SVG in; TIFF and ICO out as well). Documents keep text, headings, lists, links and tables, not page layout. Up to 50 files of one type, 60 MB each.
 - Audio: MP3, WAV, FLAC, OGG, Opus, M4A and AAC into MP3, WAV, FLAC, OGG, Opus and M4A, plus the sound from MP4, MOV, MKV and WebM videos. Up to 1 GB. Tags and cover art carry over. Nothing encodes video.
 - Archives: open ZIP, 7Z, RAR, TAR, TAR.GZ/BZ2/XZ, GZ, BZ2 and XZ, save single files out of them, convert them to ZIP, TAR or TAR.GZ, or pack any files into a new one. Up to 300 MB and 10,000 files.
@@ -42,11 +42,11 @@ The comparison protocol is in [the benchmark plan](../docs/research/benchmark-pl
 
 ## UI structure
 
-The homepage, the Tools menu and every page heading read from the shared catalog in `dist/tools.js`, which also defines the Writing / Documents / Images groups. Planned tools stay in the catalog with `state: 'soon'` or `'research'` and appear only under "Coming next". Hash URLs such as `#light-edit`, `#word` and `#image-resize` keep the draft in memory, and old `#studio` links still resolve. `dist/styles.css` is the single stylesheet; `dist/theme.js` applies appearance before paint.
+The homepage, the Tools menu and every page heading read from the shared catalog in `dist/tools.js`, which also defines the header sections. Planned tools stay in the catalog with `state: 'soon'` or `'research'` and appear only under "Coming next". Hash URLs such as `#light-edit`, `#word` and `#image-resize` keep the draft in memory, and old `#studio` links still resolve. `dist/styles.css` is the single stylesheet; `dist/theme.js` applies appearance before paint.
 
 Audio is `conv-audio.js` (Mediabunny); archives are `conv-archive.js` (libarchive.js to read, fflate and our TAR writer to write) with their page in `archive-ui.js`. Conversions route through `dist/convert.js` (formats, routes, `convertFile`) to the engines `conv-doc.js`, `conv-data.js` and `conv-pdf.js`. Vendored libraries load on first use through `dist/libs.js`; their licences are in `dist/vendor/licenses/`. Photo metadata and the BMP/TIFF/ICO encoders are `image-meta.js` and `image-codecs.js`. The pages are `convert-ui.js`, `pdf-ui.js` and `wipe-ui.js`, sharing `files.js`.
 
-The drop-anywhere wheel lives in `dist/wheel.js` (events and drawing), `dist/wheel-geometry.js` (angles, hit-testing, segment paths) and `dist/actions.js` (which options fit which files). Image conversion uses the canvas in `dist/images.js` and `dist/image-ui.js`; batches download as one ZIP built with the existing `office-zip.js`. The status pill is `dist/island.js`. See [design](../docs/ui-design.md) and [research](../research/README.md).
+The dial lives in `dist/dial.js` (drawing and events), `dist/wheel-geometry.js` (angles, hit-testing, segment paths) and `dist/actions.js` (which options fit which files and sections). `dist/hubs.js` runs the homepage and section pages, and `dist/quick.js` does one-click Humanize. Image conversion uses the canvas in `dist/images.js` and `dist/image-ui.js`; batches download as one ZIP built with the existing `office-zip.js`. The status pill is `dist/island.js`. See [design](../docs/ui-design.md) and [research](../research/README.md).
 
 ## Office limits and validation
 

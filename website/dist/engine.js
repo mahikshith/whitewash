@@ -66,6 +66,37 @@ const clarityRules = [
   [/(?<![\p{L}\p{N}_])first and foremost(?![\p{L}\p{N}_])/giu, 'first', 'Less wordy phrasing'],
 ];
 
+// Stock AI wording with a plain swap that keeps the sentence intact.
+const wSource = (body, tail = '') => `(?<![\\p{L}\\p{N}_])(?:${body})(?![\\p{L}\\p{N}_])${tail}`;
+const w = (body, tail) => new RegExp(wSource(body, tail), 'giu');
+const tellRules = [
+  [w('delve into'), 'look at', 'Plainer than “delve into”'], [w('delves into'), 'looks at', 'Plainer than “delves into”'],
+  [w('delved into'), 'looked at', 'Plainer than “delved into”'], [w('delving into'), 'looking at', 'Plainer than “delving into”'],
+  [w('a (?:myriad|plethora) of'), 'many', 'Plainer than a stock AI phrase'],
+  [w('leverage'), 'use', 'Plainer than “leverage”'], [w('leverages'), 'uses', 'Plainer than “leverages”'],
+  [w('leveraged'), 'used', 'Plainer than “leveraged”'], [w('leveraging'), 'using', 'Plainer than “leveraging”'],
+  [w('seamless'), 'smooth', 'Less hype'], [w('seamlessly'), 'smoothly', 'Less hype'],
+  [w('in the realm of'), 'in', 'Plainer than “in the realm of”'],
+  [w('navigat(?:e|ing) the (?:complexities|intricacies) of'), 'handle', 'Plainer than a stock AI phrase'],
+  [w('harness(?:ing)? the power of'), 'use', 'Plainer than a stock AI phrase'],
+  [w('unlock(?:ing)? the (?:full )?potential of'), 'get the most from', 'Plainer than a stock AI phrase'],
+  [w('cutting-edge|state-of-the-art'), 'modern', 'Less hype'],
+  [w('game-changing|groundbreaking|revolutionary'), 'new', 'Less hype'],
+  [w('ever-evolving'), 'changing', 'Less hype'],
+  [w('pivotal'), 'key', 'Less hype'],
+];
+// Openers and sign-offs that add nothing. Removed whole.
+const cutRules = [
+  [w('(?:it is|it[’\']s) (?:important|worth|worthwhile) (?:to note|noting) that', String.raw`,?\s*`), 'Cut a filler opener'],
+  [w('it should be noted that', String.raw`,?\s*`), 'Cut a filler opener'],
+  [w('in today[’\']s fast-paced world|in the modern era|in today[’\']s digital age', String.raw`,?\s*`), 'Cut a filler opener'],
+  [/(?<=^|[.!?]\s+|\n)(?:in conclusion|in summary|to sum up|overall|ultimately|in essence),\s*/gimu, 'Cut a filler opener'],
+  [/(?<=^|[.!?]\s+|\n)(?:certainly|absolutely|of course|sure|great question)!\s*/gimu, 'Cut a chatbot leftover'],
+  [w('as an ai(?: language model)?', String.raw`,?\s*`), 'Cut a chatbot leftover'],
+  [/(?<=^|[.!?]\s+|\n)(?:i hope this helps|let me know if you (?:have|need) (?:any(?:thing)?|more)[^.!?\n]{0,60}|i hope this email finds you well|feel free to (?:reach out|ask|let me know)[^.!?\n]{0,60})[.!]?[ \t]*/gimu, 'Cut a chatbot sign-off'],
+  [w('(?:please )?feel free to', String.raw`\s+`), 'Cut “feel free to”'],
+];
+
 // Chatbot copy-paste residue: citation plumbing that only renders inside the chat UI.
 const artifactRules = [
   [/\uE200(?:file)?cite(?:\uE202[\w-]+)+\uE201/gu, 'Remove a ChatGPT source-pill marker; its link did not survive the copy'],
@@ -156,7 +187,23 @@ export function proposeEdits(text, options = {}) {
     add(/ — /gu, ' - ', 'cleanup', 'Use a spaced hyphen instead of a spaced em dash');
     add(/(?<=\p{L})’(?=\p{L})/gu, "'", 'cleanup', 'Use a straight apostrophe');
   }
-  if (options.mode === 'polish') for (const [pattern, after, reason] of clarityRules) add(pattern, after, 'clarity', reason);
+  if (options.mode === 'polish' || options.mode === 'humanize') for (const [pattern, after, reason] of clarityRules) add(pattern, after, 'clarity', reason);
+  if (options.mode === 'humanize') {
+    for (const [pattern, after, reason] of tellRules) add(pattern, after, 'clarity', reason);
+    // Openers and chatbot sign-offs: cut them and capitalise what follows.
+    for (const [pattern, reason] of cutRules) for (const match of text.matchAll(pattern)) {
+      let start = match.index; const end = start + match[0].length;
+      if (isProtected(start, end)) continue;
+      const next = text[end] || '';
+      const atStart = start === 0 || /[.!?]\s*$|\n\s*$/.test(text.slice(Math.max(0, start - 3), start));
+      // A cut that ends the line takes the space before it too.
+      if (end === text.length || next === '\n') while (start > 0 && /[ \t]/.test(text[start - 1])) start--;
+      push(start, end, '', 'clarity', reason);
+      // Capitalise the next word as its own edit, so it keeps its own formatting.
+      if (atStart && /\p{Ll}/u.test(next)) push(end, end + 1, next.toUpperCase(), 'clarity', 'Capitalise the new first word');
+    }
+    if (options.format !== 'md') for (const match of text.matchAll(/\*\*([^*\n]{1,200})\*\*/gu)) if (!isProtected(match.index, match.index + match[0].length)) push(match.index, match.index + match[0].length, match[1], 'cleanup', 'Remove leftover Markdown bold');
+  }
   let previousEnd = 0;
   return edits.sort((a, b) => a.start - b.start || b.end - a.end).filter((edit) => {
     if (edit.start < previousEnd) return false;

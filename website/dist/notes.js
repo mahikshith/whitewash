@@ -69,6 +69,15 @@ const TOOL = {
   sign: { title: 'Sign', rows: [['You get', 'Your drawn signature placed on the page you pick'], ['Note', 'A visible signature, not a certificate-based digital signature']] },
   squeeze: { title: 'Shrink images', rows: [['You get', 'Smaller files at up to 2560 px, tuned with MozJPEG and OxiPNG'], ['Drops', 'Camera details like location']] },
   ocr: { title: 'Read the text', rows: [['You get', 'The words in the image as text you can copy, polish or save'], ['Also', 'A searchable PDF of the image'], ['Note', 'English only for now. Clear, straight photos work best']] },
+  edit: { title: 'Edit', rows: [['You get', 'The text in the editor, already humanized, with every change marked'], ['Then', 'Undo any change, edit by hand, copy or download']] },
+  protect: { title: 'Lock with a password', rows: [['You get', 'The same PDF, needing a password to open (AES-256)']] },
+  unlock: { title: 'Remove the password', rows: [['You get', 'A copy that opens without a password'], ['Needs', 'The password, typed once']] },
+  split: { title: 'Split', rows: [['You get', 'The pages you pick, or every page as its own PDF']] },
+  'to-images': { title: 'PDF → JPG', rows: [['You get', 'Every page as an image, in a ZIP']] },
+  watermark: { title: 'Stamp', rows: [['You get', 'Text like DRAFT across every page']] },
+  numbers: { title: 'Page numbers', rows: [['You get', 'A number on every page, where you choose']] },
+  repair: { title: 'Repair', rows: [['You get', 'A rebuilt copy of a PDF that won’t open or shows errors']] },
+  'more-pdf': { title: 'Every PDF tool', rows: [['You get', 'The PDF page with this file loaded and all 15 tools on the dial']] },
   'to-pdf-images': { title: 'Images → PDF', rows: [['You get', 'One PDF, one image per page'], ['Drops', 'Camera details like location']] },
 };
 
@@ -79,6 +88,14 @@ export function actionNote(action, files) {
     const note = routeNote(from, action.to);
     if (files.length > 1) note.rows.unshift(['Files', files.length + ' files, saved together in a ZIP']);
     return note;
+  }
+  if (action.humanize) {
+    const inPlace = ['txt', 'md', 'docx', 'pptx', 'xlsx'].includes(from);
+    const kind = { docx: 'Word file', pptx: 'slide deck', xlsx: 'spreadsheet', txt: 'text file', md: 'Markdown file' }[from] || 'file';
+    const rows = action.humanize === 'clean'
+      ? [['Removes', 'Hidden characters, odd spaces, soft hyphens and chatbot citation junk'], ['You get', inPlace ? 'The same ' + kind + ', with nothing else touched' : 'A Word file with the text']]
+      : [['Removes', 'Filler (“in order to”), stock AI phrases (“delve into”, “it is important to note”), chatbot sign-offs, hidden characters'], ['You get', inPlace ? 'The same ' + kind + ' back: styles, tables, images and layout untouched' : 'A Word file with the humanized text. A PDF’s layout can’t be edited in place'], ['Keeps', 'Quotes, numbers, names, links and code exactly as they were']];
+    return { title: action.humanize === 'clean' ? 'Strip hidden characters' : 'Humanize', rows, foot: 'One click. Runs on this device. Nothing is uploaded.' };
   }
   if (action.convert) return routeNote(from || 'png', Object.keys(FORMATS).find((k) => FORMATS[k].mime === action.convert) || 'png');
   if (action.tool === 'images-to-pdf') return { ...TOOL['to-pdf-images'], foot: 'Runs on this device. Nothing is uploaded.' };

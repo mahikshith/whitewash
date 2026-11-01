@@ -1,7 +1,7 @@
 // The Tools menu: a tab per group on the left, that group's tools on the
 // right, and a search box on top that finds tools and "x to y" conversions.
 // Ctrl+K or / opens it with the search box focused.
-import { tools, groups } from './tools.js';
+import { tools, groups, sections } from './tools.js';
 import { FORMATS } from './convert.js';
 import { searchAll } from './search.js';
 import { routeNote } from './notes.js';
@@ -82,7 +82,6 @@ export function initMenu() {
     if ($('tools-menu').open) { const tool = location.hash.slice(1).split('?')[0]; const group = tools.find((t) => t.id === tool)?.group; if (group) showGroup(group); }
     else { $('menu-search').value = ''; showResults(''); }
   });
-  $('search-button').addEventListener('click', () => openSearch());
   document.addEventListener('keydown', (event) => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName) || document.activeElement?.isContentEditable;
     if ((event.key === 'k' && (event.metaKey || event.ctrlKey)) || (event.key === '/' && !typing)) { event.preventDefault(); openSearch(); }
@@ -92,4 +91,24 @@ export function initMenu() {
 export function openSearch() {
   $('tools-menu').open = true;
   requestAnimationFrame(() => $('menu-search').focus());
+}
+
+// The tabs across the header. Each tab opens its section page; hovering or
+// focusing it drops down every tool in that section.
+export function initTabs() {
+  $('section-tabs').replaceChildren(...sections.map((section) => {
+    const tab = document.createElement('div'); tab.className = 'tab';
+    const link = document.createElement('a');
+    link.href = section.href || '#' + section.id; link.className = 'tab-link'; link.dataset.section = section.id;
+    link.textContent = section.title;
+    const panel = document.createElement('div'); panel.className = 'tab-menu' + (section.tools.length > 6 ? ' two' : '');
+    const lede = document.createElement('p'); lede.className = 'menu-blurb'; lede.textContent = section.lede;
+    const list = document.createElement('div'); list.className = 'tab-items';
+    list.append(...section.tools.map((id) => tools.find((t) => t.id === id)).map((t) => item('#' + t.id, t.icon, t.title, t.description, '')));
+    panel.append(lede, list);
+    tab.append(link, panel);
+    // Close the drop-down once something in it is picked.
+    panel.addEventListener('click', (event) => { if (event.target.closest('a')) { tab.classList.add('closed'); setTimeout(() => tab.classList.remove('closed'), 400); document.activeElement?.blur(); } });
+    return tab;
+  }));
 }

@@ -17,55 +17,44 @@
 <a class="skip-link" href="#content">Skip to content</a>
 <header class="header">
   <a class="brand" href="#home" aria-label="Whitewash home"><img src="./mark.svg" width="28" height="28" alt="">whitewash</a>
-  <details id="tools-menu" class="tools-menu"><summary>Tools <svg aria-hidden="true"><use href="#chevron"/></svg></summary>
+  <nav id="section-tabs" class="section-tabs" aria-label="Sections"></nav>
+  <details id="tools-menu" class="tools-menu"><summary aria-label="Search all tools (Ctrl K)" title="Search all tools (Ctrl K)"><svg aria-hidden="true"><use href="#search"/></svg><span>Search</span><kbd>Ctrl K</kbd></summary>
     <div class="mega" role="dialog" aria-label="All tools">
-      <label class="menu-search"><svg aria-hidden="true"><use href="#search"/></svg><input id="menu-search" type="search" placeholder="Search tools or conversions, like “pdf to word”" autocomplete="off" spellcheck="false" aria-label="Search tools and conversions"><kbd>Ctrl K</kbd></label>
+      <label class="menu-search"><svg aria-hidden="true"><use href="#search"/></svg><input id="menu-search" type="search" placeholder="Search tools or conversions, like “pdf to word”" autocomplete="off" spellcheck="false" aria-label="Search tools and conversions"><kbd>Esc</kbd></label>
       <div id="menu-body" class="menu-body"><div id="menu-tabs" class="menu-tabs" role="tablist" aria-orientation="vertical"></div><nav id="menu-panel" class="menu-panel" role="tabpanel"></nav></div>
       <nav id="menu-results" class="menu-results" aria-label="Search results" hidden></nav>
     </div>
   </details>
-  <nav class="quick-links" aria-label="Popular tools"><a href="#light-edit">Polish</a><a href="#convert">Convert</a><a href="#pdf-merge">PDF</a><a href="#metadata">Wipe metadata</a></nav>
-  <button id="search-button" class="search-button" aria-label="Search tools (Ctrl K)" title="Search tools (Ctrl K)"><svg aria-hidden="true"><use href="#search"/></svg></button>
   <button id="theme-toggle" class="theme-button" aria-label="Dark mode" aria-pressed="false" title="Switch to dark mode"><span id="theme-icon" aria-hidden="true">☾</span></button>
 </header>
 <div id="content" tabindex="-1">
-<main id="home-view" class="home">
-  <section class="hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Free · No sign-up · Nothing gets uploaded</p>
-      <h1>Make it sound like <span class="highlight">you</span> wrote it.</h1>
-      <p class="lede">Paste an AI draft. Whitewash cuts the filler, flags the stock phrases and shows you every change before you keep it.</p>
+<main id="hub-view" class="hub">
+  <section class="hub-top">
+    <div class="hub-copy">
+      <p class="eyebrow" id="hub-eyebrow">Free · No sign-up · Files never leave your device</p>
+      <h1 id="hub-title"></h1>
+      <p id="hub-lede" class="lede"></p>
+      <aside id="hub-info" class="dial-info" aria-live="polite"></aside>
+      <div class="hub-buttons"><button class="primary" id="hub-pick">Choose a file</button><button class="text-button" id="hub-clear" hidden>Start over</button></div>
+      <p id="hub-error" class="office-error" role="alert" hidden></p>
     </div>
-    <div class="hero-box">
-      <label class="sr-only" for="hero-draft">Your draft</label>
-      <textarea id="hero-draft" placeholder="Paste your draft here…" maxlength="100000" spellcheck="false"></textarea>
-      <div class="hero-actions">
-        <button type="button" class="text-button" id="hero-sample">Try an example</button>
-        <button type="button" class="ghost" id="hero-check" disabled>Spot AI tells</button>
-        <button type="button" class="primary" id="hero-run" disabled>Polish it</button>
-      </div>
-    </div>
+    <div class="dial-wrap"><div id="hub-dial"></div></div>
   </section>
-  <section class="drop-band" aria-labelledby="drop-title">
-    <button class="orb" id="home-orb" aria-label="Choose a file and pick what to do with it"><span></span></button>
-    <div class="drop-copy"><h2 id="drop-title">Got a file? Drop it anywhere on this page.</h2><p>Documents, PDFs, spreadsheets, subtitles and images. A wheel pops up with what you can do with it: convert, polish, merge or wipe its hidden info.</p></div>
-    <button class="pill" id="pick-any">Choose a file</button>
-    <input id="pick-input" type="file" multiple hidden>
-  </section>
-  <div id="tool-groups" class="tool-groups"></div>
-  <section class="coming"><h2>Coming next</h2><ul id="coming-list"></ul></section>
+  <section id="hub-tools" class="hub-tools" aria-label="Tools"></section>
+  <input id="hub-input" type="file" multiple hidden>
 </main>
 <main id="tool-view" class="tool-page" hidden>
   <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
   <div class="tool-heading"><h1 id="page-title"></h1><p id="page-description"></p></div>
   <section id="file-entry" class="panel file-entry" hidden><button class="primary large" id="select-file">Choose a text file</button><p>.txt or .md · up to 400 KB · or drop it here</p></section>
   <section id="editor" class="panel editor" aria-label="Text workspace">
-    <div class="input-toolbar"><label for="draft">Your text</label><span id="document-name"></span><button id="upload" class="text-button">Open a file</button><button id="sample" class="text-button">Try an example</button></div>
+    <div class="input-toolbar"><label for="draft">Your text</label><span id="document-name"></span><button id="upload" class="text-button">Open a file</button></div>
     <textarea id="draft" placeholder="Paste your draft here…" spellcheck="false" maxlength="100000" aria-describedby="input-count"></textarea>
     <div class="input-bottom"><span id="input-count">0 words</span><button id="undo-replace" class="text-button" hidden>Undo</button><button id="clear" class="text-button">Clear</button></div>
     <div class="primary-row"><button id="run" class="primary" disabled>Polish it</button></div>
     <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Plain text</option><option value="md">Markdown</option></select></label><div id="cleanup-settings" class="options-content"><label><input type="checkbox" id="spaces" checked> Turn non-breaking spaces into normal ones</label><label><input type="checkbox" id="soft-hyphens" checked> Remove hidden hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>Can join words in some languages.</small></label><label><input type="checkbox" id="punctuation"> Plain punctuation <small>Swaps em dashes, curly quotes and … for keyboard versions.</small></label></div><label for="locks">Never change these phrases</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One per line"></textarea><small>Up to 50. Case matters.</small></div></details>
     <section id="output" class="output" aria-labelledby="output-title" hidden><div class="output-header"><h2 id="output-title">Result</h2><span id="edit-count"></span><button id="copy" class="text-button">Copy</button><button id="download" class="text-button">Download</button></div><div id="result" class="result" tabindex="0"></div><div id="character-report" class="character-report" hidden></div><details id="changes-panel" class="changes-panel"><summary id="changes-title">See changes</summary><div class="review-actions"><button id="keep-all" class="text-button">Keep all</button><button id="reject-all" class="text-button">Undo all</button></div><div id="changes"></div></details></section>
+    <div class="output-empty"><svg aria-hidden="true"><use href="#sparkle"/></svg><p>Paste or open a draft on the left, then hit the button. The humanized version shows up here.</p></div>
   </section>
   <input id="file-input" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
 </main>
@@ -74,7 +63,7 @@
   <div class="tool-heading"><h1 id="office-title"></h1><p id="office-description"></p></div>
   <section class="panel office-workspace" aria-label="Document workspace">
     <div class="office-entry"><p id="office-filename" hidden></p><button id="office-action" class="primary large">Choose a file</button><p id="office-limits"></p><button id="office-another" class="text-button" hidden>Choose another file</button></div>
-    <details id="office-options" class="options"><summary>Options</summary><div class="options-content"><label>Edits <select id="office-mode"><option value="polish">Polish wording</option><option value="clean">Only fix odd characters</option></select></label><label><input type="checkbox" id="office-punctuation"> Plain punctuation</label><label for="office-locks">Never change these phrases</label><textarea id="office-locks" rows="2" maxlength="2000" placeholder="One per line"></textarea></div></details>
+    <details id="office-options" class="options"><summary>Options</summary><div class="options-content"><label>Edits <select id="office-mode"><option value="humanize">Humanize (filler, AI phrases, hidden characters)</option><option value="polish">Only cut wordy phrases</option><option value="clean">Only fix odd characters</option></select></label><label><input type="checkbox" id="office-punctuation"> Plain punctuation</label><label for="office-locks">Never change these phrases</label><textarea id="office-locks" rows="2" maxlength="2000" placeholder="One per line"></textarea></div></details>
     <section id="office-output" class="office-output" hidden><h2 id="office-summary" tabindex="-1"></h2><p id="office-scope"></p><details id="office-review"><summary id="office-review-title">See changes</summary><div id="office-changes"></div></details></section>
     <p id="office-error" class="office-error" role="alert" hidden></p>
   </section>
@@ -96,16 +85,17 @@
   </section>
   <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif" multiple hidden>
 </main>
-<main id="convert-view" class="tool-page" hidden>
-  <a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a>
+<main id="convert-view" class="tool-page wide" hidden>
   <div class="tool-heading"><h1 id="convert-title"></h1><p id="convert-description"></p></div>
-  <section class="panel" aria-label="Converter">
-    <div class="office-entry"><button id="convert-pick" class="primary large">Choose a file</button><p>Documents, PDFs, spreadsheets, subtitles and images · several files of one type work too · or drop them here</p></div>
-    <ul id="convert-files" class="image-results file-list" hidden></ul>
-    <div id="convert-targets" class="target-chips" hidden><p>Turn it into · point at a format to see what you get</p><div id="convert-chips"></div><aside id="convert-note" class="route-note" aria-live="polite" hidden></aside></div>
-    <section id="convert-output" class="office-output" hidden aria-live="polite"><h2 id="convert-summary"></h2><ul id="convert-results" class="image-results"></ul><div class="image-buttons"><button class="primary" id="convert-download">Save again</button><button class="text-button" id="convert-again">Convert another file</button></div></section>
-    <p id="convert-error" class="office-error" role="alert" hidden></p>
-    <p class="image-note">Documents keep their text, headings, lists, links and tables. Exact page layout, fonts and pictures inside documents don’t come along. Scanned PDFs need text recognition, which isn’t built yet. Video and audio aren’t supported.</p>
+  <section class="convert-grid" aria-label="Converter">
+    <div class="from-panel"><h2>From</h2><div id="convert-from"></div></div>
+    <div class="dial-wrap"><div id="convert-dial"></div></div>
+    <div class="convert-side">
+      <aside id="convert-note" class="dial-info" aria-live="polite"></aside>
+      <ul id="convert-files" class="image-results file-list" hidden></ul>
+      <section id="convert-output" class="office-output" hidden aria-live="polite"><h2 id="convert-summary"></h2><ul id="convert-results" class="image-results"></ul><div class="image-buttons"><button class="primary" id="convert-download">Save again</button><button class="text-button" id="convert-again">Another file</button></div></section>
+      <p id="convert-error" class="office-error" role="alert" hidden></p>
+    </div>
   </section>
   <input id="convert-input" type="file" multiple hidden>
 </main>
@@ -190,16 +180,7 @@
 </div>
 <footer class="footer"><span>Runs in your browser. Your text and files never leave this tab.</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
-<button id="float-orb" class="float-orb" aria-label="Drop a file here, or click to choose one" title="Drop a file here" hidden><span></span></button>
-<input id="float-input" type="file" multiple hidden>
-<div id="drop-scrim" class="drop-scrim" hidden><p id="scrim-text">Drop it anywhere</p></div>
-<div id="wheel" class="wheel" role="dialog" aria-modal="true" aria-label="Choose what to do with your file" tabindex="-1" hidden>
-  <div class="wheel-disc"></div>
-  <svg id="wheel-svg" viewBox="0 0 340 340" width="340" height="340" aria-hidden="true"></svg>
-  <div class="wheel-hub" aria-live="polite"><strong id="wheel-label"></strong><span id="wheel-sub"></span></div>
-  <p id="wheel-keys" class="wheel-keys"></p>
-  <aside id="wheel-info" class="wheel-info" aria-live="polite" hidden></aside>
-</div>
+
 <div id="island" class="island" role="status" aria-live="polite" hidden>
   <span class="island-dot" aria-hidden="true"></span>
   <div class="island-text"><strong id="island-title"></strong><span id="island-detail"></span></div>
@@ -234,6 +215,9 @@
 <symbol id="lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
 <symbol id="unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></symbol>
 <symbol id="wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8-1.5-1.5a4 4 0 0 1-5-5L13 2l1.5 4.5zM3 21l4-4"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="arrow-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
 <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 </body>
