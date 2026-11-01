@@ -4,7 +4,7 @@ Product discovery for a web and mobile writing tool that improves clarity, clean
 
 Planned feature: Metadata & Privacy, with inspection, selective removal of supported metadata, and a verified export report. Metadata cleanup does not guarantee removal of statistical text watermarks or external provenance records.
 
-Status: first browser-local website implemented. Model-assisted rewriting, AI classification, provider watermark checks and Office/PDF metadata sanitization are research/roadmap items, not connected services.
+Status: browser-local website with the writing tools, about 250 file conversions (documents, data, images, audio, archives), PDF tools and a metadata wiper for photos, PDFs and Office files. Model-assisted rewriting, AI classification and provider watermark checks are research/roadmap items, not connected services. Parked ideas are in [research/later.md](research/later.md).
 
 The product must distinguish Unicode cleanup, writing improvement, statistical AI detection, and provider watermark verification. It must not promise universal detector bypass or certify human authorship from a detector score.
 
@@ -18,4 +18,4 @@ The [website guide](website/README.md) covers running, testing and current limit
 
 Open the [private website preview](https://whitewash-studio.astute-newt-2147.chatgpt.site). [Validation](docs/validation.md) and [deployment details](docs/deployment.md) record completed checks and operational limits.
 
-The [implementation roadmap](docs/implementation-roadmap.md) separates working tools from the next model, document and metadata features. The [tool-first design](docs/ui-design.md) provides a directory, distinct task pages and a single primary processing action. Light/dark appearance remembers the local preference.
+The [implementation roadmap](docs/implementation-roadmap.md) separates working tools from the next model, document and metadata features. The [design notes](docs/ui-design.md) cover the new homepage, the drop-anywhere wheel and the image tools. The [research folder](research/README.md) holds the converter teardown, the conversion-site survey and the phased plan.

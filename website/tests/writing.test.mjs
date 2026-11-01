@@ -30,3 +30,19 @@ test('Unicode tags and variation selectors can be inspected without stripping va
   assert.ok(items.some((item) => item.code === 'U+E0100'));
   assert.equal(applyEdits(text, proposeEdits(text, { mode: 'polish', zeroWidth: true, punctuation: true })), text);
 });
+
+test('stock AI phrasing is flagged, never edited, and respects quotes, code and word boundaries', () => {
+  const text = 'Certainly! Let’s dive in. Overall, we delve into a rich tapestry. It\'s not just a tool, it\'s a partner. Not only fast but also cheap. **Bold** text. As of my last knowledge update, feel free to leverage it. Foster care stays. "We delve" quoted.\n`delve into tapestry`\nundelved delvers';
+  const snapshot = text;
+  const found = inspectWriting(text).map((note) => note.text);
+  assert.deepEqual(found, ['Certainly!', 'Let’s dive in', 'Overall', 'delve', 'tapestry', 'It\'s not just a tool, it\'s', 'Not only fast but also', '**Bold**', 'As of my last knowledge update', 'feel free to', 'leverage']);
+  assert.equal(text, snapshot);
+  assert.ok(!inspectWriting('**Bold** in Markdown.', 'md').length);
+  assert.ok(inspectWriting('Great question. I\'d be happy to help. In conclusion, it was pivotal.').every((note) => /leftover|opener|Hype/.test(note.note)));
+});
+
+test('new polish rules keep sentence-start capitals and leave protected text alone', () => {
+  const text = 'Prior to launch, each and every team is able to ship. In spite of the fact that it rained, we met with regard to budgets. First and foremost, act in the near future. AT THE PRESENT TIME "prior to" stays.';
+  assert.equal(applyEdits(text, proposeEdits(text, { mode: 'polish' })), 'Before launch, every team can ship. Although it rained, we met about budgets. First, act soon. NOW "prior to" stays.');
+  assert.equal(applyEdits(text, proposeEdits(text, { mode: 'clean' })), text);
+});
