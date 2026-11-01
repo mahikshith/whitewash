@@ -278,6 +278,10 @@ export async function convertFile(file, to, progress) {
   }
   if (TABLE_ONLY.includes(to) || (DATA_IN.includes(from) && to === 'md')) {
     const table = await readTable(file, from);
+    // CSV and TSV hold one table, so a workbook with several sheets gives one file per sheet.
+    if ((to === 'csv' || to === 'tsv') && table.sheets.length > 1) {
+      return table.sheets.map((sheet) => ({ blob: new Blob([writeTable({ sheets: [sheet] }, to)], { type: FORMATS[to].mime + ';charset=utf-8' }), name: baseName(file.name) + '-' + (sheet.name || 'sheet').replace(/[\\/:*?"<>|]+/g, '_') + '.' + to }));
+    }
     return wrap(writeTable(table, to));
   }
   progress?.('Reading ' + FORMATS[from].label);

@@ -1,16 +1,18 @@
 import { FORMATS, detectFormat, targets, convertFile, acceptList, conversionCount } from './convert.js';
 import { saveAll, listRow, dropZone, formatBytes } from './files.js';
 import * as island from './island.js';
+import { routeNote, renderNote } from './notes.js';
 
 const $ = (id) => document.getElementById(id);
 let active = null, files = [], from = null, last = null, generation = 0;
 
 export function showConvert(tool) {
   if (!tool) { generation++; return; }
-  if (active?.id !== tool.id) { files = []; from = null; last = null; render(); }
-  active = tool;
+  const key = tool.id + ':' + (tool.to || '');
+  if (active?.key !== key) { files = []; from = null; last = null; active = { ...tool, key }; render(); }
+  active = { ...tool, key };
   $('convert-title').textContent = tool.title;
-  $('convert-description').textContent = tool.id === 'convert' ? 'Drop a file and pick what you want it to be. ' + conversionCount() + ' conversions, all done on your device.' : tool.description;
+  $('convert-description').textContent = tool.id === 'convert' && !tool.to ? 'Drop a file and pick what you want it to be. ' + conversionCount() + ' conversions, all done on your device.' : tool.description;
   $('convert-pick').textContent = files.length ? 'Choose a different file' : tool.action;
 }
 
@@ -26,8 +28,11 @@ function render() {
     chip.title = FORMATS[to].name;
     if (from === 'pdf' && ['jpg', 'png', 'webp'].includes(to)) chip.title += ', one per page';
     chip.addEventListener('click', () => run(to));
+    for (const type of ['mouseenter', 'focus']) chip.addEventListener(type, () => renderNote($('convert-note'), routeNote(from, to)));
     return chip;
   }));
+  // Until a format is pointed at, describe the most likely one.
+  renderNote($('convert-note'), options.length ? routeNote(from, active?.to && options.includes(active.to) ? active.to : options[0]) : null);
   if (!last) $('convert-output').hidden = true;
   $('convert-error').hidden = true;
 }

@@ -10,6 +10,9 @@ import { showWipe, loadWipe, quickWipe } from './wipe-ui.js';
 import { PICKER_ACCEPT } from './actions.js';
 import { showArchive, loadArchive } from './archive-ui.js';
 import * as island from './island.js';
+import { initMenu } from './menu.js';
+import { FORMATS } from './convert.js';
+import { routeNote } from './notes.js';
 import { formatBytes } from './images.js';
 
 const $ = (id) => document.getElementById(id);
@@ -73,19 +76,8 @@ for (const group of groups) {
   }
   section.append(heading, grid);
   $('tool-groups').append(section);
-  const menuGroup = document.createElement('div'); menuGroup.className = 'menu-group';
-  const menuTitle = document.createElement('p'); menuTitle.textContent = group.title;
-  menuGroup.append(menuTitle);
-  for (const tool of tools.filter((item) => item.group === group.id)) {
-    const link = document.createElement('a');
-    link.href = '#' + tool.id;
-    link.append(document.createTextNode(tool.title));
-    const status = statusChip(tool);
-    if (status) link.append(status);
-    menuGroup.append(link);
-  }
-  $('tool-menu-list').append(menuGroup);
 }
+initMenu();
 for (const tool of tools.filter((item) => item.state !== 'ready')) {
   const item = document.createElement('li');
   const link = document.createElement('a'); link.href = '#' + tool.id; link.textContent = tool.title;
@@ -116,6 +108,16 @@ function fileGate() {
   $('editor').hidden = waiting;
 }
 
+// #convert?from=pdf&to=docx gives the converter a heading and a preset target
+// for that pair, so search results land on a page that says what it does.
+function convertView(tool) {
+  const params = new URLSearchParams(location.hash.split('?')[1] || '');
+  const from = params.get('from'), to = params.get('to');
+  if (tool.id !== 'convert' || !FORMATS[from] || !FORMATS[to]) return tool;
+  const note = routeNote(from, to);
+  return { ...tool, from, to, title: FORMATS[from].label + ' to ' + FORMATS[to].label, description: (note.rows[0]?.[1] || 'Convert on this device') + '. Drop a ' + FORMATS[from].label + ' file and it converts straight away.', action: 'Choose a ' + FORMATS[from].label + ' file' };
+}
+
 function route() {
   if (location.hash === '#content') { $('content').focus(); return; }
   active = toolFromHash(location.hash);
@@ -135,7 +137,7 @@ function route() {
   $('float-orb').hidden = !active;
   showOffice(office ? active : null);
   showImages(image ? active : null);
-  showConvert(mode === 'convert' ? active : null);
+  showConvert(mode === 'convert' ? convertView(active) : null);
   showPdf(mode === 'pdf' ? active : null);
   showWipe(mode === 'wipe' ? active : null);
   showArchive(mode === 'archive' ? active : null);

@@ -2,6 +2,7 @@
 // under the cursor; drop it on an option to run it. Choosing a file with the
 // button opens the same wheel for pointer, touch and keyboard.
 import { wheelActions } from './actions.js';
+import { actionNote, renderNote } from './notes.js';
 import { WHEEL, segmentAngles, hitTest, segmentPath, labelPoint, clampCentre } from './wheel-geometry.js';
 
 const $ = (id) => document.getElementById(id);
@@ -22,6 +23,9 @@ function setIndex(index) {
   $('wheel-svg').querySelectorAll('.segment').forEach((node, i) => node.classList.toggle('active', i === index));
   const action = state.actions[index];
   $('wheel-label').textContent = action ? action.hint : state.mode === 'drag' ? 'Drop on an option' : 'Pick one';
+  // Side card: what this option gives you. During a drag the browser hides file
+  // names, so the card uses the MIME types it can see.
+  renderNote($('wheel-info'), action ? actionNote(action, state.files.map((f, i) => f.name ? f : { type: state.types?.[i] || '' })) : null);
   $('wheel').dataset.hub = index === -1 ? 'on' : '';
   if (action && state.mode === 'pick' && navigator.vibrate && matchMedia('(pointer: coarse)').matches) navigator.vibrate(4);
 }
@@ -60,6 +64,7 @@ function open(actions, x, y, mode, files) {
   wheel.style.left = (centre.x - SIZE / 2) + 'px';
   wheel.style.top = (centre.y - SIZE / 2) + 'px';
   wheel.dataset.mode = mode;
+  wheel.dataset.side = centre.x > window.innerWidth / 2 ? 'left' : 'right';
   render();
   $('wheel-sub').textContent = describe(files);
   $('wheel-keys').textContent = mode === 'drag' ? 'Drop on the middle or outside to pick later' : '← → to move · Enter to run · Esc to close';
@@ -121,7 +126,7 @@ function onDragOver(event) {
   const items = [...event.dataTransfer.items].filter((item) => item.kind === 'file').map((item) => ({ type: item.type }));
   const result = items.length && items.every((item) => item.type) ? wheelActions(items) : { actions: [] };
   const [x, y] = origin(event);
-  if (result.actions.length) open(result.actions, x, y, 'drag', items.map(() => ({ name: '' })));
+  if (result.actions.length) { open(result.actions, x, y, 'drag', items.map(() => ({ name: '' }))); state.types = items.map((item) => item.type); }
   else { armed = true; $('drop-scrim').hidden = false; }
 }
 
