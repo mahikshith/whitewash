@@ -49,22 +49,24 @@ test('file kinds come from the name first, then the MIME type seen during a drag
 
 test('the wheel only offers what fits the files', () => {
   const ids = (files) => wheelActions(files).actions.map((a) => a.id);
-  assert.deepEqual(ids([{ name: 'a.txt' }]).slice(0, 3), ['polish', 'check', 'clean']);
+  assert.deepEqual(ids([{ name: 'a.txt' }]).slice(0, 2), ['humanize', 'edit'], 'Humanize first, then Edit');
+  assert.equal(ids([{ name: 'a.docx' }])[0], 'humanize');
+  assert.equal(wheelActions([{ name: 'a.pdf' }]).actions[0].humanize, 'polish');
   assert.ok(ids([{ name: 'a.xlsx' }]).includes('wipe'));
   const pngs = wheelActions([{ name: 'a.png', type: 'image/png' }, { name: 'b.png', type: 'image/png' }]).actions;
   assert.ok(!pngs.some((a) => a.convert === 'image/png'), 'no PNG to PNG');
   assert.ok(pngs.some((a) => a.convert === 'image/jpeg'));
   assert.ok(ids([{ name: 'a.pdf' }, { name: 'b.pdf' }]).includes('merge'));
   assert.ok(ids([{ name: 'a.pdf' }]).includes('to-docx'));
-  assert.deepEqual(ids([{ name: 'a.docx' }, { name: 'b.jpg' }]), ['wipe', 'zip']);
-  assert.deepEqual(ids([{ name: 'a.txt' }, { name: 'b.csv' }]), ['zip'], 'mixed files can always be zipped');
+  assert.deepEqual(ids([{ name: 'a.docx' }, { name: 'b.jpg' }]), ['wipe', 'zip', 'to-tgz']);
+  assert.deepEqual(ids([{ name: 'a.txt' }, { name: 'b.csv' }]), ['zip', 'to-tgz'], 'mixed files can always be packed');
   assert.ok(ids([{ name: 'song.flac' }]).includes('to-mp3') && !ids([{ name: 'song.flac' }]).includes('to-flac'));
   assert.equal(ids([{ name: 'clip.mov' }])[0], 'to-mp3');
   assert.equal(ids([{ name: 'backup.rar' }])[0], 'open');
   assert.equal(fileKind({ name: 'x.7z' }), 'archive');
   assert.match(wheelActions([{ name: 'a.xyz' }]).reason, /can’t open/);
   assert.match(wheelActions(Array.from({ length: 51 }, () => ({ name: 'x.jpg' }))).reason, /50/);
-  for (const files of [[{ name: 'a.txt' }], [{ name: 'a.pdf' }], [{ name: 'a.jpg' }], [{ name: 'a.csv' }]]) assert.ok(wheelActions(files).actions.length <= 8);
+  for (const files of [[{ name: 'a.txt' }], [{ name: 'a.pdf' }], [{ name: 'a.jpg' }], [{ name: 'a.csv' }]]) assert.ok(wheelActions(files).actions.length <= 10);
 });
 
 test('image output names, types and sizes', () => {
@@ -77,4 +79,15 @@ test('image output names, types and sizes', () => {
   assert.deepEqual(fitWithin(800, 600, 1600), { width: 800, height: 600 });
   assert.deepEqual(uniqueNames(['a.jpg', 'A.jpg', 'b.jpg', 'a.jpg']), ['a.jpg', 'A 2.jpg', 'b.jpg', 'a 3.jpg']);
   assert.equal(formatBytes(1_500_000), '1.5 MB');
+});
+
+test('a PDF gets a two-layer dial: jobs inside, options outside', () => {
+  const actions = wheelActions([{ name: 'a.pdf' }]).actions;
+  assert.deepEqual(actions.map((a) => a.id), ['humanize', 'to-docx', 'compress', 'edit', 'convert', 'pages', 'secure', 'fix', 'wipe']);
+  const child = (group, id) => actions.find((a) => a.id === group).children.find((c) => c.id === id);
+  assert.equal(child('secure', 'sign').tool, 'pdf-sign');
+  assert.equal(child('pages', 'split').tool, 'pdf-split');
+  assert.equal(child('convert', 'to-png').to, 'png');
+  assert.ok(actions.every((a) => a.icon), 'every inner segment has an icon');
+  for (const files of [[{ name: 'a.docx' }], [{ name: 'a.jpg' }], [{ name: 'a.mp3' }], [{ name: 'a.zip' }]]) assert.ok(wheelActions(files).actions.length <= 8);
 });

@@ -56,6 +56,15 @@ Skipped in this phase:
 - **Real redaction.** Needs page rasterising plus a box-drawing UI; next candidate.
 - **PDF → Excel** (table detection) and **Office ↔ PDF with layout** (see below).
 
+## Phase 4: dial first, one-click Humanize (1 November 2026)
+
+- **The product is wiping AI slop.** Humanize is the first tab and the first segment on every document dial.
+- **One button.** Humanize does filler, stock AI phrases, chatbot openers and sign-offs, hidden characters and punctuation in one pass, then says what it fixed in one line. Edit is the only other writing button.
+- **Same file back.** Word, PowerPoint and Excel are edited in place (styles, tables and runs kept, checked with python-docx). PDF, HTML, ODT and EPUB come back as Word files.
+- **Big dial everywhere.** Homepage, Convert (formats left, dial right), PDF (all 15 tools, Compress first), Compress, Audio, Archives, Privacy. Header tabs with hover dropdowns list every tool.
+- **Removed:** hero paste box, "Try an example", the floating orb and the overlay wheel. The editor shows draft and result side by side.
+- **Later:** a simpler phone layout; AI rewriting with your own key ([later.md](later.md)).
+
 ## Not building
 
 - **Word ↔ PDF with layout.** It needs a LibreOffice WASM build of tens of MB plus server headers, and the output still breaks. This is the conversion people search for most, so the site should say plainly that it isn't offered.
@@ -65,5 +74,5 @@ Skipped in this phase:
 
 ## Open questions for the owner
 
-- **Hosting.** The old preview was a ChatGPT Sites deployment, which we can't publish to. GitHub Pages would serve the same files for free.
-- **Sounds.** The Windows app plays tiny tick sounds on the wheel. Optional, off by default?
+- **Hosting.** Settled: GitHub Pages, deployed from `main` by `.github/workflows/pages.yml`.
+- **Sounds.** The Windows app plays tiny tick sounds on its wheel. Optional, off by default?

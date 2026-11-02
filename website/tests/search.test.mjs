@@ -37,3 +37,12 @@ test('ASCII85 and hex unwrapping for PDF image streams', () => {
   assert.equal(ascii85('<~z~>'), '\0\0\0\0');
   assert.deepEqual([..._test.asciiHex(new TextEncoder().encode('48 65 6c6c 6F7>'))], [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x70]);
 });
+
+import { proposeEdits, applyEdits } from '../dist/engine.js';
+test('Humanize cuts AI filler but never touches quotes, numbers or links', () => {
+  const text = 'Certainly! It is important to note that we leverage a myriad of tools. I hope this helps!\n"We delve into it," said Bo. Revenue was 1,250 at https://x.io/delve-into.';
+  const out = applyEdits(text, proposeEdits(text, { mode: 'humanize', format: 'txt' }));
+  assert.equal(out.split('\n')[0].trim(), 'We use many tools.');
+  assert.ok(out.includes('"We delve into it,"'));
+  assert.ok(out.includes('1,250') && out.includes('https://x.io/delve-into'));
+});

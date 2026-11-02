@@ -1,16 +1,17 @@
 import { proposeEdits, applyEdits, inspectCharacters, inspectWriting, wordCount, MAX_CHARACTERS } from './engine.js';
-import { tools, groups, toolFromHash, statusLabel } from './tools.js';
+import { toolFromHash } from './tools.js';
+import { sectionFromHash, sectionOf } from './sections.js';
 import { readTextFile } from './uploads.js';
 import { showOffice, loadOfficeFile } from './office-ui.js';
 import { showImages, loadImages, quickConvert } from './image-ui.js';
-import { initWheel, openPicker } from './wheel.js';
+import { initHub, showHub, loadHub } from './hubs.js';
+import { humanizeFile, textOf } from './quick.js';
 import { showConvert, loadConvert, quickConvertFile } from './convert-ui.js';
 import { showPdf, loadPdf, setPolishHandler } from './pdf-ui.js';
 import { showWipe, loadWipe, quickWipe } from './wipe-ui.js';
-import { PICKER_ACCEPT } from './actions.js';
 import { showArchive, loadArchive } from './archive-ui.js';
 import * as island from './island.js';
-import { initMenu } from './menu.js';
+import { initMenu, initTabs } from './menu.js';
 import { showOcr, loadOcr, setOcrPolishHandler } from './ocr-ui.js';
 import { FORMATS } from './convert.js';
 import { routeNote } from './notes.js';
@@ -35,64 +36,14 @@ function notify(message) {
   timer = setTimeout(() => { $('notice').textContent = ''; }, 6000);
 }
 
-function icon(tool) {
-  const wrapper = document.createElement('span');
-  wrapper.className = 'tool-icon';
-  wrapper.setAttribute('aria-hidden', 'true');
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-  use.setAttribute('href', '#' + tool.icon);
-  svg.append(use); wrapper.append(svg);
-  if (tool.label) { const label = document.createElement('small'); label.textContent = tool.label; wrapper.append(label); }
-  return wrapper;
-}
-
-function statusChip(tool) {
-  const label = statusLabel(tool);
-  if (!label) return null;
-  const status = document.createElement('span');
-  status.className = 'status' + (tool.isNew ? ' new' : '');
-  status.textContent = label;
-  return status;
-}
-
-for (const group of groups) {
-  const ready = tools.filter((tool) => tool.group === group.id && tool.state === 'ready');
-  const section = document.createElement('section');
-  section.className = 'tool-group'; section.id = group.id;
-  const heading = document.createElement('div'); heading.className = 'group-heading';
-  const title = document.createElement('h2'); title.textContent = group.title;
-  const blurb = document.createElement('p'); blurb.textContent = group.blurb;
-  heading.append(title, blurb);
-  const grid = document.createElement('div'); grid.className = 'tool-grid';
-  for (const tool of ready) {
-    const card = document.createElement('a');
-    card.href = '#' + tool.id; card.className = 'tool-card'; card.dataset.tool = tool.id;
-    const name = document.createElement('h3'); name.textContent = tool.title;
-    const text = document.createElement('p'); text.textContent = tool.description;
-    card.append(icon(tool), name, text);
-    const status = statusChip(tool);
-    if (status) card.append(status);
-    grid.append(card);
-  }
-  section.append(heading, grid);
-  $('tool-groups').append(section);
-}
 initMenu();
-for (const tool of tools.filter((item) => item.state !== 'ready')) {
-  const item = document.createElement('li');
-  const link = document.createElement('a'); link.href = '#' + tool.id; link.textContent = tool.title;
-  item.append(link, document.createTextNode(' ' + tool.description));
-  $('coming-list').append(item);
-}
+initTabs();
 
 function counts() {
   $('input-count').textContent = wordCount($('draft').value).toLocaleString() + ' words';
   $('run').disabled = !$('draft').value.length;
   $('document-name').textContent = filename;
   $('undo-replace').hidden = !previous;
-  const hero = $('hero-draft').value.trim().length > 0;
-  $('hero-run').disabled = !hero; $('hero-check').disabled = !hero;
 }
 
 function invalidate() {
@@ -121,13 +72,16 @@ function convertView(tool) {
 
 function route() {
   if (location.hash === '#content') { $('content').focus(); return; }
-  active = toolFromHash(location.hash);
+  const section = sectionFromHash(location.hash);
+  active = section ? null : toolFromHash(location.hash);
   const ready = active?.state === 'ready';
   const office = ready && active.mode === 'office';
   const image = ready && active.mode === 'image';
   const mode = ready ? active.mode : null;
   const separate = ['office', 'image', 'convert', 'pdf', 'wipe', 'archive', 'ocr'].includes(mode);
-  $('home-view').hidden = !!active;
+  $('hub-view').hidden = !!active;
+  showHub(active ? false : section ? section.id : null);
+  for (const link of document.querySelectorAll('.tab-link')) link.classList.toggle('current', link.dataset.section === sectionOf(location.hash)?.id);
   $('tool-view').hidden = !ready || separate;
   $('office-view').hidden = !office;
   $('image-view').hidden = !image;
@@ -136,7 +90,6 @@ function route() {
   $('wipe-view').hidden = mode !== 'wipe';
   $('archive-view').hidden = mode !== 'archive';
   $('ocr-view').hidden = mode !== 'ocr';
-  $('float-orb').hidden = !active;
   showOffice(office ? active : null);
   showImages(image ? active : null);
   showConvert(mode === 'convert' ? convertView(active) : null);
@@ -146,7 +99,7 @@ function route() {
   showOcr(mode === 'ocr' ? active : null);
   $('upcoming-view').hidden = !active || ready;
   $('tools-menu').open = false;
-  document.title = active ? active.title + ' · Whitewash' : 'Whitewash: make AI drafts sound like you';
+  document.title = active ? active.title + ' · Whitewash' : section ? section.title + ' · Whitewash' : 'Whitewash: humanize, convert and clean any file';
   if (ready && !separate) {
     $('page-title').textContent = active.title;
     $('page-description').textContent = active.description;
@@ -162,9 +115,7 @@ function route() {
       : active.description + ' Not built yet. The writing tools work today.';
     $('upcoming-status').textContent = active.state === 'research' ? 'Still researching' : 'Coming soon';
   }
-  const section = !active && location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
-  if (section?.classList.contains('tool-group')) section.scrollIntoView();
-  else window.scrollTo(0, 0);
+  window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
 document.addEventListener('click', (event) => {
@@ -287,10 +238,6 @@ $('draft').addEventListener('paste', (event) => {
 });
 for (const id of ['format', 'spaces', 'soft-hyphens', 'zero-width', 'punctuation']) $(id).addEventListener('change', invalidate);
 $('locks').addEventListener('input', invalidate);
-$('sample').addEventListener('click', () => {
-  replace(active.mode === 'writing' ? 'It is important to note that this is a seamless process.\n\nWe completed the review on Friday. I hope this helps.' : 'At this point in time, we want to utilize customer feedback.\n\nThe estimate is INR\u00a048,500 for 12 teams. Keep the original figures in order to review the budget.', '', 'txt', false);
-  processDraft();
-});
 $('clear').addEventListener('click', () => { replace('', '', 'txt', fileLoaded); $('draft').focus(); });
 $('undo-replace').addEventListener('click', () => {
   if (!previous) return;
@@ -366,7 +313,6 @@ $('info-dialog').addEventListener('click', (event) => {
   if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) $('info-dialog').close();
 });
 
-// Home: the hero box hands its draft to the full tool page.
 async function openTool(id) {
   if (location.hash !== '#' + id) {
     const changed = new Promise((resolve) => window.addEventListener('hashchange', resolve, { once: true }));
@@ -374,24 +320,35 @@ async function openTool(id) {
     await changed;
   }
 }
-async function heroRun(id) {
-  const text = $('hero-draft').value;
-  if (!text.trim()) return;
-  await openTool(id);
-  replace(text, '', 'txt', false);
-  processDraft();
+
+// One click from a dial: the finished file downloads and the status pill says what changed.
+async function quickHumanize(file, kind) {
+  island.progress(kind === 'clean' ? 'Cleaning' : 'Humanizing', file.name, null);
+  try {
+    const result = await humanizeFile(file, kind, (step) => island.progress(step, file.name, null));
+    island.saveBlob(result.blob, result.name);
+    const readable = result.edits.length && !/\.(xlsx|xls|ods|csv)$/i.test(file.name);
+    island.done('Saved ' + result.name, result.summary + (result.note ? '. ' + result.note : ''), readable ? { label: 'See changes', run: async () => openText(file, 'light-edit') } : undefined);
+  } catch (error) { island.fail('That didn’t work', error.message); }
 }
-$('hero-draft').addEventListener('input', counts);
-$('hero-run').addEventListener('click', () => heroRun('light-edit'));
-$('hero-check').addEventListener('click', () => heroRun('writing-check'));
-$('hero-draft').addEventListener('keydown', (event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) heroRun('light-edit'); });
-$('hero-sample').addEventListener('click', () => {
-  $('hero-draft').value = 'It is important to note that, at this point in time, our team has the ability to utilize customer feedback on a daily basis in order to ship a seamless experience.\n\nI hope this helps!';
-  counts(); $('hero-draft').focus();
-});
+
+async function openText(file, toolId) {
+  island.progress('Opening the text', file.name, null);
+  try {
+    let text = await textOf(file);
+    island.hide();
+    await openTool(toolId);
+    if (text.length > MAX_CHARACTERS) { notify('Only the first 100,000 characters were loaded.'); text = text.slice(0, MAX_CHARACTERS); }
+    replace(text, file.name, /\.md$/i.test(file.name) ? 'md' : 'txt', true);
+    processDraft();
+  } catch (error) { island.fail('Couldn’t open the text', error.message); }
+}
 
 // Files from the wheel go straight to the right tool.
 async function runAction(action, files) {
+  if (action.humanize) { for (const file of files) await quickHumanize(file, action.humanize); return; }
+  if (action.text) { await openText(files[0], action.text); return; }
+  if (action.hub) { await openTool(action.hub); loadHub(files); return; }
   if (action.convert) { quickConvert(files, action); return; }
   if (action.to) { for (const file of files) await quickConvertFile(file, action.to); return; }
   if (action.wipe) { quickWipe(files); return; }
@@ -427,22 +384,7 @@ async function polishExtracted(text, name) {
 }
 setPolishHandler(polishExtracted);
 setOcrPolishHandler(polishExtracted);
-initWheel({ isActive: (event) => !$('home-view').hidden || !!event?.target?.closest?.('#float-orb'), anchor: () => $('home-view').hidden ? $('float-orb') : null, onRun: runAction, onReject: notify });
-$('pick-input').accept = PICKER_ACCEPT;
-$('float-input').accept = PICKER_ACCEPT;
-function pickFrom(input, ...buttons) {
-  let origin = buttons[0];
-  for (const button of buttons) button.addEventListener('click', () => { origin = button; input.click(); });
-  input.addEventListener('change', () => {
-    const files = [...input.files];
-    input.value = '';
-    if (!files.length) return;
-    const box = origin.getBoundingClientRect();
-    openPicker(files, box.left + box.width / 2, box.top + box.height / 2);
-  });
-}
-pickFrom($('pick-input'), $('pick-any'), $('home-orb'));
-pickFrom($('float-input'), $('float-orb'));
+initHub({ run: runAction });
 // A file dropped outside a drop area should never replace the page.
 document.addEventListener('dragover', (event) => { if (!event.defaultPrevented && [...(event.dataTransfer?.types || [])].includes('Files')) event.preventDefault(); });
 document.addEventListener('drop', (event) => { if (!event.defaultPrevented) event.preventDefault(); });

@@ -6,31 +6,34 @@
 
 The old homepage was 13 identical tiles under a generic tagline, with "AI" in nearly every label. The main job, pasting a draft and fixing it, took a click to reach, and a third of the tiles were placeholders. See [the copy audit](../research/copy-audit.md).
 
-## Layout
+## Layout (Phase 4, dial first)
 
-- **Hero with the paste box in it.** "Make it sound like you wrote it." The draft box sits beside the headline. "Polish it" and "Spot AI tells" hand the draft to the full tool page and run it.
-- **Drop band with the orb.** Says plainly that a file can be dropped anywhere on the page. "Choose a file" opens the same wheel for touch and keyboard users.
-- **Grouped tools.** Writing, Convert, PDF, Office files and privacy, Images. Each card has an icon, a plain title and one sentence.
-- **Coming next.** Unbuilt tools are listed once, in a box at the bottom, with their own status pages.
+The product is one idea: drop a file, click one thing, get the finished file back. Every page that takes files is a big dial beside a short explanation.
 
-## The wheel
+- **Header tabs, one per kind of file.** Humanize, PDF, Word, Excel, PowerPoint, Images, Audio, Archives (`sections.js`). Hovering a tab drops down every option for that format, in columns by job (From PDF, To PDF, Pages…). Clicking it opens that format's page. Search (Ctrl/⌘K or `/`) sits on the right and only searches; it is not a second tool list.
+- **Homepage.** Headline and a "How it works" card on the left, the big dial on the right, and nothing else. Before a file, the inner ring holds the eight tabs and the outer ring shows the hovered tab's jobs. After a drop, the dial shows what you can do with that file. Tool cards live only on each format page.
+- **Format pages** (`#humanize`, `#pdf`, `#word`, `#excel`, `#powerpoint`, `#images`, `#audio`, `#archive`) use the same layout: jobs on the inner ring, their options on the outer ring, then the tools as cards and the conversions as compact chips below.
+- **Convert.** Formats on the left, the dial of targets in the middle, notes and results on the right. Pick a format or drop a file, then click a target. If you click a target first, the picker opens and the conversion runs as soon as the file arrives.
+- **Editor.** Draft and result side by side, so the page fits a laptop screen without scrolling.
+- No hero paste box, no example text, no floating orb.
 
-Drag a file over the homepage and a glass radial wheel opens under the cursor. It offers only what fits the file: Polish, AI tells, Clean and quick conversions for text; Polish, Wipe info and conversions for Office files; Word, Polish, Shrink, Sign, Wipe info and Pages for a PDF; Merge for several PDFs; JPG, PNG, WebP, PDF, Wipe info, Shrink and (for one image) Text for images; other audio formats for a sound file, MP3, M4A or WAV for a video; Open plus other archive formats for an archive; and ZIP for any set of several files. "More" opens the full converter. Drop on an option to run it. Dropping on the middle, or outside, keeps the wheel open so you can pick with the pointer or the arrow keys.
+## One-click Humanize
 
-Measurements come from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)): 62 px inner radius, 150 px outer, 6 px gaps, 12 px corners, a spring open with a staggered fan-out, and a 6 px outward nudge on hover. The code is our own.
+A document dial has two writing buttons, never more:
 
-A browser only sees a drag once it reaches the tab, and only learns file names on drop. So the wheel uses MIME types during the drag and checks again on drop. If the type is unknown during the drag (Markdown often is), a plain "Drop it anywhere" screen shows instead and the wheel opens on drop.
+- **Humanize** does everything in one pass: filler, stock AI phrases ("delve into", "it is important to note"), chatbot openers and sign-offs, Markdown bold, hidden characters and smart punctuation. Word, PowerPoint and Excel come back as the same file with every style, table and run kept. PDF, HTML, ODT and EPUB come back as a Word file, and the status pill says why. A one-line summary says what changed ("Fixed 13 AI phrases, 2 hidden characters").
+- **Edit** opens the text editor already humanized, where every change can be kept or undone.
 
-On tool pages a small floating orb sits in the bottom corner. Drop a file on it, or click it, and the wheel opens around it. Drops elsewhere on a tool page go to that tool.
+Quotes, numbers, URLs and code are never touched.
 
-Quick conversions and wipes download straight away and report in a status pill at the top of the screen. Everything else opens the matching tool page with the file already loaded.
+## The dial
 
-Beside the wheel, a dark card says what the highlighted action gives you, what it keeps and what it drops. It sits on whichever side has room, and under the wheel on phones.
+`dial.js` draws it. With nothing nested it is one ring (92 to 254 px). With nested jobs it has two layers: the jobs on an inner ring (86 to 170 px) and, around the job you point at, its options on an outer ring (178 to 254 px). One job stays open when nothing is pointed at, so the outer ring is never empty. On touch, the first tap opens a job and the second opens its page. The middle is a plain + (no coloured circle). Pointer, touch, keyboard (Tab, arrows, Enter) and file drops all work. The middle button opens the file picker. The first Humanize segment is lit as the primary action. Measurements started from Open-Tangerine and og-converter ([teardown](../research/ui-teardown.md)); the code is our own.
 
-## Menu
+Beside the dial, a card says what the highlighted segment gives you, what it keeps and what it drops.
 
-The header holds a "Tools" mega menu, four quick links (Polish, Convert, PDF, Wipe metadata) and a search button. The menu has group tabs on the left and that group's tools on the right; typing in its search box replaces both with results, including direct conversion routes. Ctrl/⌘K or `/` opens it from anywhere.
+Quick actions download straight away and report in a status pill at the top of the screen. Anything that needs one more choice (sign, organize pages, protect) opens its tool with the file already loaded.
 
 ## Look
 
-Warm paper background, near-black ink, and a lime accent used for highlights, the active wheel segment and "New" labels. Big rounded corners (24–28 px on panels, pill buttons). Headings in Bricolage Grotesque, body in the system sans-serif. Dark mode swaps the primary button to lime.
+Warm paper background, near-black ink, and a lime accent used for highlights, the primary dial segment and "New" labels. Big rounded corners (24–28 px on panels, pill buttons). Headings in Bricolage Grotesque, body in the system sans-serif. Dark mode swaps the primary button to lime.
