@@ -98,7 +98,15 @@ export const inputFormats = () => Object.keys(FORMATS).filter((id) => targets(id
 export const acceptList = () => inputFormats().map((id) => '.' + (EXTENSION[id] || id)).concat(['.htm', '.jpeg', '.markdown', '.tgz', '.m4v']).join(',');
 
 const baseName = (name) => (name || 'file').replace(/\.[^.]+$/, '') || 'file';
-const text = async (file) => new TextDecoder('utf-8').decode(await file.arrayBuffer()).replace(/^﻿/, '');
+// UTF-16 files carry a byte-order mark. Anything that isn't valid UTF-8 is
+// read as Windows-1252 so accented letters in old files don't turn into �.
+const text = async (file) => {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const label = bytes[0] === 0xff && bytes[1] === 0xfe ? 'utf-16le' : bytes[0] === 0xfe && bytes[1] === 0xff ? 'utf-16be' : 'utf-8';
+  let decoded;
+  try { decoded = new TextDecoder(label, { fatal: label === 'utf-8' }).decode(bytes); } catch { decoded = new TextDecoder('windows-1252').decode(bytes); }
+  return decoded.replace(/^\ufeff/, '');
+};
 const bytesOf = async (file) => new Uint8Array(await file.arrayBuffer());
 
 // ---------- Subtitles ----------
@@ -131,7 +139,9 @@ async function readDoc(file, from, progress) {
   if (from === 'html') return docs.blocksFromHtml(await text(file));
   if (from === 'docx') {
     const mammoth = await libs.mammoth();
-    const result = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() }, { convertImage: mammoth.images.imgElement(() => ({ src: '' })) });
+    // mammoth's own errors talk about zip internals; say what the person can act on.
+    const result = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() }, { convertImage: mammoth.images.imgElement(() => ({ src: '' })) })
+      .catch(() => { throw new Error('This Word file looks damaged, or it isn’t a .docx. Old .doc files need saving as .docx first.'); });
     return docs.blocksFromHtml(result.value);
   }
   if (from === 'odt') return docs.blocksFromHtml(await docs.htmlFromOdt(await bytesOf(file)));
@@ -140,7 +150,7 @@ async function readDoc(file, from, progress) {
   if (from === 'pdf') {
     const { textPages } = await import('./conv-pdf.js');
     const doc = docs.blocksFromPdfText(await textPages(await bytesOf(file), (n, total) => progress?.('Reading page ' + n + ' of ' + total)));
-    if (!doc.blocks.length) throw new Error('No text found. This PDF may be scanned images; text recognition (OCR) isn’t available yet.');
+    if (!doc.blocks.length) throw new Error('No text found. This PDF may be scanned pages. Run it through Read text from scans first.');
     return doc;
   }
   if (DATA_IN.includes(from)) return docs.blocksFromTable(await readTable(file, from));
@@ -282,7 +292,7 @@ export async function convertFile(file, to, progress) {
     if ((to === 'csv' || to === 'tsv') && table.sheets.length > 1) {
       return table.sheets.map((sheet) => ({ blob: new Blob([writeTable({ sheets: [sheet] }, to)], { type: FORMATS[to].mime + ';charset=utf-8' }), name: baseName(file.name) + '-' + (sheet.name || 'sheet').replace(/[\\/:*?"<>|]+/g, '_') + '.' + to }));
     }
-    return wrap(writeTable(table, to));
+    return wrap(await writeTable(table, to));
   }
   progress?.('Reading ' + FORMATS[from].label);
   const doc = await readDoc(file, from, progress);

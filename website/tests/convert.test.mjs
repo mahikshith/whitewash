@@ -88,7 +88,7 @@ test('text writers keep headings, emphasis, links, lists and tables', () => {
 });
 
 test('DOCX, ODT and EPUB are valid zips with well-formed XML', async () => {
-  for (const [bytes, part, mimetype] of [[doc.toDocx(sample), 'word/document.xml'], [doc.toOdt(sample), 'content.xml', 'application/vnd.oasis.opendocument.text'], [doc.toEpub(sample), 'OEBPS/c0.xhtml', 'application/epub+zip']]) {
+  for (const [bytes, part, mimetype] of [[await doc.toDocx(sample), 'word/document.xml'], [await doc.toOdt(sample), 'content.xml', 'application/vnd.oasis.opendocument.text'], [await doc.toEpub(sample), 'OEBPS/c0.xhtml', 'application/epub+zip']]) {
     const raw = bytes instanceof Uint8Array ? bytes : new Uint8Array(await bytes.arrayBuffer());
     const zip = await readZip(raw), files = {};
     for (const [name, entry] of zip) files[name] = await unpack(entry);
@@ -139,6 +139,17 @@ test('PDF wiper removes author, title, tools and IDs', async () => {
   assert.equal(await pageCount(bytes), 1);
 });
 
+test('PDF wiper deletes the XMP stream itself, not just the link to it', async () => {
+  const pdf = await PDFDocument.load(await makePdf(1));
+  const { PDFName } = await import('../dist/vendor/pdf-lib.esm.min.js');
+  const xmp = '<?xpacket begin=""?><x:xmpmeta xmlns:x="adobe:ns:meta/"><dc:creator>XMPSECRETAUTHOR</dc:creator></x:xmpmeta><?xpacket end="w"?>';
+  const stream = pdf.context.stream(xmp, { Type: 'Metadata', Subtype: 'XML' });
+  pdf.catalog.set(PDFName.of('Metadata'), pdf.context.register(stream));
+  const { bytes, remaining } = await wipePdf(await pdf.save({ useObjectStreams: false }));
+  assert.deepEqual(remaining, []);
+  assert.ok(!Buffer.from(bytes).toString('latin1').includes('XMPSECRETAUTHOR'));
+});
+
 test('images in a PDF lose their camera details', async () => {
   const { imagesToPdf } = await import('../dist/conv-pdf.js');
   const fs = await import('node:fs');
@@ -156,4 +167,33 @@ test('archive names and paths are made safe', async () => {
   assert.equal(stripArchiveExtension('photos.tar.xz'), 'photos');
   assert.equal(archiveFormat('a.tbz2'), 'tbz2');
   assert.equal(archiveFormat('a.docx'), null);
+});
+
+test('XLSX dates come out as dates and extra columns are not dropped from JSON', async () => {
+  const { replaceEntry, writeZip } = await import('../dist/office-zip.js');
+  const entries = new Map();
+  const add = (name, xml) => replaceEntry(entries, name, new TextEncoder().encode(xml));
+  const ns = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  add('xl/workbook.xml', '<workbook ' + ns + '><sheets><sheet name="S" sheetId="1" r:id="rId1"/></sheets></workbook>');
+  add('xl/_rels/workbook.xml.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>');
+  add('xl/styles.xml', '<styleSheet ' + ns + '><numFmts count="2"><numFmt numFmtId="164" formatCode="yyyy\\-mm\\-dd"/><numFmt numFmtId="165" formatCode="[h]:mm"/></numFmts><cellXfs count="5"><xf numFmtId="0"/><xf numFmtId="14"/><xf numFmtId="164"/><xf numFmtId="165"/><xf numFmtId="4"/></cellXfs></styleSheet>');
+  add('xl/worksheets/sheet1.xml', '<worksheet ' + ns + '><sheetData><row r="1"><c r="A1" t="inlineStr"><is><t>When</t></is></c></row>'
+    + '<row r="2"><c r="A2" s="1"><v>46148</v></c><c r="B2" s="2"><v>46148.5</v></c><c r="C2" s="3"><v>0.75</v></c><c r="D2" s="4"><v>1234.5</v></c></row></sheetData></worksheet>');
+  const table = await data.readXlsx(writeZip(entries));
+  assert.deepEqual(table.sheets[0].rows[1], ['2026-05-06', '2026-05-06 12:00:00', '18:00:00', '1234.5']);
+  const json = JSON.parse(data.writeJson(table));
+  assert.deepEqual(json[0], { When: '2026-05-06', column2: '2026-05-06 12:00:00', column3: '18:00:00', column4: 1234.5 });
+});
+
+test('written packages deflate their parts but keep the mimetype entry stored', async () => {
+  const rows = [['Name', 'Note'], ...Array.from({ length: 2000 }, (_, i) => ['row ' + i, 'the same long note again and again'])];
+  for (const bytes of [await data.writeXlsx({ sheets: [{ name: 'S', rows }] }), await data.writeOds({ sheets: [{ name: 'S', rows }] })]) {
+    const entries = await readZip(bytes, { maxBytes: 60_000_000 });
+    const methods = [...entries.values()].map((e) => [e.name, e.method]);
+    assert.ok(methods.some(([, m]) => m === 8), 'something is deflated');
+    if (entries.has('mimetype')) assert.equal(entries.get('mimetype').method, 0);
+    assert.ok(bytes.length < 60_000, 'compressed, got ' + bytes.length);
+  }
+  const table = await data.readXlsx(await data.writeXlsx({ sheets: [{ name: 'S', rows }] }));
+  assert.equal(table.sheets[0].rows[2000][0], 'row 1999');
 });

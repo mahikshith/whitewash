@@ -68,13 +68,19 @@ function summary(items) {
   return formatBytes(before) + ' → ' + formatBytes(after) + (change > 0 ? ' (' + change + '% smaller)' : change < 0 ? ' (' + -change + '% bigger)' : '');
 }
 
-async function run() {
+// Changing a setting re-runs the batch. Leaving a field fires that change on
+// the same click that hits Download, so Download waits for the run instead of
+// being disabled under the pointer.
+let running = null, skipped = 0;
+function run() { running = convertBatch(); return running; }
+
+async function convertBatch() {
   if (!sources.length || !active) return;
   const version = ++generation;
   $('image-error').hidden = true;
   $('image-summary').textContent = 'Working…';
   $('image-output').hidden = false;
-  $('image-download').disabled = true;
+  $('image-download').disabled = !results.length;
   const { done, failed } = await convertAll(sources, settings(), (i) => {
     if (version === generation) $('image-summary').textContent = 'Working on ' + (i + 1) + ' of ' + sources.length + '…';
   });
@@ -89,11 +95,12 @@ async function run() {
   $('image-summary').textContent = done.length ? (done.length === 1 ? '1 image ready' : done.length + ' images ready') + ' · ' + summary(done) : 'Nothing converted';
   $('image-download').disabled = !done.length;
   $('image-download').textContent = done.length > 1 ? 'Download all (.zip)' : 'Download';
-  if (failed.length) { $('image-error').textContent = failed.join(' '); $('image-error').hidden = false; }
+  const notes = [...failed, ...(skipped ? ['Only the first 50 images were used; ' + skipped + ' more were left out.'] : [])];
+  if (notes.length) { $('image-error').textContent = notes.join(' '); $('image-error').hidden = false; }
 }
 
 export function loadImages(files) {
-  sources = files.slice(0, 50);
+  sources = files.slice(0, 50); skipped = Math.max(0, files.length - 50); results = [];
   $('image-pick').textContent = 'Choose different images';
   run();
 }
@@ -117,6 +124,7 @@ $('image-input').addEventListener('change', () => { loadImages([...$('image-inpu
 for (const id of ['image-format', 'image-longest', 'image-quality']) $(id).addEventListener('change', run);
 $('image-quality').addEventListener('input', () => { $('image-quality-value').textContent = $('image-quality').value; });
 $('image-download').addEventListener('click', async () => {
+  await running;
   if (!results.length) return;
   const file = await bundle(results);
   island.saveBlob(file.blob, file.name);

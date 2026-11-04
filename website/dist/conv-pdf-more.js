@@ -22,12 +22,15 @@ export const isEncrypted = (bytes) => {
   return /\/Encrypt\s/.test(text);
 };
 
-// AES-256. With no owner password, the open password is also the owner password.
+// AES-256. The owner password is random and never shown: if it matched the
+// open password, anyone who could open the file would get full rights and the
+// print/copy/edit limits would mean nothing.
+const randomPassword = () => Array.from(crypto.getRandomValues(new Uint8Array(24)), (b) => b.toString(16).padStart(2, '0')).join('');
 export async function protect(bytes, password, { allowPrint = true, allowCopy = false, allowEdit = false } = {}) {
   if (!password || password.length < 4) throw new Error('Use a password of at least 4 characters.');
   if (isEncrypted(bytes)) throw new Error('This PDF already has a password. Unlock it first.');
   const restrict = ['--print=' + (allowPrint ? 'full' : 'none'), '--extract=' + (allowCopy ? 'y' : 'n'), '--modify=' + (allowEdit ? 'all' : 'none')];
-  return qpdf(['/in.pdf', '--encrypt', password, password, '256', ...restrict, '--', '/out.pdf'], bytes);
+  return qpdf(['/in.pdf', '--encrypt', password, randomPassword(), '256', ...restrict, '--', '/out.pdf'], bytes);
 }
 
 export async function unlock(bytes, password) {

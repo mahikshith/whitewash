@@ -39,7 +39,10 @@ export async function humanizeFile(file, kind = 'polish', onStep) {
     return { blob: new Blob([text], { type: format === 'md' ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8' }), name: base(file.name) + suffix + '.' + format, edits, summary: summarize(edits) };
   }
   let bytes, name, note = '';
-  if (IN_PLACE.includes(format)) { bytes = new Uint8Array(await file.arrayBuffer()); name = file.name; }
+  if (IN_PLACE.includes(format)) {
+    if (file.size > 10_000_000) throw new Error('Office files up to 10 MB only. This one is ' + Math.round(file.size / 1e6) + ' MB.');
+    bytes = new Uint8Array(await file.arrayBuffer()); name = file.name;
+  }
   else if (VIA_WORD.includes(format)) {
     onStep?.('Reading the text');
     const [docx] = await convertFile(file, 'docx');

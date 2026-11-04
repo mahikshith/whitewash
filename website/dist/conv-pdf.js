@@ -109,7 +109,6 @@ export async function pageNumbers(bytes, { position = 'bottom-center', format = 
 
 // Metadata wiper for PDFs: clears the Info dictionary and the XMP stream, then
 // reopens the copy to check nothing came back.
-const INFO_KEYS = ['Title', 'Author', 'Subject', 'Keywords', 'Creator', 'Producer', 'CreationDate', 'ModDate', 'Trapped'];
 const PDF_LABEL = { Author: 'Author', Creator: 'Made with', Producer: 'PDF tool', Title: 'Title', Subject: 'Subject', Keywords: 'Keywords', CreationDate: 'Created', ModDate: 'Last saved', Trapped: 'Print trapping flag' };
 
 export async function scanPdf(bytes) {
@@ -143,6 +142,12 @@ export async function wipePdf(bytes) {
   for (const key of [...info.keys()]) info.delete(key);
   for (const key of ['Metadata', 'PieceInfo']) doc.catalog.delete(PDFName.of(key));
   for (const page of doc.getPages()) for (const key of ['Metadata', 'PieceInfo']) page.node.delete(PDFName.of(key));
+  // Dropping the key isn't enough: pdf-lib saves every object, referenced or
+  // not, so the XMP stream itself would stay in the file. Delete every
+  // metadata stream outright, including ones on images and fonts.
+  for (const [ref, object] of doc.context.enumerateIndirectObjects()) {
+    if (object?.dict?.get?.(PDFName.of('Type')) === PDFName.of('Metadata')) doc.context.delete(ref);
+  }
   delete doc.context.trailerInfo.ID;
   const out = await doc.save({ updateFieldAppearances: false });
   // pdf-lib writes its own Producer and dates on save; strip them from the saved copy too.
@@ -152,7 +157,9 @@ export async function wipePdf(bytes) {
   delete again.context.trailerInfo.Info;
   delete again.context.trailerInfo.ID;
   const clean = await again.save({ updateFieldAppearances: false });
-  const remaining = (await scanPdf(clean)).items.filter((item) => INFO_KEYS.includes(item.label) || item.label === 'XMP metadata');
+  // Everything the scan can still find counts, and so does a raw XMP packet.
+  const remaining = (await scanPdf(clean)).items;
+  if (/<x:xmpmeta|<\?xpacket/.test(new TextDecoder('latin1').decode(clean))) remaining.push({ label: 'XMP metadata', detail: 'Hidden XML block still in the file', risk: 'high' });
   return { bytes: clean, removed: items, remaining };
 }
 

@@ -2,7 +2,7 @@
 // paragraphs, lists, code, quotes, tables), and every output is written from
 // that list. This keeps text, headings, emphasis, links, lists and tables.
 // It does not keep page layout, fonts, colours or images.
-import { readZip, unpack, replaceEntry, writeZip } from './office-zip.js';
+import { readZip, unpack, deflateEntry, writeZip } from './office-zip.js';
 const BIG = { maxBytes: 60_000_000, maxEntries: 5000 };
 
 const encoder = new TextEncoder(), decoder = new TextDecoder();
@@ -315,13 +315,13 @@ export function toHtml(doc) {
     + '</head><body>\n' + toHtmlBody(doc) + '</body></html>\n';
 }
 
-function zip(files) {
+async function zip(files) {
   const entries = new Map();
-  for (const [name, content] of files) replaceEntry(entries, name, typeof content === 'string' ? encoder.encode(content) : content);
+  for (const [name, content] of files) await deflateEntry(entries, name, typeof content === 'string' ? encoder.encode(content) : content);
   return writeZip(entries);
 }
 
-export function toDocx(doc) {
+export async function toDocx(doc) {
   const links = [];
   const run = (r, extra = '') => {
     const props = (r.b ? '<w:b/>' : '') + (r.i ? '<w:i/>' : '') + (r.code ? '<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas" w:cs="Consolas"/>' : '') + (r.href ? '<w:rStyle w:val="Hyperlink"/>' : '') + extra;
@@ -365,7 +365,7 @@ export function toDocx(doc) {
   ]);
 }
 
-export function toOdt(doc) {
+export async function toOdt(doc) {
   const span = (r) => { const text = esc(r.text).replace(/\n/g, '<text:line-break/>'); const style = r.b && r.i ? 'BI' : r.b ? 'B' : r.i ? 'I' : r.code ? 'C' : ''; const inner = style ? '<text:span text:style-name="' + style + '">' + text + '</text:span>' : text; return r.href ? '<text:a xlink:type="simple" xlink:href="' + esc(r.href) + '">' + inner + '</text:a>' : inner; };
   const runs = (list) => list.map(span).join('');
   const body = doc.blocks.map((b) => {
@@ -412,7 +412,7 @@ export function toRtf(doc) {
   return '{\\rtf1\\ansi\\ansicpg1252\\deff0{\\fonttbl{\\f0\\fswiss Calibri;}{\\f1\\fmodern Consolas;}}\\fs22\n' + body + '\n}';
 }
 
-export function toEpub(doc, id = 'urn:uuid:' + (globalThis.crypto?.randomUUID?.() || Date.now())) {
+export async function toEpub(doc, id = 'urn:uuid:' + (globalThis.crypto?.randomUUID?.() || Date.now())) {
   const title = doc.title || 'Document';
   const split = doc.blocks.some((b) => b.t === 'h' && b.level === 1) ? 1 : doc.blocks.some((b) => b.t === 'h' && b.level === 2) ? 2 : 0;
   const chapters = [];
@@ -446,7 +446,15 @@ export async function toPdf(doc, libs) {
   const newPage = () => { page = pdf.addPage([W, H]); y = H - M; };
   newPage();
   const ensure = (height) => { if (y - height < M) newPage(); };
-  const supported = (font, text) => { try { font.encodeText(text); return text; } catch { return Array.from(text).map((ch) => { try { font.encodeText(ch); return ch; } catch { return '?'; } }).join(''); } };
+  // Noto Sans has no Chinese, Japanese, Korean or emoji glyphs. fontkit draws a
+  // blank box for a missing glyph, so swap those characters for "?" instead
+  // of letting them vanish from the page.
+  const charsets = new Map();
+  const supported = (font, text) => {
+    if (!charsets.has(font)) charsets.set(font, new Set(font.getCharacterSet()));
+    const set = charsets.get(font);
+    return Array.from(text).map((ch) => set.has(ch.codePointAt(0)) || /\s/.test(ch) ? ch : /[\u200b-\u200d\ufe0e\ufe0f]/.test(ch) ? '' : '?').join('');
+  };
   const fontFor = (r) => r.code ? mono : r.b ? bold : regular;
 
   function paragraph(runs, { size = 11, indent = 0, lead = 1.45, color = rgb(0.1, 0.1, 0.12), boldAll = false, prefix = '' } = {}) {
