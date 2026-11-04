@@ -117,5 +117,6 @@ export function renderNote(element, note) {
   }
   const foot = document.createElement('small'); foot.textContent = note.foot;
   element.append(title, list, foot);
+  element.classList.toggle('proof', !!note.proof);
   element.hidden = false;
 }

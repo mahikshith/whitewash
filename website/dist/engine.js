@@ -1,7 +1,11 @@
 export const MAX_CHARACTERS = 100_000;
 export const MAX_FILE_BYTES = 400_000;
 export function quotationRanges(text) {
-  return Array.from(text.matchAll(/"[^"]*(?:"|$)|“[^”]*(?:”|$)|‘[^’]*(?:’|$)|(?<!\p{L})'[^']*'(?!\p{L})/gu), (match) => [match.index, match.index + match[0].length]);
+  // A quote is protected up to its closing mark (600 characters at most). An
+  // unclosed one only protects the rest of its own line, so a stray quote
+  // can't freeze the rest of a document. A straight quote right after a digit
+  // is an inch mark (27" wide), not an opening quote.
+  return Array.from(text.matchAll(/(?<!\p{N})"(?:[^"]{0,600}"|[^"\n]{0,600}(?=\n|$))|“(?:[^”]{0,600}”|[^”\n]{0,600}(?=\n|$))|‘(?:[^’]{0,600}’|[^’\n]{0,600}(?=\n|$))|(?<!\p{L})'[^'\n]{0,600}'(?!\p{L})/gu), (match) => [match.index, match.index + match[0].length]);
 }
 
 // Protect whole Markdown constructs conservatively; richer prose-node editing needs a parser.
@@ -23,7 +27,7 @@ export function protectedRanges(text, format = 'txt', locks = [], { artifacts = 
     } else if (marker) {
       fence = marker[1];
       ranges.push([offset, offset + line.length]);
-    } else if (/^( {4}|\t)|`/.test(line) || (!artifacts && format === 'md' && /[|<>\[\]$]|!\[|^\s*(?:#{1,6}\s|>)/.test(line))) {
+    } else if (/^( {4}|\t)/.test(line) || (format === 'md' && /`/.test(line)) || (!artifacts && format === 'md' && /[|<>\[\]$]|!\[|^\s*(?:#{1,6}\s|>)/.test(line))) {
       ranges.push([offset, offset + line.length]);
     }
     offset += line.length;
@@ -33,6 +37,8 @@ export function protectedRanges(text, format = 'txt', locks = [], { artifacts = 
   };
   if (!artifacts) addMatches(/https?:\/\/[^\s<>]+|www\.[^\s<>]+|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/gu);
   ranges.push(...quotationRanges(text));
+  // Plain text: protect only the `code spans` themselves, not the whole line.
+  if (format !== 'md') addMatches(/`[^`\n]+`/gu);
   if (!artifacts) addMatches(/\p{N}+(?:[.,:/%-]\p{N}+)*/gu);
   for (const term of locks.filter(Boolean)) {
     let start = text.indexOf(term);
@@ -87,13 +93,15 @@ const tellRules = [
 ];
 // Openers and sign-offs that add nothing. Removed whole.
 const cutRules = [
-  [w('(?:it is|it[’\']s) (?:important|worth|worthwhile) (?:to note|noting) that', String.raw`,?\s*`), 'Cut a filler opener'],
+  [w('(?:it is|it[’\']s) (?:important|worth|worthwhile) (?:to note|noting|to mention|mentioning) that', String.raw`,?\s*`), 'Cut a filler opener'],
   [w('it should be noted that', String.raw`,?\s*`), 'Cut a filler opener'],
   [w('in today[’\']s fast-paced world|in the modern era|in today[’\']s digital age', String.raw`,?\s*`), 'Cut a filler opener'],
-  [/(?<=^|[.!?]\s+|\n)(?:in conclusion|in summary|to sum up|overall|ultimately|in essence),\s*/gimu, 'Cut a filler opener'],
-  [/(?<=^|[.!?]\s+|\n)(?:certainly|absolutely|of course|sure|great question)!\s*/gimu, 'Cut a chatbot leftover'],
+  // The rest only count at the start of a sentence (checked below), so
+  // "we shipped at the end of the day" is left alone.
+  [w('in conclusion|in summary|to sum up|overall|ultimately|in essence|at the end of the day', String.raw`,\s*`), 'Cut a filler opener', true],
+  [w('certainly|absolutely|of course|sure|great question', String.raw`!\s*`), 'Cut a chatbot leftover', true],
   [w('as an ai(?: language model)?', String.raw`,?\s*`), 'Cut a chatbot leftover'],
-  [/(?<=^|[.!?]\s+|\n)(?:i hope this helps|let me know if you (?:have|need) (?:any(?:thing)?|more)[^.!?\n]{0,60}|i hope this email finds you well|feel free to (?:reach out|ask|let me know)[^.!?\n]{0,60})[.!]?[ \t]*/gimu, 'Cut a chatbot sign-off'],
+  [w(String.raw`i hope this helps|let me know if you (?:have|need) (?:any(?:thing)?|more)[^.!?\n]{0,60}|i hope this email finds you well|feel free to (?:reach out|ask|let me know)[^.!?\n]{0,60}`, String.raw`[.!]?[ \t]*`), 'Cut a chatbot sign-off', true],
   [w('(?:please )?feel free to', String.raw`\s+`), 'Cut “feel free to”'],
 ];
 
@@ -191,16 +199,35 @@ export function proposeEdits(text, options = {}) {
   if (options.mode === 'humanize') {
     for (const [pattern, after, reason] of tellRules) add(pattern, after, 'clarity', reason);
     // Openers and chatbot sign-offs: cut them and capitalise what follows.
-    for (const [pattern, reason] of cutRules) for (const match of text.matchAll(pattern)) {
-      let start = match.index; const end = start + match[0].length;
-      if (isProtected(start, end)) continue;
+    // Cuts run in text order, so a cut that ends where an earlier opener was cut
+    // ("In today's world, it is important to note that…") still starts a sentence.
+    const cuts = [];
+    for (const [pattern, reason, anchored] of cutRules) for (const match of text.matchAll(pattern)) cuts.push([match.index, match.index + match[0].length, reason, anchored]);
+    const starts = new Set();
+    // A sentence starts at the top of the text, after . ! ? or a line break,
+    // after a list marker or heading mark, or where an earlier opener was cut.
+    const lineStart = /(?:^|\n)[ \t]*(?:(?:[-*+]|\d{1,3}[.)]|#{1,6}|>)[ \t]+)?$/;
+    let taken = 0, lastCut = null;
+    for (const [matchStart, end, reason, anchored] of cuts.sort((a, b) => a[0] - b[0] || b[1] - a[1])) {
+      let start = matchStart;
+      if (start < taken || isProtected(start, end)) continue;
       const next = text[end] || '';
-      const atStart = start === 0 || /[.!?]\s*$|\n\s*$/.test(text.slice(Math.max(0, start - 3), start));
-      // A cut that ends the line takes the space before it too.
-      if (end === text.length || next === '\n') while (start > 0 && /[ \t]/.test(text[start - 1])) start--;
+      const atStart = starts.has(start) || /[.!?]\s*$/.test(text.slice(Math.max(0, start - 3), start)) || lineStart.test(text.slice(Math.max(0, start - 20), start)) || start === 0;
+      if (anchored && !atStart) continue;
+      taken = end;
+      if (atStart) starts.add(end);
+      // A cut that ends the line takes the space before it too. When it follows
+      // straight on from the previous cut, the two become one edit.
+      if (end === text.length || next === '\n') {
+        if (lastCut && lastCut.end === start) { start = lastCut.start; edits.splice(edits.indexOf(lastCut), 1); }
+        while (start > 0 && /[ \t]/.test(text[start - 1]) && !edits.some((e) => e.start < start && e.end >= start)) start--;
+      }
       push(start, end, '', 'clarity', reason);
+      lastCut = edits.at(-1);
       // Capitalise the next word as its own edit, so it keeps its own formatting.
-      if (atStart && /\p{Ll}/u.test(next)) push(end, end + 1, next.toUpperCase(), 'clarity', 'Capitalise the new first word');
+      // Words with a capital inside (iPhone, eBay) are names: leave them lowercase.
+      const word = /^[\p{L}\p{N}'’-]*/u.exec(text.slice(end, end + 40))[0];
+      if (atStart && /\p{Ll}/u.test(next) && !/\p{Lu}/u.test(word.slice(1))) push(end, end + 1, next.toUpperCase(), 'clarity', 'Capitalise the new first word');
     }
     if (options.format !== 'md') for (const match of text.matchAll(/\*\*([^*\n]{1,200})\*\*/gu)) if (!isProtected(match.index, match.index + match[0].length)) push(match.index, match.index + match[0].length, match[1], 'cleanup', 'Remove leftover Markdown bold');
   }

@@ -6,8 +6,8 @@ test('plain punctuation is opt-in, respects quotes, code, ranges, locks and Unic
   const text = 'We’re ready… okay — next. 2019–2021. “Keep… — this” `code…` Locked… 👩‍👩‍👧‍👦 ❤️ 🏴\u{e0067}\u{e0062}\u{e0065}\u{e006e}\u{e0067}\u{e007f}';
   assert.equal(applyEdits(text, proposeEdits(text)), text);
   const output = applyEdits(text, proposeEdits(text, { punctuation: true, locks: ['Locked…'] }));
-  // A line containing inline code is conservatively retained in full.
-  assert.equal(output, text);
+  // In plain text only the `code` span is protected; the prose around it is edited.
+  assert.equal(output, text.replace('We’re ready… okay — next.', 'We\'re ready... okay - next.'));
   const prose = 'We’re ready… okay — next. 2019–2021. “Keep… — this” Locked…';
   assert.equal(applyEdits(prose, proposeEdits(prose, { punctuation: true, locks: ['Locked…'] })), 'We\'re ready... okay - next. 2019–2021. “Keep… — this” Locked…');
 });
@@ -45,4 +45,30 @@ test('new polish rules keep sentence-start capitals and leave protected text alo
   const text = 'Prior to launch, each and every team is able to ship. In spite of the fact that it rained, we met with regard to budgets. First and foremost, act in the near future. AT THE PRESENT TIME "prior to" stays.';
   assert.equal(applyEdits(text, proposeEdits(text, { mode: 'polish' })), 'Before launch, every team can ship. Although it rained, we met about budgets. First, act soon. NOW "prior to" stays.');
   assert.equal(applyEdits(text, proposeEdits(text, { mode: 'clean' })), text);
+});
+
+test('back-to-back openers still leave a capital at the start of the sentence', () => {
+  const text = "In today's fast-paced world, it is important to note that teamwork is crucial. Certainly! It should be noted that we shipped.";
+  assert.equal(applyEdits(text, proposeEdits(text, { mode: 'humanize' })), 'Teamwork is crucial. We shipped.');
+  const mid = 'We met, and it is important to note that budgets slipped.';
+  assert.equal(applyEdits(mid, proposeEdits(mid, { mode: 'humanize' })), 'We met, and budgets slipped.');
+});
+
+test('openers after list markers and headings, names, and chains of openers', () => {
+  const h = (text) => applyEdits(text, proposeEdits(text, { mode: 'humanize' }));
+  const cases = [
+    ["- In today's fast-paced world, teams move fast.", '- Teams move fast.'],
+    ["## In today's fast-paced world, headings work", '## Headings work'],
+    ['1. Certainly! we ship.', '1. We ship.'],
+    ['It is important to note that iPhone sales rose.', 'iPhone sales rose.'],
+    ['It is important to note that eBay grew.', 'eBay grew.'],
+    ["Overall, it's worth mentioning that results vary.", 'Results vary.'],
+    ['Ultimately, at the end of the day, it is what it is.', 'It is what it is.'],
+    ['Thanks. I hope this helps! Let me know if you have any questions.', 'Thanks.'],
+    ['We shipped at the end of the day. Overall the team did well.', 'We shipped at the end of the day. Overall the team did well.'],
+  ];
+  for (const [input, expected] of cases) {
+    assert.equal(h(input), expected, input);
+    assert.equal(h(expected), expected, 'running Humanize twice changes nothing: ' + input);
+  }
 });
