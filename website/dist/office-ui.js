@@ -45,7 +45,7 @@ async function run() {
       : rows.length ? rows.length + (rows.length === 1 ? ' edit made' : ' edits made') : 'Nothing to change. This one already reads fine.';
     $('office-scope').textContent = tool.id === 'metadata'
       ? 'Author, company, app and date fields are gone. Comments, tracked changes and images inside the file are still there.'
-      : tool.id === 'word' ? 'Edited the body text and tables. Headers, footnotes, links, fields and tracked changes were left alone.'
+      : tool.id === 'word-humanize' ? 'Edited the body text and tables. Headers, footnotes, links, fields and tracked changes were left alone.'
         : tool.id === 'presentations' ? 'Edited the text on your slides. Speaker notes, layouts, fields and links were left alone.'
           : 'Edited long text cells only. Formulas, numbers, header rows and short cells were left alone.';
     $('office-changes').replaceChildren();

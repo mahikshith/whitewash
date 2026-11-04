@@ -17,18 +17,20 @@ export function showOcr(tool) {
 
 export async function loadOcr(list) {
   const version = ++generation;
-  $('ocr-error').hidden = true; $('ocr-output').hidden = false; $('ocr-text').value = '';
+  $('ocr-error').hidden = true; $('ocr-output').hidden = false; $('ocr-text').value = ''; result = null;
   const pdfs = list.filter((f) => fileKind(f) === 'pdf'), images = list.filter((f) => fileKind(f) === 'image');
-  if (!pdfs.length && !images.length) { fail('Use photos or scans (JPG, PNG, WebP) or a scanned PDF.'); return; }
-  if (pdfs.length > 1 || (pdfs.length && images.length)) { fail('Use one PDF, or a set of images, at a time.'); return; }
+  if (!pdfs.length && !images.length) { $('ocr-output').hidden = true; fail('Use photos or scans (JPG, PNG, WebP) or a scanned PDF.'); return; }
+  if (pdfs.length > 1 || (pdfs.length && images.length)) { $('ocr-output').hidden = true; fail('Use one PDF, or a set of images, at a time.'); return; }
   baseName = (list[0].name || 'scan').replace(/\.[^.]+$/, '');
   const say = (text) => { if (version === generation) $('ocr-summary').textContent = text; };
   try {
     say('Getting pages ready…');
     const sources = pdfs.length ? await pdfPagesForOcr(new Uint8Array(await pdfs[0].arrayBuffer()), (n, total) => say('Preparing page ' + n + ' of ' + total + '…')) : images;
     say('Starting the text reader…');
+    const widths = sources.map((source) => source.pageWidth);
     result = await recognize(sources, { pdf: true, onPage: (n, total, p) => say('Reading page ' + n + ' of ' + total + '… ' + Math.round(p * 100) + '%') });
     if (version !== generation) return;
+    result.widths = widths;
     const text = result.pages.map((p) => p.text.trim()).join('\n\n');
     const confidence = Math.round(result.pages.reduce((s, p) => s + p.confidence, 0) / result.pages.length);
     $('ocr-text').value = text;
@@ -45,7 +47,7 @@ $('ocr-save').addEventListener('click', () => island.saveBlob(new Blob([$('ocr-t
 $('ocr-polish').addEventListener('click', () => onPolish?.($('ocr-text').value, baseName + '.txt'));
 $('ocr-pdf').addEventListener('click', async () => {
   if (!result?.pages.every((p) => p.pdf)) return;
-  try { island.saveBlob(new Blob([await joinPdfs(result.pages.map((p) => p.pdf))], { type: 'application/pdf' }), baseName + '-searchable.pdf'); }
+  try { island.saveBlob(new Blob([await joinPdfs(result.pages.map((p) => p.pdf), result.widths)], { type: 'application/pdf' }), baseName + '-searchable.pdf'); }
   catch (error) { fail('Couldn’t build the searchable PDF: ' + error.message); }
 });
 dropZone($('ocr-view'), loadOcr);

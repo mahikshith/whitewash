@@ -116,7 +116,10 @@ function drawPages() {
 function showError(message) { $('pdf-error').textContent = message; $('pdf-error').hidden = false; }
 
 async function imageBytes(file) {
-  if (file.type === 'image/jpeg' || file.type === 'image/png') return { bytes: await readBytes(file), type: file.type };
+  // Trust the bytes, not the name: a JPEG saved as .png is common.
+  const bytes = await readBytes(file);
+  const sniffed = bytes[0] === 0xff && bytes[1] === 0xd8 ? 'image/jpeg' : bytes[0] === 0x89 && bytes[1] === 0x50 ? 'image/png' : null;
+  if (sniffed) return { bytes, type: sniffed };
   const bitmap = await createImageBitmap(file);
   const canvas = document.createElement('canvas'); canvas.width = bitmap.width; canvas.height = bitmap.height;
   canvas.getContext('2d').drawImage(bitmap, 0, 0); bitmap.close();
@@ -194,7 +197,7 @@ async function run() {
     last = await saveAll(outputs, base + '-pages.zip');
     $('pdf-summary').textContent = summary + (tool === 'pdf-compress' ? '' : ' · ' + formatBytes(last.blob.size));
     $('pdf-output').hidden = false;
-  } catch (error) { if (version === generation) showError(error.message); }
+  } catch (error) { if (version === generation) showError(error?.message || String(error) || 'That didn’t work.'); }
   finally { if (version === generation) { $('pdf-run').textContent = RUN_LABEL[tool]; render(); } }
 }
 

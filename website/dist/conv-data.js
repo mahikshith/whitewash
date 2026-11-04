@@ -1,7 +1,7 @@
 // Tables: CSV, TSV, JSON, XLSX, ODS, Markdown and HTML. A table is
 // { sheets: [{ name, rows: string[][] }] }. Values are kept as text; spreadsheet
 // formulas are read as their last saved result.
-import { readZip, unpack, replaceEntry, writeZip } from './office-zip.js';
+import { readZip, unpack, deflateEntry, writeZip } from './office-zip.js';
 const BIG = { maxBytes: 60_000_000, maxEntries: 5000 };
 
 const encoder = new TextEncoder(), decoder = new TextDecoder();
@@ -97,7 +97,9 @@ const typed = (value, type) => {
 export function writeJson(table) {
   const sheet = (rows) => {
     const [header = [], ...body] = rows;
-    const keys = header.map((key, i) => key || 'column' + (i + 1));
+    // Cells past the last header still get a key, so no value is dropped.
+    const width = Math.max(header.length, ...body.map((row) => row.length));
+    const keys = Array.from({ length: width }, (_, i) => header[i] || 'column' + (i + 1));
     const types = columnTypes(body, keys.length);
     return body.map((row) => Object.fromEntries(keys.map((key, i) => [key, typed(row[i], types[i])])));
   };
@@ -149,6 +151,8 @@ export async function readXlsx(bytes) {
   const shared = await part('xl/sharedStrings.xml');
   const insidePhonetic = (node) => { for (let n = node.parentNode; n; n = n.parentNode) if (n.localName === 'rPh') return true; return false; };
   const strings = shared ? childrenNamed(shared.documentElement, 'si').map((si) => byLocal(si, 't').filter((t) => !insidePhonetic(t)).map((t) => t.textContent).join('')) : [];
+  const dateStyles = await xlsxDateStyles(await part('xl/styles.xml'));
+  const epoch = /^(1|true)$/.test(byLocal(workbook, 'workbookPr')[0]?.getAttribute('date1904') || '') ? Date.UTC(1904, 0, 1) : Date.UTC(1899, 11, 30);
   const sheets = [];
   for (const sheet of byLocal(workbook, 'sheet')) {
     const id = sheet.getAttribute('r:id') || Array.from(sheet.attributes).find((a) => a.localName === 'id')?.value;
@@ -164,7 +168,7 @@ export async function readXlsx(bytes) {
         const col = c.getAttribute('r') ? columnIndex(c.getAttribute('r')) : values.length;
         const type = c.getAttribute('t');
         const v = childrenNamed(c, 'v')[0]?.textContent ?? '';
-        values[col] = type === 's' ? strings[Number(v)] ?? '' : type === 'inlineStr' ? byLocal(c, 't').map((t) => t.textContent).join('') : type === 'b' ? (v === '1' ? 'TRUE' : 'FALSE') : v;
+        values[col] = type === 's' ? strings[Number(v)] ?? '' : type === 'inlineStr' ? byLocal(c, 't').map((t) => t.textContent).join('') : type === 'b' ? (v === '1' ? 'TRUE' : 'FALSE') : v !== '' && (!type || type === 'n') && dateStyles.has(Number(c.getAttribute('s') || 0)) ? serialDate(Number(v), epoch, dateStyles.get(Number(c.getAttribute('s') || 0))) : v;
       }
       rows[index] = Array.from(values, (v) => v ?? '');
     }
@@ -174,9 +178,35 @@ export async function readXlsx(bytes) {
   return { sheets };
 }
 
-function zipFrom(files) {
+// Excel stores dates as day counts; the cell style says whether a number is a
+// date. Built-in formats 14-22 and 45-47 are dates or times, and a custom
+// format is one if it uses d, y, h or s outside quotes and [colour] tags.
+async function xlsxDateStyles(styles) {
+  const kinds = new Map();
+  if (!styles) return kinds;
+  const custom = new Map(byLocal(styles, 'numFmt').map((f) => [Number(f.getAttribute('numFmtId')), f.getAttribute('formatCode') || '']));
+  const kindOf = (id) => {
+    if (id >= 14 && id <= 17 || id === 22) return id === 22 ? 'datetime' : 'date';
+    if (id >= 18 && id <= 21 || id >= 45 && id <= 47) return 'time';
+    const code = (custom.get(id) || '').replace(/\[([hms])+\]/gi, '$1').replace(/"[^"]*"|\[[^\]]*\]|\\.|_.|\*./g, '').toLowerCase();
+    if (!code || /^general$/.test(code)) return null;
+    const date = /[dy]/.test(code) || /m/.test(code) && !/[hs]/.test(code), time = /[hs]/.test(code);
+    return date && time ? 'datetime' : date ? 'date' : time ? 'time' : null;
+  };
+  const xfs = byLocal(styles, 'cellXfs')[0];
+  if (xfs) childrenNamed(xfs, 'xf').forEach((xf, i) => { const kind = kindOf(Number(xf.getAttribute('numFmtId') || 0)); if (kind) kinds.set(i, kind); });
+  return kinds;
+}
+function serialDate(serial, epoch, kind) {
+  if (!Number.isFinite(serial)) return String(serial);
+  const iso = new Date(epoch + Math.round(serial * 86_400_000)).toISOString();
+  const day = iso.slice(0, 10), time = iso.slice(11, 19);
+  return kind === 'time' ? time : kind === 'date' && time === '00:00:00' ? day : day + ' ' + time;
+}
+
+async function zipFrom(files) {
   const entries = new Map();
-  for (const [name, text] of files) replaceEntry(entries, name, typeof text === 'string' ? encoder.encode(text) : text);
+  for (const [name, text] of files) await deflateEntry(entries, name, typeof text === 'string' ? encoder.encode(text) : text);
   return writeZip(entries);
 }
 
@@ -189,7 +219,7 @@ const safeSheetName = (name, i, used) => {
   return candidate;
 };
 
-export function writeXlsx(table) {
+export async function writeXlsx(table) {
   const used = new Set();
   const names = table.sheets.map((s, i) => safeSheetName(s.name, i, used));
   const files = [
@@ -234,7 +264,7 @@ export async function readOds(bytes) {
   return { sheets };
 }
 
-export function writeOds(table) {
+export async function writeOds(table) {
   const body = table.sheets.map((sheet, i) => '<table:table table:name="' + escapeXml(sheet.name || 'Sheet' + (i + 1)) + '">'
     + sheet.rows.map((row) => '<table:table-row>' + (row.length ? row : ['']).map((value) => isNumber(value)
       ? '<table:table-cell office:value-type="float" office:value="' + String(value).trim() + '"><text:p>' + escapeXml(value) + '</text:p></table:table-cell>'

@@ -93,6 +93,15 @@ export function replaceEntry(entries, name, bytes) {
   entries.set(name, { ...previous, name, method: 0, crc: crc32(bytes), size: bytes.length, packed: bytes, time: previous?.time || 0, date: previous?.date || 33, attributes: previous?.attributes || 0 });
 }
 
+// New parts are deflated so a written DOCX, XLSX, ODT or EPUB isn't several
+// times bigger than it needs to be. An ODF/EPUB mimetype entry must stay stored.
+export async function deflateEntry(entries, name, bytes) {
+  replaceEntry(entries, name, bytes);
+  if (name === 'mimetype' || bytes.length < 256 || typeof CompressionStream === 'undefined') return;
+  const packed = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());
+  if (packed.length < bytes.length) Object.assign(entries.get(name), { method: 8, packed });
+}
+
 export function writeZip(entries, clearDates = false) {
   const parts = [], directory = [];
   let offset = 0, directorySize = 0;
