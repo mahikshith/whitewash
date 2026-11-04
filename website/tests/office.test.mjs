@@ -118,3 +118,12 @@ test('ZIP parser catches corruption, duplicates, unsafe paths, overstated sizes 
   const overflow = new Map(); replaceEntry(overflow, 'part', enc.encode('a'.repeat(100000))); const e = overflow.get('part'); e.method = 8; e.packed = new Uint8Array(deflateRawSync(e.packed)); e.size = 1; e.crc = crc32(enc.encode('a'));
   await assert.rejects(readZip(writeZip(overflow)));
 });
+
+test('one inch mark in a Word file does not stop every later edit', async () => {
+  const body = '<w:p><w:r><w:t>The desk is 27" wide.</w:t></w:r></w:p><w:p><w:r><w:t>It is important to note that we utilize it daily.</w:t></w:r></w:p>';
+  const result = await processOffice(packageFor('docx', { 'word/document.xml': word(body) }), 'inch.docx', { mode: 'humanize' });
+  assert.ok(result.report.edits.length > 0);
+  const out = texts(await textPart(result.bytes, 'word/document.xml'), W).join('|');
+  assert.ok(out.startsWith('The desk is 27" wide.|'), out);
+  assert.ok(!/important to note|utilize/.test(out), out);
+});

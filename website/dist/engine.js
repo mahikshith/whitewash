@@ -1,7 +1,11 @@
 export const MAX_CHARACTERS = 100_000;
 export const MAX_FILE_BYTES = 400_000;
 export function quotationRanges(text) {
-  return Array.from(text.matchAll(/"[^"]*(?:"|$)|“[^”]*(?:”|$)|‘[^’]*(?:’|$)|(?<!\p{L})'[^']*'(?!\p{L})/gu), (match) => [match.index, match.index + match[0].length]);
+  // A quote is protected up to its closing mark (600 characters at most). An
+  // unclosed one only protects the rest of its own line, so a stray quote
+  // can't freeze the rest of a document. A straight quote right after a digit
+  // is an inch mark (27" wide), not an opening quote.
+  return Array.from(text.matchAll(/(?<!\p{N})"(?:[^"]{0,600}"|[^"\n]{0,600}(?=\n|$))|“(?:[^”]{0,600}”|[^”\n]{0,600}(?=\n|$))|‘(?:[^’]{0,600}’|[^’\n]{0,600}(?=\n|$))|(?<!\p{L})'[^'\n]{0,600}'(?!\p{L})/gu), (match) => [match.index, match.index + match[0].length]);
 }
 
 // Protect whole Markdown constructs conservatively; richer prose-node editing needs a parser.
@@ -23,7 +27,7 @@ export function protectedRanges(text, format = 'txt', locks = [], { artifacts = 
     } else if (marker) {
       fence = marker[1];
       ranges.push([offset, offset + line.length]);
-    } else if (/^( {4}|\t)|`/.test(line) || (!artifacts && format === 'md' && /[|<>\[\]$]|!\[|^\s*(?:#{1,6}\s|>)/.test(line))) {
+    } else if (/^( {4}|\t)/.test(line) || (format === 'md' && /`/.test(line)) || (!artifacts && format === 'md' && /[|<>\[\]$]|!\[|^\s*(?:#{1,6}\s|>)/.test(line))) {
       ranges.push([offset, offset + line.length]);
     }
     offset += line.length;
@@ -33,6 +37,8 @@ export function protectedRanges(text, format = 'txt', locks = [], { artifacts = 
   };
   if (!artifacts) addMatches(/https?:\/\/[^\s<>]+|www\.[^\s<>]+|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/gu);
   ranges.push(...quotationRanges(text));
+  // Plain text: protect only the `code spans` themselves, not the whole line.
+  if (format !== 'md') addMatches(/`[^`\n]+`/gu);
   if (!artifacts) addMatches(/\p{N}+(?:[.,:/%-]\p{N}+)*/gu);
   for (const term of locks.filter(Boolean)) {
     let start = text.indexOf(term);

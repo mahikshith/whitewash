@@ -6,8 +6,8 @@ test('plain punctuation is opt-in, respects quotes, code, ranges, locks and Unic
   const text = 'We’re ready… okay — next. 2019–2021. “Keep… — this” `code…` Locked… 👩‍👩‍👧‍👦 ❤️ 🏴\u{e0067}\u{e0062}\u{e0065}\u{e006e}\u{e0067}\u{e007f}';
   assert.equal(applyEdits(text, proposeEdits(text)), text);
   const output = applyEdits(text, proposeEdits(text, { punctuation: true, locks: ['Locked…'] }));
-  // A line containing inline code is conservatively retained in full.
-  assert.equal(output, text);
+  // In plain text only the `code` span is protected; the prose around it is edited.
+  assert.equal(output, text.replace('We’re ready… okay — next.', 'We\'re ready... okay - next.'));
   const prose = 'We’re ready… okay — next. 2019–2021. “Keep… — this” Locked…';
   assert.equal(applyEdits(prose, proposeEdits(prose, { punctuation: true, locks: ['Locked…'] })), 'We\'re ready... okay - next. 2019–2021. “Keep… — this” Locked…');
 });

@@ -84,3 +84,15 @@ test('applying proposed edits is idempotent on a multilingual fixture', () => {
   const once = polish(input, { format: 'md' });
   assert.equal(polish(once, { format: 'md' }), once);
 });
+
+test('an inch mark or a stray quote does not freeze the rest of the text', () => {
+  const h = (text, format) => applyEdits(text, proposeEdits(text, { mode: 'humanize', format }));
+  assert.equal(h('The monitor is 27" wide.\nIt is important to note that we utilize it daily.'), 'The monitor is 27" wide.\nWe use it daily.');
+  assert.equal(h('She said "maybe\nIt is important to note that it shipped.'), 'She said "maybe\nIt shipped.');
+});
+
+test('in plain text a backtick protects only the code span, not the line', () => {
+  const h = (text) => applyEdits(text, proposeEdits(text, { mode: 'humanize' }));
+  assert.equal(h('Run `npm test`. It is important to note that we utilize it daily.'), 'Run `npm test`. We use it daily.');
+  assert.equal(h('Keep `in order to` as written.'), 'Keep `in order to` as written.');
+});
