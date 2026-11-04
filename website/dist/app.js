@@ -81,7 +81,13 @@ function route() {
   const separate = ['office', 'image', 'convert', 'pdf', 'wipe', 'archive', 'ocr'].includes(mode);
   $('hub-view').hidden = !!active;
   showHub(active ? false : section ? section.id : null);
-  for (const link of document.querySelectorAll('.tab-link')) link.classList.toggle('current', link.dataset.section === sectionOf(location.hash)?.id);
+  const owner = sectionOf(location.hash);
+  for (const link of document.querySelectorAll('.tab-link')) link.classList.toggle('current', link.dataset.section === owner?.id);
+  // Back links return to the format page the tool lives on, not the homepage.
+  for (const back of document.querySelectorAll('.back-link')) {
+    back.href = owner ? '#' + owner.id : '#home';
+    back.lastChild.textContent = owner ? ' Back to ' + owner.title : ' Home';
+  }
   $('tool-view').hidden = !ready || separate;
   $('office-view').hidden = !office;
   $('image-view').hidden = !image;
@@ -293,10 +299,14 @@ function dialog(title, paragraphs) {
   for (const text of paragraphs) { const p = document.createElement('p'); p.textContent = text; $('dialog-content').append(p); }
   $('info-dialog').showModal();
 }
-$('privacy').addEventListener('click', () => dialog('Privacy', [
+const privacy = () => dialog('Privacy', [
   'Everything happens in this browser tab. Your text and files are never uploaded, there’s no account, and there are no analytics.',
+  'Check it yourself: open your browser’s developer tools (F12), go to the Network tab, then humanize or convert a file. You’ll only see this site’s own scripts loading, never your file going out. The page’s security policy also blocks it from talking to any other server.',
+  'Or load the page, turn on airplane mode, and humanize some pasted text: it still works. PDF, audio, archive and scan tools load extra code the first time you use them, so open them once while you’re online.',
   'The only thing saved is whether you picked light or dark mode. Reloading the page clears your draft. The site host still sees ordinary page requests, like any website.',
-]));
+]);
+$('privacy').addEventListener('click', privacy);
+$('trust-check')?.addEventListener('click', privacy);
 $('help').addEventListener('click', () => dialog('Help', [
   'Paste text or drop a file, pick what you want done, then copy or download the result. Your original is never changed.',
   'Polishing uses a list of English phrase rules, not an AI model. Open “See changes” to undo any edit you don’t like.',

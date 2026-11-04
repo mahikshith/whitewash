@@ -46,3 +46,10 @@ test('new polish rules keep sentence-start capitals and leave protected text alo
   assert.equal(applyEdits(text, proposeEdits(text, { mode: 'polish' })), 'Before launch, every team can ship. Although it rained, we met about budgets. First, act soon. NOW "prior to" stays.');
   assert.equal(applyEdits(text, proposeEdits(text, { mode: 'clean' })), text);
 });
+
+test('back-to-back openers still leave a capital at the start of the sentence', () => {
+  const text = "In today's fast-paced world, it is important to note that teamwork is crucial. Certainly! It should be noted that we shipped.";
+  assert.equal(applyEdits(text, proposeEdits(text, { mode: 'humanize' })), 'Teamwork is crucial. We shipped.');
+  const mid = 'We met, and it is important to note that budgets slipped.';
+  assert.equal(applyEdits(mid, proposeEdits(mid, { mode: 'humanize' })), 'We met, and budgets slipped.');
+});

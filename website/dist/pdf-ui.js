@@ -7,6 +7,9 @@ const $ = (id) => document.getElementById(id);
 let active = null, items = [], pages = [], last = null, generation = 0, onPolish = null;
 const MULTI = { 'pdf-merge': true, 'images-to-pdf': true };
 const RUN_LABEL = { 'pdf-protect': 'Add password', 'pdf-unlock': 'Unlock PDF', 'pdf-compress': 'Compress PDF', 'pdf-repair': 'Repair PDF', 'pdf-sign': 'Sign and save', 'pdf-merge': 'Merge PDFs', 'pdf-split': 'Split PDF', 'pdf-organize': 'Save PDF', 'images-to-pdf': 'Make PDF', 'pdf-to-images': 'Save pages as images', 'pdf-polish': 'Polish the text', 'pdf-watermark': 'Add watermark', 'pdf-numbers': 'Add page numbers' };
+// Jobs whose default setting is right for most people run as soon as the file
+// lands. Change a setting afterwards and press the button to run it again.
+const AUTO = new Set(['pdf-polish', 'pdf-compress', 'pdf-repair', 'pdf-to-images']);
 const HINT = { 'images-to-pdf': 'JPG, PNG, WebP, GIF or BMP · add as many as you like · or drop them here', 'pdf-merge': 'Add two or more PDFs · or drop them here' };
 
 export const setPolishHandler = (fn) => { onPolish = fn; };
@@ -46,6 +49,9 @@ function render() {
     return row;
   }));
   $('pdf-pages').hidden = active?.id !== 'pdf-organize' || !pages.length;
+  // No dead grey button before there's a file: the drop zone is the first step.
+  $('pdf-run').closest('.primary-row').hidden = !items.length;
+  if (items.length && AUTO.has(active?.id) && last && $('pdf-run').textContent === RUN_LABEL[active.id]) $('pdf-run').textContent = 'Redo with these settings';
   $('pdf-run').disabled = !items.length || (active?.id === 'pdf-merge' && items.length < 2) || (active?.id === 'pdf-organize' && !pages.some((p) => !p.deleted));
 }
 
@@ -75,7 +81,7 @@ export async function loadPdf(list) {
   if (active.id === 'pdf-organize' && items[0]) await thumbnails(items[0].bytes, version);
   if (active.id === 'pdf-sign' && items[0]) { $('sign-page').replaceChildren(...Array.from({ length: items[0].pages }, (_, i) => new Option('Page ' + (i + 1), i))); $('sign-page').value = items[0].pages - 1; await signPreview(); }
   render();
-  if (!MULTI[active.id] && items.length && active.id === 'pdf-polish') run();
+  if (!MULTI[active.id] && items.length && AUTO.has(active.id)) run();
 }
 
 async function thumbnails(bytes, version) {

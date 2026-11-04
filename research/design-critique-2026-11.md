@@ -33,7 +33,7 @@ Ordered by how much it costs you.
 
 ## A functional bug that hurts the pitch
 
-Humanizing "In today's fast-paced world, it is important to note that teamwork is crucial." returns "teamwork is crucial." The first letter isn't re-capitalised when two stock phrases are cut back to back. A single phrase is handled; two in a row isn't. This is the first thing a paying user would see go wrong, so it should be fixed before any pricing goes live. (Flagged for the functional-testing work rather than fixed here.)
+Humanizing "In today's fast-paced world, it is important to note that teamwork is crucial." returns "teamwork is crucial." The first letter isn't re-capitalised when two stock phrases are cut back to back. A single phrase is handled; two in a row isn't. This is the first thing a paying user would see go wrong, so it should be fixed before any pricing goes live. (Fixed in Phase B, with a regression test.)
 
 ## What competitors do that we should borrow
 
@@ -60,24 +60,46 @@ The opening we have that they don't: **document humanizing that returns the same
 
 No layout, dial, or flow changes. Everything mykee fixed in Phase 4 (dial size, plain + centre, no badges, one Humanize button) is untouched.
 
-## Phase B (next, no decision needed)
+## Phase B (done in the same PR, except where noted)
 
-1. **Run on drop.** Single-tool pages start the job as soon as the file arrives with the default setting, then show the result with "Change setting and redo". Kill the disabled grey button.
-2. **Proof of privacy.** A small "Check it yourself" link that opens a note: turn on airplane mode after the page loads and the core tools still work; the page's security policy blocks outside connections. Add a live "0 bytes uploaded" counter in the status pill after each job.
-3. **Back links go to the format page** the tool lives on.
-4. **Fix the capitalisation bug** above.
-5. **Lighten the dial's bowl** in light mode and even out the card grid.
-6. **Phone dial first.** On phones, put the dial right under the headline and the before/after card below it.
+1. **Run on drop.** *(Done for Compress, Repair, PDF to images and Humanize a PDF. The run button stays hidden until a file arrives and then reads "Redo with these settings". Other tools need a real choice first: a password, pages, signature placement.)* Single-tool pages start the job as soon as the file arrives with the default setting, then show the result with "Change setting and redo". Kill the disabled grey button.
+2. **Proof of privacy.** *(Done: a "Check it yourself" link in the trust row opens steps for checking the Network tab and trying airplane mode. The "0 bytes uploaded" counter isn't built.)* A small "Check it yourself" link that opens a note: turn on airplane mode after the page loads and the core tools still work; the page's security policy blocks outside connections. Add a live "0 bytes uploaded" counter in the status pill after each job.
+3. *(Done.)* **Back links go to the format page** the tool lives on.
+4. *(Done, with a test.)* **Fix the capitalisation bug** above.
+5. **Lighten the dial's bowl** in light mode *(done)* and even out the card grid *(not yet)*.
+6. *(Done.)* **Phone dial first.** On phones, put the dial right under the headline and the before/after card below it.
 
-## Phase C (needs mykee's call): the paid surface
+## Phase C: AI rewrite, with your own key or ours
 
-Nothing is built for this yet, because what to charge for changes the product. My recommendation:
+Status 4 Nov 2026: pricing is on hold (mykee's call), but the direction is set. AI features come in two ways, and the hosted one is the paid one. This builds on the parked notes in [`later.md`](later.md).
 
-- **Free forever:** everything that exists today. Converters, PDF tools and rule-based Humanize stay free, no limits. That's the funnel and the reason people bookmark it; capping it now would just push them back to iLovePDF.
-- **Pro (around $8 a month or $60 a year):** the things that cost us money or are clearly "work" features:
-  - "Rewrite in your voice", the LLM rewrite already parked in `research/later.md`, with a monthly word allowance.
-  - Batch Humanize (drop 50 Word files, get a ZIP back).
-  - Saved "never change these phrases" lists and a personal style profile.
-- **Where it shows up:** a "Pro" item at the right of the header; a locked third segment on the document dial ("Rewrite") that opens a short upsell instead of a pricing table; a `#pricing` page with two columns, not four.
+### What the AI does
+- **Rewrite** as a third segment on every document dial, next to Humanize and Edit. Humanize stays rule-based, free and instant. Rewrite runs a model over the text the rules have already cleaned, so it's cheaper and less likely to drift.
+- Later: a voice profile (paste two or three things you wrote), "rewrite just this sentence" on a flagged AI tell, shorten or change tone, and a model pass that fixes reading order in PDF imports.
+- Word, PowerPoint and Excel still come back as the same file. The model rewrites paragraph text only. Runs, styles, numbers, quotes, links and code stay locked, the same as Humanize today.
 
-Smallpdf and iLovePDF both price around $7 to $15 a month for Pro, and humanizer tools sit in the same band, so $8 is in range. Treat that number as a placeholder until there's an LLM cost per word to price against.
+### Two ways to power it
+| | Bring your own key | Whitewash AI (Pro) |
+|---|---|---|
+| Who pays for the model | The user, on their own provider account | Us, covered by the subscription |
+| Where the text goes | Straight from the browser to the provider (OpenAI, Anthropic, Google). Never to us | To our server, then the provider. Not stored |
+| Setup | Paste a key once | Sign in |
+| What it needs from us | A settings sheet and the provider calls. No server | Accounts, billing (Stripe), metering, abuse limits, a small API |
+
+### The design
+- **First click on Rewrite with nothing set up** opens one sheet with two cards: "Use your own key" (free, paste a key, pick the provider) and "Whitewash AI" (Pro, sign in). No pricing table.
+- **Key settings** live behind a small key icon in the header. The key is kept on this device only. By default it lasts for the tab session, with a "remember on this device" checkbox. There's a "Test key" button and a "Forget key" button. The sheet says in one line where the text goes.
+- **Honest labels.** Today every tool says "never uploaded". Any AI action shows a small "Sent to OpenAI" (or Anthropic, or Whitewash) tag on the button and in the status pill, so the privacy promise stays true for everything else.
+- **Cost before you click.** For a dropped document, show roughly how many words will be sent before running it.
+
+### Things to know before building it
+- **The content security policy has to change.** It only allows same-origin connections today. A key-based provider must be allowed in `connect-src`, one host at a time, and only for the providers we support. Anthropic's API also needs its direct-browser-access header for calls made from a browser.
+- **A "bring your own key" paywall can't be enforced on a static site.** The code ships to the browser, so anyone can turn a client-side lock off. Make bring-your-own-key free and let Pro be the hosted option. Hosted AI is the part that costs us money and the part a server can actually meter. If you'd rather charge for bring-your-own-key as well, that needs the server and accounts first.
+- **Hosted AI ends "no server".** It needs a backend, sign-in and billing. That's the biggest single piece of work on this list, so it should be its own phase after bring-your-own-key ships.
+- **Don't promise to beat AI detectors.** "Reads like you wrote it" is the claim. Detector-bypass claims are what the low-trust competitors sell.
+
+### Order
+1. Bring-your-own-key Rewrite for pasted text (settings sheet, one provider, CSP change).
+2. The same for Word, PowerPoint and Excel, keeping structure.
+3. More providers and a voice profile.
+4. Whitewash AI: accounts, billing and the hosted endpoint. This is when pricing comes back.

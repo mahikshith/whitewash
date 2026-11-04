@@ -191,11 +191,17 @@ export function proposeEdits(text, options = {}) {
   if (options.mode === 'humanize') {
     for (const [pattern, after, reason] of tellRules) add(pattern, after, 'clarity', reason);
     // Openers and chatbot sign-offs: cut them and capitalise what follows.
-    for (const [pattern, reason] of cutRules) for (const match of text.matchAll(pattern)) {
-      let start = match.index; const end = start + match[0].length;
+    // Cuts run in text order, so a cut that ends where an earlier opener was cut
+    // ("In today's world, it is important to note that…") still starts a sentence.
+    const cuts = [];
+    for (const [pattern, reason] of cutRules) for (const match of text.matchAll(pattern)) cuts.push([match.index, match.index + match[0].length, reason]);
+    const starts = new Set();
+    for (const [matchStart, end, reason] of cuts.sort((a, b) => a[0] - b[0])) {
+      let start = matchStart;
       if (isProtected(start, end)) continue;
       const next = text[end] || '';
-      const atStart = start === 0 || /[.!?]\s*$|\n\s*$/.test(text.slice(Math.max(0, start - 3), start));
+      const atStart = start === 0 || starts.has(start) || /[.!?]\s*$|\n\s*$/.test(text.slice(Math.max(0, start - 3), start));
+      if (atStart) starts.add(end);
       // A cut that ends the line takes the space before it too.
       if (end === text.length || next === '\n') while (start > 0 && /[ \t]/.test(text[start - 1])) start--;
       push(start, end, '', 'clarity', reason);
