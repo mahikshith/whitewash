@@ -35,7 +35,7 @@ export const sections = [
     lede: 'Wipe the AI slop out of any draft or document.',
     blurb: 'Drop a Word, PowerPoint, Excel, PDF or text file. One click cuts the filler, stock AI phrases and hidden characters, and gives you the same kind of file back.',
     items: [
-      T('light-edit', 'Paste text'), T('word', 'Word'), T('presentations', 'Slides'), T('spreadsheets', 'Excel'), T('pdf-polish', 'PDF'),
+      T('light-edit', 'Paste text'), T('word-humanize', 'Word'), T('presentations', 'Slides'), T('spreadsheets', 'Excel'), T('pdf-polish', 'PDF'),
       G('Check', 'search', 'Look at a draft before changing it', [T('writing-check', 'AI tells'), T('characters', 'Hidden'), T('clean-text', 'Clean')]),
     ],
   },
@@ -59,7 +59,7 @@ export const sections = [
     lede: 'Word files, cleaned up or turned into anything.',
     blurb: 'Humanize a .docx and get the same file back with every style kept, or convert it to PDF, Markdown, EPUB and more.',
     items: [
-      T('word', 'Humanize'),
+      T('word-humanize', 'Humanize'),
       G('From Word', 'swap', 'Turn a Word file into something else', [T('word-to-pdf', 'PDF'), ...out('docx', ['md', 'html', 'txt', 'odt', 'rtf']), T('ebook', 'EPUB')]),
       G('To Word', 'file', 'Make a Word file from another file', [T('pdf-to-word', 'PDF'), ...out('md', ['docx'], true), ...out('html', ['docx'], true), ...out('txt', ['docx'], true), ...out('odt', ['docx'], true), ...out('pptx', ['docx'], true)]),
       T('metadata', 'Wipe info'),

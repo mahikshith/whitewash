@@ -59,7 +59,7 @@ const TOOL = {
   clean: { title: 'Clean', rows: [['You get', 'The same text without odd spaces, hidden hyphens, citation markers and tracking links'], ['Keeps', 'Emoji, accents and every other script']] },
   'pdf-polish': { title: 'Polish PDF text', rows: [['You get', 'The PDF’s text in the polish tool'], ['Note', 'The PDF itself isn’t changed']] },
   wipe: { title: 'Wipe hidden info', rows: [['Removes', 'Location, camera, author, software, edit history and AI labels'], ['Keeps', 'The content, untouched. Photos aren’t re-compressed'], ['Note', 'The copy is opened again and checked before you get it']] },
-  merge: { title: 'Merge PDFs', rows: [['You get', 'One PDF, in the order you choose'], ['Keeps', 'Every page exactly as it was']] },
+  merge: { title: 'Merge PDFs', rows: [['You get', 'One PDF, in the order you choose'], ['Keeps', 'Every page exactly as it was'], ['Drops', 'Bookmarks and form fields']] },
   organize: { title: 'Pages', rows: [['You get', 'A preview of every page to move, rotate or delete']] },
   resize: { title: 'Resize', rows: [['You get', 'Smaller images, in pixels and in file size'], ['Drops', 'Camera details like location']] },
   open: { title: 'Open archive', rows: [['You get', 'A list of what’s inside, to save one file or all of them']] },

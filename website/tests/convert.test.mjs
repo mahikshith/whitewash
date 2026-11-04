@@ -139,6 +139,17 @@ test('PDF wiper removes author, title, tools and IDs', async () => {
   assert.equal(await pageCount(bytes), 1);
 });
 
+test('PDF wiper deletes the XMP stream itself, not just the link to it', async () => {
+  const pdf = await PDFDocument.load(await makePdf(1));
+  const { PDFName } = await import('../dist/vendor/pdf-lib.esm.min.js');
+  const xmp = '<?xpacket begin=""?><x:xmpmeta xmlns:x="adobe:ns:meta/"><dc:creator>XMPSECRETAUTHOR</dc:creator></x:xmpmeta><?xpacket end="w"?>';
+  const stream = pdf.context.stream(xmp, { Type: 'Metadata', Subtype: 'XML' });
+  pdf.catalog.set(PDFName.of('Metadata'), pdf.context.register(stream));
+  const { bytes, remaining } = await wipePdf(await pdf.save({ useObjectStreams: false }));
+  assert.deepEqual(remaining, []);
+  assert.ok(!Buffer.from(bytes).toString('latin1').includes('XMPSECRETAUTHOR'));
+});
+
 test('images in a PDF lose their camera details', async () => {
   const { imagesToPdf } = await import('../dist/conv-pdf.js');
   const fs = await import('node:fs');

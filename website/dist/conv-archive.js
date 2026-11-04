@@ -1,10 +1,11 @@
-// Archives: open ZIP, 7Z, RAR, TAR (plain, .gz, .bz2, .xz) and single
-// compressed files with libarchive (WASM, in a worker). Write ZIP, TAR and
-// TAR.GZ with fflate and our own TAR writer. libarchive's writer sizes its
+// Archives: open ZIP, 7Z, RAR and TAR (plain, .gz, .bz2, .xz) with libarchive
+// and a lone .gz with fflate. libarchive.js can't read a bare .bz2 or .xz
+// stream (no raw format), so those aren't offered. libarchive runs as WASM in
+// a worker. Write ZIP, TAR and TAR.GZ with fflate and our own TAR writer. libarchive's writer sizes its
 // output buffer too tightly and fails on small files, so it isn't used.
 import * as libs from './libs.js';
 
-export const ARCHIVE_IN = ['zip', '7z', 'rar', 'tar', 'tgz', 'tbz2', 'txz', 'gz', 'bz2', 'xz'];
+export const ARCHIVE_IN = ['zip', '7z', 'rar', 'tar', 'tgz', 'tbz2', 'txz', 'gz'];
 export const ARCHIVE_OUT = ['zip', 'tar', 'tgz'];
 export const EXTENSION = { tgz: 'tar.gz', tbz2: 'tar.bz2', txz: 'tar.xz' };
 export const MAX_ARCHIVE = 300_000_000;
@@ -29,8 +30,8 @@ export function safePath(path) {
 }
 
 async function readSingle(file, format) {
-  // A lone .gz/.bz2/.xz holds one file. fflate covers gzip; libarchive the rest.
-  const inner = file.name.replace(/\.(gz|bz2|xz)$/i, '') || 'file';
+  // A lone .gz holds one file.
+  const inner = file.name.replace(/\.gz$/i, '') || 'file';
   if (format === 'gz') {
     const { gunzipSync } = await libs.fflate();
     try { return [{ path: safePath(inner), file: new File([gunzipSync(new Uint8Array(await file.arrayBuffer()))], inner.split('/').pop()) }]; }

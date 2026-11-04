@@ -42,7 +42,9 @@ export async function convertAudio(file, to, { quality = 'high', keepTags = true
       input, output,
       video: { discard: true },
       audio: { codec, ...(lossy ? { bitrate: QUALITY[quality] || QUALITY.high } : {}), ...(codec === 'opus' ? { sampleRate: 48000 } : {}) },
-      tags: keepTags ? undefined : {},
+      // MP4/M4A only stores a front cover, so a picture tagged "other" (what
+      // ffmpeg writes by default) would be dropped. Treat the first one as the cover.
+      tags: !keepTags ? {} : to === 'm4a' ? (tags) => ({ ...tags, images: tags.images?.length && !tags.images.some((i) => i.kind === 'coverFront') ? [{ ...tags.images[0], kind: 'coverFront' }, ...tags.images.slice(1)] : tags.images }) : undefined,
       showWarnings: false,
     });
     if (!conversion.isValid) {
