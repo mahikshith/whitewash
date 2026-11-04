@@ -40,7 +40,7 @@ export function routeNote(from, to) {
   } else if (DATA.includes(from) || (['html', 'md'].includes(from) && DATA.includes(to))) {
     rows.push(['You get', to === 'csv' || to === 'tsv' ? 'One ' + FORMATS[to].label + ' per sheet' : to === 'json' ? 'A list of rows keyed by the header row. Numbers stay numbers' : to === 'pdf' || to === 'docx' ? 'Each sheet as a table' : 'A ' + name(to) + ' with every sheet']);
     rows.push(['Keeps', 'Cell values as shown']);
-    rows.push(['Drops', 'Formulas (their results stay), formatting, charts and merged cells']);
+    rows.push(['Drops', 'Formulas (their results stay), formatting, charts and merged cells' + (to === 'pdf' ? '. Chinese, Japanese, Korean and emoji show as ?' : '')]);
   } else if (['srt', 'vtt'].includes(from)) {
     rows.push(['You get', to === 'txt' ? 'Just the spoken lines, one per line' : 'The same subtitles in ' + FORMATS[to].label + ' format']);
     rows.push(['Keeps', to === 'txt' ? 'The words' : 'Every line and its timing']);
@@ -48,7 +48,7 @@ export function routeNote(from, to) {
   } else if (DOCS.includes(from)) {
     rows.push(['You get', to === 'pdf' ? 'A clean PDF with real, selectable text' : to === 'epub' ? 'An e-book with a chapter for each main heading' : 'A ' + name(to)]);
     rows.push(['Keeps', from === 'pptx' ? 'Slide titles and text, one section per slide' : 'Headings, lists, tables, links, bold and italic']);
-    rows.push(['Drops', from === 'pptx' ? 'Slide design, pictures and animations' : 'Page layout, fonts, colours and images']);
+    rows.push(['Drops', (from === 'pptx' ? 'Slide design, pictures and animations' : 'Page layout, fonts, colours and images') + (to === 'pdf' ? '. Chinese, Japanese, Korean and emoji show as ?' : '')]);
   }
   return { title, rows, foot: 'Runs on this device. Nothing is uploaded.' };
 }
