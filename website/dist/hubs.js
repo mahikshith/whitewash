@@ -13,14 +13,15 @@ const $ = (id) => document.getElementById(id);
 let current = undefined, files = [], hooks = null, dial = null;
 
 const HOME = {
-  title: 'Drop a file. Pick one thing. Done.',
-  lede: 'Humanize AI drafts and documents, convert anything, shrink PDFs, wipe hidden metadata. Point at the dial to see everything it does.',
+  title: 'Take the AI out of any document.',
+  lede: 'Drop a Word file, deck, spreadsheet, PDF or plain text. One click strips the filler, stock AI phrases and hidden characters, and hands back the same file. The same dial converts, compresses and cleans metadata.',
 };
 
 function idleNote() {
   const section = sections.find((s) => s.id === current);
-  if (!section) return { title: 'How it works', rows: [['1', 'Drop any file on the dial, or click the +'], ['2', 'The dial shows what you can do with it'], ['3', 'Click one. You get the finished file']], foot: 'Word, PowerPoint, Excel, PDF, text, images, audio, archives.' };
-  return { title: section.title, rows: [['Drop', section.blurb]], foot: 'Point at the dial: each job opens its options in the outer ring.' };
+  if (!section) return { title: 'One click on Humanize', rows: [['Before', 'Certainly! It is important to note that the launch slipped by two weeks. I hope this helps!'], ['After', 'The launch slipped by two weeks.']], foot: 'Word, PowerPoint and Excel come back as the same file, with every style and table kept.', proof: true };
+  const jobs = section.items.map((item) => item.label).join(', ');
+  return { title: 'Point at the dial', rows: [['Jobs', jobs], ['Tip', 'Drop a file first and the dial only shows what fits it']], foot: 'Each job opens its options in the outer ring.' };
 }
 
 function loadedNote() {
@@ -106,7 +107,7 @@ export function showHub(sectionId) {
   const section = sections.find((s) => s.id === current);
   $('hub-title').textContent = section ? section.lede : HOME.title;
   $('hub-lede').textContent = section ? section.blurb : HOME.lede;
-  $('hub-eyebrow').textContent = section ? section.title : 'Free · No sign-up · Files never leave your device';
+  $('hub-eyebrow').textContent = section ? section.title : 'Humanizer · Converter · PDF tools';
   refresh();
 }
 

@@ -31,12 +31,17 @@
 <main id="hub-view" class="hub">
   <section class="hub-top">
     <div class="hub-copy">
-      <p class="eyebrow" id="hub-eyebrow">Free · No sign-up · Files never leave your device</p>
+      <p class="eyebrow" id="hub-eyebrow">Humanizer · Converter · PDF tools</p>
       <h1 id="hub-title"></h1>
       <p id="hub-lede" class="lede"></p>
       <aside id="hub-info" class="dial-info" aria-live="polite"></aside>
       <div class="hub-buttons"><button class="primary" id="hub-pick">Choose a file</button><button class="text-button" id="hub-clear" hidden>Start over</button></div>
       <p id="hub-error" class="office-error" role="alert" hidden></p>
+      <ul class="trust" aria-label="Why it’s safe">
+        <li><svg aria-hidden="true"><use href="#lock"/></svg><span><strong>Never uploaded</strong>Runs in this tab. Nothing goes to a server.</span></li>
+        <li><svg aria-hidden="true"><use href="#check"/></svg><span><strong>No account</strong>No sign-up, no email, no watermark.</span></li>
+        <li><svg aria-hidden="true"><use href="#shield"/></svg><span><strong>No tracking</strong>No analytics or ad scripts on the page.</span></li>
+      </ul>
     </div>
     <div class="dial-wrap"><div id="hub-dial"></div></div>
   </section>
@@ -54,7 +59,7 @@
     <div class="primary-row"><button id="run" class="primary" disabled>Polish it</button></div>
     <details id="options" class="options"><summary>Options</summary><div class="options-content"><label>Format <select id="format"><option value="txt">Plain text</option><option value="md">Markdown</option></select></label><div id="cleanup-settings" class="options-content"><label><input type="checkbox" id="spaces" checked> Turn non-breaking spaces into normal ones</label><label><input type="checkbox" id="soft-hyphens" checked> Remove hidden hyphens</label><label><input type="checkbox" id="zero-width"> Remove zero-width spaces <small>Can join words in some languages.</small></label><label><input type="checkbox" id="punctuation"> Plain punctuation <small>Swaps em dashes, curly quotes and … for keyboard versions.</small></label></div><label for="locks">Never change these phrases</label><textarea id="locks" rows="2" maxlength="2000" placeholder="One per line"></textarea><small>Up to 50. Case matters.</small></div></details>
     <section id="output" class="output" aria-labelledby="output-title" hidden><div class="output-header"><h2 id="output-title">Result</h2><span id="edit-count"></span><button id="copy" class="text-button">Copy</button><button id="download" class="text-button">Download</button></div><div id="result" class="result" tabindex="0"></div><div id="character-report" class="character-report" hidden></div><details id="changes-panel" class="changes-panel"><summary id="changes-title">See changes</summary><div class="review-actions"><button id="keep-all" class="text-button">Keep all</button><button id="reject-all" class="text-button">Undo all</button></div><div id="changes"></div></details></section>
-    <div class="output-empty"><svg aria-hidden="true"><use href="#sparkle"/></svg><p>Paste or open a draft on the left, then hit the button. The humanized version shows up here.</p></div>
+    <div class="output-empty"><svg aria-hidden="true"><use href="#sparkle"/></svg><p>Paste or open a draft, then press Humanize it. The cleaned version shows up here with every change marked.</p></div>
   </section>
   <input id="file-input" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
 </main>
@@ -178,7 +183,10 @@
 </main>
 <main id="upcoming-view" class="upcoming-page" hidden><a class="back-link" href="#home"><span aria-hidden="true">←</span> All tools</a><div class="upcoming-content"><span id="upcoming-status" class="status">Coming soon</span><h1 id="upcoming-title"></h1><p id="upcoming-description"></p><a class="primary" href="#light-edit">Polish a draft instead</a></div></main>
 </div>
-<footer class="footer"><span>Runs in your browser. Your text and files never leave this tab.</span><div><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></div></footer>
+<footer class="footer">
+  <div class="footer-brand"><a class="brand" href="#home"><img src="./mark.svg" width="22" height="22" alt="">whitewash</a><p>Runs in your browser. Your text and files never leave this tab.</p></div>
+  <nav class="footer-links" aria-label="Footer"><a href="#humanize">Humanize</a><a href="#pdf">PDF</a><a href="#convert">Convert</a><a href="#metadata">Wipe metadata</a><a href="https://github.com/mahikshith/whitewash" rel="noopener">Source on GitHub</a><button id="privacy" class="text-button">Privacy</button><button id="help" class="text-button">Help</button></nav>
+</footer>
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
 
 <div id="island" class="island" role="status" aria-live="polite" hidden>

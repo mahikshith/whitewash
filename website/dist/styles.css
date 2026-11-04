@@ -126,8 +126,12 @@ select { margin-left:8px; padding:5px 10px; background:var(--soft); border:1px s
 .upcoming-content p { color:var(--muted); max-width:480px; margin:0 0 28px; font-size:16px; }
 
 /* Footer, notices, dialog */
-.footer { max-width:1080px; margin:24px auto 0; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:22px 0 30px; border-top:1px solid var(--border); color:var(--muted); font-size:13px; }
-.footer>div { display:flex; gap:22px; }
+.footer { max-width:1192px; margin:40px auto 0; display:flex; align-items:flex-start; justify-content:space-between; gap:28px; padding:28px 24px 36px; border-top:1px solid var(--border); color:var(--muted); font-size:13px; }
+.footer-brand .brand { font-size:18px; color:var(--ink); }
+.footer-brand p { margin:8px 0 0; max-width:300px; }
+.footer-links { display:flex; flex-wrap:wrap; align-items:center; gap:10px 22px; padding-top:4px; }
+.footer-links a { text-decoration:none; }
+.footer-links a:hover { color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
 .notice { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:70; max-width:calc(100vw - 32px); padding:12px 20px; background:var(--ink); color:var(--page); border-radius:999px; font-size:14px; box-shadow:0 8px 28px rgba(0,0,0,.2); }
 .notice:empty { display:none; }
 dialog { width:calc(100% - 32px); max-width:580px; max-height:85vh; padding:28px; color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:26px; }
@@ -426,3 +430,37 @@ dialog::backdrop { background:rgba(10,10,12,.45); backdrop-filter:blur(4px); }
 }
 .tab:nth-child(n+5) .tab-menu { left:auto; right:-8px; }
 :root[data-theme="dark"] .dial-seg.child path { fill:#45454d; stroke:#45454d; }
+
+/* Trust row under the homepage buttons */
+.trust { list-style:none; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; margin:28px 0 0; padding:20px 0 0; border-top:1px solid var(--border); }
+.trust li { display:flex; gap:10px; align-items:flex-start; font-size:12.5px; line-height:1.4; color:var(--muted); }
+.trust svg { flex:none; width:18px; height:18px; margin-top:1px; fill:none; stroke:var(--ink); stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.trust strong { display:block; color:var(--ink); font-size:13.5px; font-weight:650; margin-bottom:2px; }
+
+/* Before/after card on the homepage */
+.dial-info.proof dd { font-size:14.5px; line-height:1.5; }
+.dial-info.proof dd:nth-of-type(1) { color:var(--muted); text-decoration:line-through; text-decoration-color:color-mix(in srgb, var(--removed) 70%, transparent); text-decoration-thickness:1.5px; }
+.dial-info.proof dd:nth-of-type(2) { font-weight:600; }
+.dial-info.proof dd:nth-of-type(2)::before { content:""; display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--ink) 80%, transparent); vertical-align:1px; }
+
+/* Single-tool pages: the entry reads as a drop zone, not a lone button */
+.panel>.office-entry,.file-entry { margin:16px; padding:36px 24px; border:2px dashed color-mix(in srgb, var(--ink) 16%, transparent); border-radius:20px; background:color-mix(in srgb, var(--page) 55%, var(--surface)); transition:border-color .2s, background .2s; }
+.panel>.office-entry:hover { border-color:color-mix(in srgb, var(--ink) 35%, transparent); }
+.drop-active .panel>.office-entry,.drop-active .file-entry { border-color:var(--ink); background:color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+
+@media (max-width:900px) {
+  .trust { grid-template-columns:1fr; gap:12px; }
+}
+@media (max-width:620px) {
+  /* Phone header: brand and buttons on top, the format tabs on their own scrolling row */
+  .header { height:auto; flex-wrap:wrap; row-gap:0; padding-top:10px; }
+  .header .brand { margin-right:auto; }
+  .section-tabs { order:3; flex:1 0 100%; height:46px; margin:0 -16px; padding:0 12px; overflow-x:auto; scrollbar-width:none; mask-image:linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 28px), transparent); -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 28px), transparent); }
+  .section-tabs::-webkit-scrollbar { display:none; }
+  .dial-hub-icon { width:24px; height:24px; margin:0; }
+  .dial-hub-icon svg { width:22px; height:22px; }
+  .dial-hub strong { font-size:13px; }
+  .dial-hub span:last-child { display:none; }
+  .footer { flex-direction:column; gap:16px; margin:24px 0 0; padding:24px 16px 32px; }
+  .panel>.office-entry,.file-entry { margin:12px; padding:28px 16px; }
+}
