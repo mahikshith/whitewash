@@ -53,3 +53,22 @@ test('back-to-back openers still leave a capital at the start of the sentence', 
   const mid = 'We met, and it is important to note that budgets slipped.';
   assert.equal(applyEdits(mid, proposeEdits(mid, { mode: 'humanize' })), 'We met, and budgets slipped.');
 });
+
+test('openers after list markers and headings, names, and chains of openers', () => {
+  const h = (text) => applyEdits(text, proposeEdits(text, { mode: 'humanize' }));
+  const cases = [
+    ["- In today's fast-paced world, teams move fast.", '- Teams move fast.'],
+    ["## In today's fast-paced world, headings work", '## Headings work'],
+    ['1. Certainly! we ship.', '1. We ship.'],
+    ['It is important to note that iPhone sales rose.', 'iPhone sales rose.'],
+    ['It is important to note that eBay grew.', 'eBay grew.'],
+    ["Overall, it's worth mentioning that results vary.", 'Results vary.'],
+    ['Ultimately, at the end of the day, it is what it is.', 'It is what it is.'],
+    ['Thanks. I hope this helps! Let me know if you have any questions.', 'Thanks.'],
+    ['We shipped at the end of the day. Overall the team did well.', 'We shipped at the end of the day. Overall the team did well.'],
+  ];
+  for (const [input, expected] of cases) {
+    assert.equal(h(input), expected, input);
+    assert.equal(h(expected), expected, 'running Humanize twice changes nothing: ' + input);
+  }
+});
