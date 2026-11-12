@@ -1,6 +1,7 @@
-// "Read text from scans": images or scanned PDFs → text, polish, or a
-// searchable PDF.
-import { recognize, joinPdfs, pdfPagesForOcr } from './conv-ocr.js';
+// "Read text from scans": images or scanned PDFs → text, a Word or Markdown
+// file that keeps the layout of the scan, polish, or a searchable PDF.
+import { recognize, joinPdfs, pdfPagesForOcr, blocksFromOcr, textFromOcr } from './conv-ocr.js';
+import { toDocx, toMarkdown } from './conv-doc.js';
 import { fileKind } from './actions.js';
 import { dropZone } from './files.js';
 import * as island from './island.js';
@@ -27,11 +28,9 @@ export async function loadOcr(list) {
     say('Getting pages ready…');
     const sources = pdfs.length ? await pdfPagesForOcr(new Uint8Array(await pdfs[0].arrayBuffer()), (n, total) => say('Preparing page ' + n + ' of ' + total + '…')) : images;
     say('Starting the text reader…');
-    const widths = sources.map((source) => source.pageWidth);
     result = await recognize(sources, { pdf: true, onPage: (n, total, p) => say('Reading page ' + n + ' of ' + total + '… ' + Math.round(p * 100) + '%') });
     if (version !== generation) return;
-    result.widths = widths;
-    const text = result.pages.map((p) => p.text.trim()).join('\n\n');
+    const text = textFromOcr(result.pages);
     const confidence = Math.round(result.pages.reduce((s, p) => s + p.confidence, 0) / result.pages.length);
     $('ocr-text').value = text;
     say(text.trim() ? 'Found ' + text.split(/\s+/).filter(Boolean).length.toLocaleString() + ' words on ' + result.pages.length + (result.pages.length === 1 ? ' page' : ' pages') + ' · ' + (confidence >= 85 ? 'clear read' : confidence >= 65 ? 'mostly clear, check it' : 'hard to read, check carefully') : 'No text found. Try a sharper, straighter scan.');
@@ -43,11 +42,18 @@ function fail(message) { $('ocr-error').textContent = message; $('ocr-error').hi
 $('ocr-pick').addEventListener('click', () => $('ocr-input').click());
 $('ocr-input').addEventListener('change', () => { const list = [...$('ocr-input').files]; $('ocr-input').value = ''; if (list.length) loadOcr(list); });
 $('ocr-copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('ocr-text').value); island.done('Copied', 'The text is on your clipboard'); } catch { $('ocr-text').select(); } });
+// Word and Markdown are written from the structure found in the scan, not from the text box.
+$('ocr-docx').addEventListener('click', async () => {
+  if (!result) return;
+  try { island.saveBlob(new Blob([await toDocx(blocksFromOcr(result.pages))], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), baseName + '.docx'); }
+  catch (error) { fail('Couldn’t build the Word file: ' + error.message); }
+});
+$('ocr-md').addEventListener('click', () => { if (result) island.saveBlob(new Blob([toMarkdown(blocksFromOcr(result.pages))], { type: 'text/markdown;charset=utf-8' }), baseName + '.md'); });
 $('ocr-save').addEventListener('click', () => island.saveBlob(new Blob([$('ocr-text').value], { type: 'text/plain;charset=utf-8' }), baseName + '.txt'));
 $('ocr-polish').addEventListener('click', () => onPolish?.($('ocr-text').value, baseName + '.txt'));
 $('ocr-pdf').addEventListener('click', async () => {
   if (!result?.pages.every((p) => p.pdf)) return;
-  try { island.saveBlob(new Blob([await joinPdfs(result.pages.map((p) => p.pdf), result.widths)], { type: 'application/pdf' }), baseName + '-searchable.pdf'); }
+  try { island.saveBlob(new Blob([await joinPdfs(result.pages.map((p) => p.pdf), result.pages.map((p) => p.pageWidth))], { type: 'application/pdf' }), baseName + '-searchable.pdf'); }
   catch (error) { fail('Couldn’t build the searchable PDF: ' + error.message); }
 });
 dropZone($('ocr-view'), loadOcr);

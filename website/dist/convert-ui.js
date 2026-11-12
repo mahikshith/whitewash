@@ -61,7 +61,7 @@ export function showConvert(tool) {
 function note(option) {
   if (option?.from) { renderNote($('convert-note'), { title: FORMATS[option.from].name, rows: [['Turns into', targets(option.from).map((t) => FORMATS[t].label).join(', ')]], foot: 'Click to pick it.' }); return; }
   if (option?.to) { renderNote($('convert-note'), routeNote(option.preFrom || from, option.to)); return; }
-  if (!from) { renderNote($('convert-note'), { title: 'How it works', rows: [['1', 'Drop a file, or pick its format on the left'], ['2', 'The dial shows everything it can become'], ['3', 'Click one. The new file downloads']], foot: 'Documents keep their headings, lists, tables and links.' }); return; }
+  if (!from) { renderNote($('convert-note'), { title: 'How it works', rows: [['1', 'Drop a file, or pick its format on the left or on the dial'], ['2', 'The dial shows everything it can become'], ['3', 'Click one. The new file saves to your downloads']], foot: 'Documents keep their headings, lists, tables and links.' }); return; }
   const target = pending && targets(from).includes(pending) ? pending : null;
   if (target) { renderNote($('convert-note'), routeNote(from, target)); return; }
   renderNote($('convert-note'), { title: files.length ? 'Pick a format' : FORMATS[from].name, rows: [[files.length ? 'File' : 'Next', files.length ? files.map((f) => f.name).slice(0, 3).join(', ') + (files.length > 3 ? '…' : '') : 'Drop a ' + FORMATS[from].label + ' file, or click a format on the dial and choose the file after']], foot: 'Point at a format to see what you get.' });
@@ -73,13 +73,13 @@ function render() {
   $('convert-files').replaceChildren(...files.slice(0, 6).map((file) => listRow(file.name, formatBytes(file.size))));
   if (!from) {
     // Two layers: what you have on the inside, what it can become outside.
-    dial.set(POPULAR.filter((id) => FORMATS[id]).map((id) => ({ id: 'from-' + id, label: FORMATS[id].label, hint: 'Convert a ' + FORMATS[id].name, from: id,
-      children: targets(id).slice(0, 10).map((t) => ({ id: 'pre-' + id + '-' + t, label: FORMATS[t].label, hint: 'Make it ' + FORMATS[t].name, preFrom: id, to: t })) })), { title: 'Drop a file', sub: 'or point at what it is', icon: 'plus', state: 'idle' });
+    dial.set(POPULAR.filter((id) => FORMATS[id]).map((id) => ({ id: 'from-' + id, label: FORMATS[id].label, hint: 'Convert a ' + FORMATS[id].name, question: 'Turn ' + FORMATS[id].label + ' into…', from: id,
+      children: targets(id).slice(0, 10).map((t) => ({ id: 'pre-' + id + '-' + t, label: FORMATS[t].label, hint: 'Make it ' + FORMATS[t].name, preFrom: id, to: t })) })), { title: 'Drop a file', sub: 'or click to choose', icon: 'plus', state: 'idle', caption: 'What kind of file do you have?' });
   } else {
     const list = targets(from);
     dial.set(list.map((to) => ({ id: 'to-' + to, label: FORMATS[to].label, hint: 'Make it ' + FORMATS[to].name, to, primary: to === pending })),
-      files.length ? { title: files.length === 1 ? files[0].name : files.length + ' files', sub: 'click a format', icon: 'check', state: 'loaded' }
-        : { title: FORMATS[from].label, sub: 'drop a file or click here', icon: 'plus', state: 'idle' });
+      files.length ? { title: files.length === 1 ? files[0].name : files.length + ' files', sub: 'click here to change it', icon: 'check', state: 'loaded', caption: 'Turn ' + (files.length === 1 ? files[0].name : files.length + ' files') + ' into…' }
+        : { title: FORMATS[from].label, sub: 'drop a file or click here', icon: 'plus', state: 'idle', caption: 'Turn ' + FORMATS[from].label + ' into… (pick one, then choose your file)' });
   }
   if (!last) $('convert-output').hidden = true;
   $('convert-error').hidden = true;

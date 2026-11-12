@@ -33,22 +33,31 @@ export function routeNote(from, to) {
     rows.push(['You get', 'One ' + FORMATS[to].label + ' per page at double resolution, zipped if there’s more than one']);
     rows.push(['Keeps', 'Exactly how each page looks']);
     rows.push(['Drops', 'Selectable text and links']);
+  } else if (from === 'pptx' && to === 'pdf') {
+    rows.push(['You get', 'One PDF page per slide, at the slide’s size']);
+    rows.push(['Keeps', 'Layout, backgrounds, pictures, shapes, tables, colours, text sizes and bullets, with text you can select']);
+    rows.push(['Drops', 'Animations, video and notes. Text is drawn in Noto Sans, so line breaks can shift a little from your fonts. Charts and SmartArt show their saved preview picture, or a plain box if the deck has none']);
+  } else if (from === 'pdf' && to === 'pptx') {
+    rows.push(['You get', 'One slide per page, the same size as the page']);
+    rows.push(['Keeps', 'How the page looks, as a background picture, with the text on top as real text boxes you can edit']);
+    rows.push(['Drops', 'Drawings and tables stay part of the background picture, so only the text can be edited. Fonts fall back to ones on your computer']);
   } else if (from === 'pdf') {
-    rows.push(['You get', 'An editable ' + name(to) + ' with the PDF’s text']);
-    rows.push(['Keeps', 'Text, paragraphs, and headings (guessed from font size)']);
-    rows.push(['Drops', 'Layout, images and columns. Tables become plain lines. Scanned pages have no text, so use Read text from scans first']);
+    rows.push(['You get', 'An editable ' + name(to) + ' rebuilt from the PDF']);
+    rows.push(['Keeps', 'Headings, paragraphs, bold and italic, lists, simple tables, pictures and two-column reading order']);
+    rows.push(['Drops', 'Exact page layout and fonts. Complex tables can come out as plain lines. Scanned pages are read with OCR (English), which is slower and can misread words']);
   } else if (DATA.includes(from) || (['html', 'md'].includes(from) && DATA.includes(to))) {
     rows.push(['You get', to === 'csv' || to === 'tsv' ? 'One ' + FORMATS[to].label + ' per sheet' : to === 'json' ? 'A list of rows keyed by the header row. Numbers stay numbers' : to === 'pdf' || to === 'docx' ? 'Each sheet as a table' : 'A ' + name(to) + ' with every sheet']);
     rows.push(['Keeps', 'Cell values as shown']);
-    rows.push(['Drops', 'Formulas (their results stay), formatting, charts and merged cells' + (to === 'pdf' ? '. Chinese, Japanese, Korean and emoji show as ?' : '')]);
+    rows.push(['Drops', 'Formulas (their results stay), formatting, charts and merged cells']);
   } else if (['srt', 'vtt'].includes(from)) {
     rows.push(['You get', to === 'txt' ? 'Just the spoken lines, one per line' : 'The same subtitles in ' + FORMATS[to].label + ' format']);
     rows.push(['Keeps', to === 'txt' ? 'The words' : 'Every line and its timing']);
     if (to !== 'txt') rows.push(['Drops', 'Styling and position tags']);
   } else if (DOCS.includes(from)) {
-    rows.push(['You get', to === 'pdf' ? 'A clean PDF with real, selectable text' : to === 'epub' ? 'An e-book with a chapter for each main heading' : 'A ' + name(to)]);
-    rows.push(['Keeps', from === 'pptx' ? 'Slide titles and text, one section per slide' : 'Headings, lists, tables, links, bold and italic']);
-    rows.push(['Drops', (from === 'pptx' ? 'Slide design, pictures and animations' : 'Page layout, fonts, colours and images') + (to === 'pdf' ? '. Chinese, Japanese, Korean and emoji show as ?' : '')]);
+    const flat = to === 'txt';
+    rows.push(['You get', to === 'pdf' ? 'A clean PDF with real, selectable text and working links' : to === 'epub' ? 'An e-book with a chapter for each main heading' : to === 'pptx' ? 'A deck with a slide for each heading' : to === 'md' ? 'Markdown, with any pictures saved beside it in a ZIP' : 'A ' + name(to)]);
+    rows.push(['Keeps', flat ? 'The words, in order, with list markers' : from === 'pptx' ? 'Slide titles as headings, bullets with their levels, tables, pictures and speaker notes' : 'Headings, real lists with their levels and numbers, tables, links, bold, italic, underline, strikethrough, code blocks, quotes and pictures']);
+    rows.push(['Drops', flat ? 'All formatting and pictures' : from === 'pptx' ? 'Slide design and positions. For a copy that looks like the slides, pick PDF' : (from === 'docx' ? 'Fonts, headers, footers, text boxes’ positions and page margins' : from === 'md' ? 'Pictures that are web links or separate files (their caption stays)' : 'Fonts, colours from style sheets and page layout') + (to === 'pdf' ? '. Text is set in Noto Sans' : '')]);
   }
   return { title, rows, foot: 'Runs on this device. Nothing is uploaded.' };
 }
@@ -68,7 +77,7 @@ const TOOL = {
   compress: { title: 'Shrink PDF', rows: [['You get', 'The same PDF, smaller, with photos re-saved at a lower resolution'], ['Keeps', 'Text, fonts and drawings, sharp and selectable'], ['Note', 'If it can’t get smaller you get the original back']] },
   sign: { title: 'Sign', rows: [['You get', 'Your drawn signature placed on the page you pick'], ['Note', 'A visible signature, not a certificate-based digital signature']] },
   squeeze: { title: 'Shrink images', rows: [['You get', 'Smaller files at up to 2560 px, tuned with MozJPEG and OxiPNG'], ['Drops', 'Camera details like location']] },
-  ocr: { title: 'Read the text', rows: [['You get', 'The words in the image as text you can copy, polish or save'], ['Also', 'A searchable PDF of the image'], ['Note', 'English only for now. Clear, straight photos work best']] },
+  ocr: { title: 'Read the text', rows: [['You get', 'The words in the image, with headings, lists and tables kept, to save as Word, Markdown or text'], ['Also', 'A searchable PDF of the image'], ['Note', 'English only for now. Clear, straight photos work best']] },
   edit: { title: 'Edit', rows: [['You get', 'The text in the editor, already humanized, with every change marked'], ['Then', 'Undo any change, edit by hand, copy or download']] },
   protect: { title: 'Lock with a password', rows: [['You get', 'The same PDF, needing a password to open (AES-256)']] },
   unlock: { title: 'Remove the password', rows: [['You get', 'A copy that opens without a password'], ['Needs', 'The password, typed once']] },

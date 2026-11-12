@@ -62,7 +62,7 @@ const ALIASES = { htm: 'html', xhtml: 'html', markdown: 'md', jpeg: 'jpg', text:
 const MIME_ALIASES = { 'audio/mp3': 'mp3', 'audio/x-wav': 'wav', 'audio/wave': 'wav', 'audio/x-flac': 'flac', 'audio/x-m4a': 'm4a', 'audio/m4a': 'm4a', 'application/x-zip-compressed': 'zip', 'application/x-rar-compressed': 'rar', 'application/x-gzip': 'gz', 'application/x-tar': 'tar' };
 
 const DOC_IN = ['txt', 'md', 'html', 'docx', 'odt', 'epub', 'pdf', 'pptx'];
-const DOC_OUT = ['pdf', 'docx', 'md', 'html', 'txt', 'odt', 'rtf', 'epub'];
+const DOC_OUT = ['pdf', 'docx', 'md', 'html', 'txt', 'odt', 'rtf', 'epub', 'pptx'];
 const DATA_IN = ['csv', 'tsv', 'json', 'xlsx', 'ods'];
 const DATA_OUT = ['xlsx', 'csv', 'tsv', 'json', 'ods', 'md', 'html', 'pdf', 'docx'];
 const TABLE_ONLY = ['csv', 'tsv', 'json', 'xlsx', 'ods'];
@@ -135,23 +135,23 @@ export const writeVtt = (cues) => 'WEBVTT\n\n' + cues.map((c) => c.start + ' -->
 // ---------- Documents and tables ----------
 async function readDoc(file, from, progress) {
   if (from === 'txt') return docs.blocksFromText(await text(file));
-  if (from === 'md') { const md = await libs.marked(); return docs.blocksFromHtml(md.parse(await text(file), { gfm: true })); }
-  if (from === 'html') return docs.blocksFromHtml(await text(file));
-  if (from === 'docx') {
-    const mammoth = await libs.mammoth();
-    // mammoth's own errors talk about zip internals; say what the person can act on.
-    const result = await mammoth.convertToHtml({ arrayBuffer: await file.arrayBuffer() }, { convertImage: mammoth.images.imgElement(() => ({ src: '' })) })
-      .catch(() => { throw new Error('This Word file looks damaged, or it isn’t a .docx. Old .doc files need saving as .docx first.'); });
-    return docs.blocksFromHtml(result.value);
-  }
+  if (from === 'md') return docs.resolveImages(docs.blocksFromMarkdown(await text(file), await libs.marked()));
+  if (from === 'html') return docs.resolveImages(docs.blocksFromHtml(await text(file)));
+  if (from === 'docx') return docs.blocksFromDocx(await bytesOf(file));
   if (from === 'odt') return docs.blocksFromHtml(await docs.htmlFromOdt(await bytesOf(file)));
-  if (from === 'epub') return docs.blocksFromHtml(await docs.htmlFromEpub(await bytesOf(file)));
-  if (from === 'pptx') return docs.blocksFromHtml(await docs.htmlFromPptx(await bytesOf(file)));
+  if (from === 'epub') return docs.blocksFromEpub(await bytesOf(file));
+  if (from === 'pptx') return (await import('./pptx-read.js')).blocksFromPptx(await bytesOf(file));
   if (from === 'pdf') {
-    const { textPages } = await import('./conv-pdf.js');
-    const doc = docs.blocksFromPdfText(await textPages(await bytesOf(file), (n, total) => progress?.('Reading page ' + n + ' of ' + total)));
-    if (!doc.blocks.length) throw new Error('No text found. This PDF may be scanned pages. Run it through Read text from scans first.');
-    return doc;
+    const { extractPages, blocksFromPdfPages } = await import('./pdf-extract.js');
+    const doc = blocksFromPdfPages(await extractPages(await bytesOf(file), { onPage: (n, total) => progress?.('Reading page ' + n + ' of ' + total) }));
+    if (doc.blocks.some((b) => b.t !== 'img')) return doc;
+    // Scanned pages have no text to copy, so read them with OCR instead.
+    const ocr = await import('./conv-ocr.js');
+    const sources = await ocr.pdfPagesForOcr(await bytesOf(file), (n, total) => progress?.('Preparing page ' + n + ' of ' + total));
+    const read = await ocr.recognize(sources, { onPage: (n, total) => progress?.('Reading scanned page ' + n + ' of ' + total) });
+    const scanned = ocr.blocksFromOcr(read.pages);
+    if (!scanned.blocks.length) throw new Error('No text found in this PDF, even after reading it as a scan.');
+    return scanned;
   }
   if (DATA_IN.includes(from)) return docs.blocksFromTable(await readTable(file, from));
   throw new Error('Can’t read ' + from + ' files yet.');
@@ -176,6 +176,7 @@ async function writeDoc(doc, to) {
   if (to === 'rtf') return docs.toRtf(doc);
   if (to === 'epub') return docs.toEpub(doc);
   if (to === 'pdf') return docs.toPdf(doc, libs);
+  if (to === 'pptx') { const { writePptx, blocksToSlides } = await import('./pptx-write.js'); return writePptx(blocksToSlides(doc)); }
   throw new Error('Can’t write ' + to + '.');
 }
 
@@ -282,6 +283,16 @@ export async function convertFile(file, to, progress) {
     const { images } = await renderPages(await bytesOf(file), { type: FORMATS[to].mime, scale: 2, onPage: (n, total) => progress?.('Drawing page ' + n + ' of ' + total) });
     return images.map((image) => ({ blob: image.blob, name: baseName(file.name) + '-page-' + String(image.page).padStart(String(images.length).length, '0') + '.' + to }));
   }
+  // Two routes are about how pages look, not how text flows, so they skip the
+  // block list: slides are drawn onto PDF pages, and PDF pages become slides.
+  if (from === 'pptx' && to === 'pdf') {
+    const { pptxToPdf } = await import('./pptx-render.js');
+    return wrap(await pptxToPdf(await bytesOf(file), libs, (n, total) => progress?.('Drawing slide ' + n + ' of ' + total)));
+  }
+  if (from === 'pdf' && to === 'pptx') {
+    const { pdfToPptx } = await import('./pdf-to-pptx.js');
+    return wrap(await pdfToPptx(await bytesOf(file), { onPage: (n, total) => progress?.('Rebuilding page ' + n + ' of ' + total) }));
+  }
   if (SUBS.includes(from)) {
     const cues = parseSubtitles(await text(file));
     return wrap(to === 'srt' ? writeSrt(cues) : to === 'vtt' ? writeVtt(cues) : cues.map((c) => c.text).join('\n') + '\n');
@@ -298,6 +309,14 @@ export async function convertFile(file, to, progress) {
   const doc = await readDoc(file, from, progress);
   if (!doc.title) doc.title = baseName(file.name);
   progress?.('Writing ' + FORMATS[to].label);
+  // Markdown can't hold pictures, so they are saved beside it and linked.
+  const pictures = to === 'md' ? doc.blocks.filter((b) => b.t === 'img') : [];
+  if (pictures.length) {
+    const stem = baseName(file.name).replace(/[^\w.-]+/g, '-') || 'file';
+    const names = pictures.map((b, i) => stem + '-image-' + (i + 1) + (b.mime === 'image/jpeg' ? '.jpg' : '.png'));
+    const markdown = docs.toMarkdown(doc, { image: (_, i) => names[i] });
+    return [...wrap(markdown), ...pictures.map((b, i) => ({ blob: new Blob([b.bytes], { type: b.mime }), name: names[i] }))];
+  }
   return wrap(await writeDoc(doc, to));
 }
 

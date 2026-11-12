@@ -9,6 +9,7 @@
 | [conversion-research.md](conversion-research.md) | What iLovePDF, Smallpdf, PDF24, CloudConvert and the open-source browser converters offer, and which of those can run fully in a browser |
 | [copy-audit.md](copy-audit.md) | Why the current site reads as machine-written, line by line |
 | [audio-archives-synthid.md](audio-archives-synthid.md) | Browser audio and archive libraries compared, why video is out, and the SynthID removal repos with the decision not to build it |
+| [conversion-teardown.md](conversion-teardown.md) | How ppt-master, pdf2docx, markitdown, PPTXjs, mammoth, docxjs and pandoc keep formatting, and what we took from each (12 November 2026) |
 | [later.md](later.md) | Parked ideas, including AI features with your own key or paid credits |
 
 ## Sources

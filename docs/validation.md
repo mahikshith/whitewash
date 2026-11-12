@@ -47,3 +47,13 @@ Final copy verification: all thirteen feature titles explicitly contain AI. Brow
 ## Before-and-after homepage cards
 
 18 October 2026. All thirteen catalog entries define an input and an outcome. Browser checks confirmed thirteen visible conversion flows/arrows, retained New/Soon/Research badges and matching accessible status labels. Desktop cards use a right arrow; at a 334 CSS px mobile width the sequence stacks with a down arrow and no horizontal overflow. Both themes were checked. JavaScript syntax and catalog completeness checks passed. Text/file processing was unchanged, so the processing suite and file round trips were not rerun for this presentation-only update.
+
+## Conversion rewrite and real-file pass
+
+12 November 2026. 133 Node tests pass. The document engine, the slide renderer, PDF reading, PDF to PowerPoint and OCR layout were rewritten; details are in [conversions.md](conversions.md).
+
+111 real files from public repositories were run through every route in headless Chromium against the served site, about 620 conversions, all completing. Outputs of the main routes (Word to PDF, PowerPoint to PDF, PDF to PowerPoint, PDF to Word, Markdown to Word and PDF, OCR) were rendered and compared side by side with LibreOffice's rendering of the originals. The twelve defects that pass found, including Microsoft Office files being rejected outright, are listed in conversions.md and fixed.
+
+The page flow (drop a file, pick from the list, drill into a group, save, result card, pending conversion, phone width, dark mode) was driven in Chromium with no console errors and no horizontal overflow at 390 px.
+
+Not done: opening the outputs in Microsoft Office or Keynote, a screen-reader pass on the new job list, Safari and Firefox runs, and real phone photos for OCR.
