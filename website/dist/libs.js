@@ -17,7 +17,6 @@ function script(file, global) {
 
 export const pdfLib = () => once('pdf-lib', () => import('./vendor/pdf-lib.esm.min.js'));
 export const fontkit = () => script('fontkit.umd.min.js', 'fontkit');
-export const mammoth = () => script('mammoth.browser.min.js', 'mammoth');
 export const marked = () => once('marked', () => import('./vendor/marked.esm.js').then((m) => m.marked));
 export const pdfjs = () => once('pdfjs', async () => {
   const lib = await import('./vendor/pdfjs/pdf.min.mjs');
@@ -50,3 +49,24 @@ export const archive = () => once('archive', async () => {
 export const fflate = () => once('fflate', () => import('./vendor/fflate.mjs'));
 export const tesseract = () => once('tesseract', () => import('./vendor/tesseract/tesseract.esm.min.js').then((m) => m.default || m));
 export const tesseractPaths = () => ({ workerPath: new URL('tesseract/worker.min.js', base).href, corePath: new URL('tesseract/core/', base).href, langPath: new URL('tesseract/lang/', base).href, gzip: true });
+
+// Text the PDF fonts can't draw (emoji, Chinese, Japanese, Korean, Arabic…),
+// drawn by the browser with the device's own fonts and returned as a PNG.
+const textImages = new Map();
+export function textImage(text, { bold = false, color = '1A1A1F' } = {}) {
+  const key = text + '|' + bold + '|' + color;
+  if (textImages.has(key)) return textImages.get(key);
+  const em = 64, canvas = document.createElement('canvas'), context = canvas.getContext('2d');
+  const font = (bold ? '700 ' : '') + em + 'px system-ui, "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Noto Sans CJK SC", sans-serif';
+  context.font = font;
+  const width = context.measureText(text).width;
+  if (!width) { textImages.set(key, null); return null; }
+  canvas.width = Math.ceil(width) + 4; canvas.height = Math.ceil(em * 1.5);
+  context.font = font; context.fillStyle = '#' + color; context.textBaseline = 'alphabetic';
+  context.fillText(text, 2, em * 1.1);
+  const raw = atob(canvas.toDataURL('image/png').split(',')[1]), bytes = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+  const made = { bytes, width, canvasWidth: canvas.width, height: canvas.height, baseline: em * 1.1, em };
+  textImages.set(key, made);
+  return made;
+}

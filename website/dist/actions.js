@@ -53,7 +53,7 @@ const PDF_LAYERED = () => [
   { ...writingActions('pdf')[0] }, to('docx', 'Turn it into an editable Word file'),
   tool('compress', 'Compress', 'Make the file smaller for email', 'pdf-compress'),
   edit,
-  group('convert', 'Convert', 'Turn it into another format', 'swap', [tool('to-images', 'JPG', 'Save each page as an image', 'pdf-to-images'), to('png', 'Each page as a PNG'), to('md'), to('txt'), to('html'), to('epub')]),
+  group('convert', 'Convert', 'Turn it into another format', 'swap', [to('pptx', 'Each page as a slide you can edit'), tool('to-images', 'JPG', 'Save each page as an image', 'pdf-to-images'), to('png', 'Each page as a PNG'), to('md'), to('txt'), to('html'), to('epub')]),
   group('pages', 'Pages', 'Reorder, split, number or stamp', 'grid', [tool('organize', 'Reorder', 'Move, turn or delete pages', 'pdf-organize'), tool('split', 'Split', 'Pull out pages or save each one', 'pdf-split'), tool('numbers', 'Numbers', 'Add page numbers', 'pdf-numbers'), tool('watermark', 'Stamp', 'Add a watermark', 'pdf-watermark')]),
   group('secure', 'Secure', 'Sign it, lock it or unlock it', 'lock', [tool('sign', 'Sign', 'Draw your signature on it', 'pdf-sign'), tool('protect', 'Lock', 'Add a password', 'pdf-protect'), tool('unlock', 'Unlock', 'Remove a password', 'pdf-unlock')]),
   group('fix', 'Fix', 'Read a scan or repair a broken file', 'wrench', [tool('ocr', 'OCR', 'Read text from a scanned PDF', 'ocr'), tool('repair', 'Repair', 'Fix a PDF that won’t open', 'pdf-repair')]),
@@ -77,9 +77,9 @@ function layer(list) {
 }
 
 function single(format) {
-  if (format === 'txt' || format === 'md') return [...writingActions(format), to('pdf'), to('docx'), more];
-  if (format === 'docx') return [...writingActions(format), wipe, to('pdf'), to('md'), to('epub'), more];
-  if (format === 'pptx') return [...writingActions(format), wipe, to('pdf', 'Slide text as a PDF'), to('docx', 'Slide text as a Word file'), more];
+  if (format === 'txt' || format === 'md') return [...writingActions(format), to('pdf'), to('docx'), to('pptx', 'A slide for each heading'), to('html'), more];
+  if (format === 'docx') return [...writingActions(format), wipe, to('pdf'), to('md'), to('pptx', 'A slide for each heading'), to('epub'), more];
+  if (format === 'pptx') return [...writingActions(format), wipe, to('pdf', 'Every slide as a PDF page, looking the same'), to('docx', 'Slide text and pictures as a Word file'), to('md', 'Slide text as Markdown'), more];
   if (format === 'xlsx') return [...writingActions(format), wipe, to('csv'), to('json'), to('pdf', 'Table as a PDF'), more];
   if (format === 'pdf') return PDF_LAYERED();
   if (AUDIO.includes(format)) return [...['mp3', 'wav', 'flac', 'm4a', 'ogg', 'opus'].filter((f) => f !== format).map((f) => to(f)), more];

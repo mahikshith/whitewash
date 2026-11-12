@@ -2,7 +2,7 @@
 // { sheets: [{ name, rows: string[][] }] }. Values are kept as text; spreadsheet
 // formulas are read as their last saved result.
 import { readZip, unpack, deflateEntry, writeZip } from './office-zip.js';
-const BIG = { maxBytes: 60_000_000, maxEntries: 5000 };
+const BIG = { maxBytes: 60_000_000, maxEntries: 5000, maxExpanded: 200_000_000, maxPart: 60_000_000 };
 
 const encoder = new TextEncoder(), decoder = new TextDecoder();
 const MAX_CELLS = 2_000_000;

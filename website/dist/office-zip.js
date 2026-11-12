@@ -15,14 +15,14 @@ export function crc32(bytes) {
 
 // Converters pass larger limits: ebooks and workbooks are often bigger than
 // the Office files the editor tools handle.
-export async function readZip(bytes, { maxBytes = 10_000_000, maxEntries = 1000 } = {}) {
+export async function readZip(bytes, { maxBytes = 10_000_000, maxEntries = 1000, maxExpanded = MAX_EXPANDED, maxPart = 10_000_000 } = {}) {
   if (!(bytes instanceof Uint8Array) || bytes.length > maxBytes || bytes.length < 22) fail();
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const u16 = (at) => view.getUint16(at, true);
   const u32 = (at) => view.getUint32(at, true);
   let end = bytes.length - 22;
   for (; end >= Math.max(0, bytes.length - 65557); end--) {
-    if (u32(end) === 0x06054b50 && end + 22 + u16(end + 20) === bytes.length) break;
+    if (u32(end) === 0x06054b50 && end + 22 + u16(end + 20) <= bytes.length) break;
   }
   if (end < 0 || u32(end) !== 0x06054b50 || u16(end + 4) || u16(end + 6)) fail();
   const count = u16(end + 10);
@@ -37,7 +37,7 @@ export async function readZip(bytes, { maxBytes = 10_000_000, maxEntries = 1000 
     const crc = u32(cursor + 16), packed = u32(cursor + 20), size = u32(cursor + 24);
     const nameSize = u16(cursor + 28), extraSize = u16(cursor + 30), commentSize = u16(cursor + 32);
     const offset = u32(cursor + 42);
-    if (flags & ~0x808 || ![0, 8].includes(method) || u16(cursor + 34) || size === 0xffffffff || packed === 0xffffffff) fail();
+    if (flags & ~0x80e || ![0, 8].includes(method) || u16(cursor + 34) || size === 0xffffffff || packed === 0xffffffff) fail();
     if (cursor + 46 + nameSize + extraSize + commentSize > end || offset + 30 > u32(end + 16)) fail();
     const nameBytes = bytes.slice(cursor + 46, cursor + 46 + nameSize);
     const name = decoder.decode(nameBytes);
@@ -48,7 +48,7 @@ export async function readZip(bytes, { maxBytes = 10_000_000, maxEntries = 1000 
     if (start + packed > u32(end + 16) || localName !== nameSize || decoder.decode(bytes.subarray(offset + 30, offset + 30 + localName)) !== name) fail();
     if (!(flags & 8) && (u32(offset + 14) !== crc || u32(offset + 18) !== packed || u32(offset + 22) !== size)) fail();
     expanded += size;
-    if (expanded > MAX_EXPANDED || size > 10_000_000) throw new Error('This package is too large when expanded (30 MB total, 10 MB per part).');
+    if (expanded > maxExpanded || size > maxPart) throw new Error('This file is too large when unpacked (' + Math.round(maxExpanded / 1e6) + ' MB in total, ' + Math.round(maxPart / 1e6) + ' MB for one part).');
     spans.push([offset, start + packed]);
     entries.set(name, { name, method, crc, size, packed: bytes.slice(start, start + packed), time: u16(cursor + 12), date: u16(cursor + 14), attributes: u32(cursor + 38) });
     cursor += 46 + nameSize + extraSize + commentSize;

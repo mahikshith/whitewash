@@ -472,3 +472,55 @@ dialog::backdrop { background:rgba(10,10,12,.45); backdrop-filter:blur(4px); }
   .hub-top .dial-wrap { order:-1; margin:4px 0 24px; }
   .panel>.office-entry,.file-entry { margin:12px; padding:28px 16px; }
 }
+/* Read text from scans: the row of save buttons wraps on narrow screens. */
+#ocr-output .image-buttons { flex-wrap:wrap; row-gap:10px; }
+
+/* ---------- Simple flow: steps, one-ring dial, plain job list ---------- */
+.steps { list-style:none; display:flex; flex-wrap:wrap; gap:8px 10px; margin:0; padding:22px 0 0; font-size:13.5px; font-weight:600; color:var(--muted); }
+.steps li { display:flex; align-items:center; gap:8px; padding:6px 14px 6px 6px; border:1px solid var(--border); border-radius:999px; background:var(--surface); }
+.steps li span { display:grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--soft); font-size:12.5px; }
+.steps li.current { color:var(--ink); border-color:var(--ink); }
+.steps li.current span { background:var(--accent); color:var(--accent-ink); }
+.steps li.done span { background:var(--ink); color:var(--page); }
+.hub-top { align-items:start; padding-top:22px; }
+.hub-or { font-size:13.5px; color:var(--muted); }
+.dial-wrap { align-content:start; gap:10px; }
+.dial-caption { min-height:24px; margin:0; max-width:520px; text-align:center; font:650 16px/1.4 var(--display); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dial-seg text { font-size:15.5px; }
+.dial-seg text.small { font-size:13px; }
+.dial.drilled .dial-hub { border-style:solid; border-color:var(--ink); background:var(--surface); }
+.hub-work { display:grid; gap:14px; }
+.hub-work.busy .job-list { opacity:.5; pointer-events:none; }
+.file-chip { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:18px; background:var(--surface); }
+.file-chip>svg { flex:none; width:36px; height:36px; padding:8px; border-radius:11px; background:var(--accent); color:var(--accent-ink); fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.file-chip>span { flex:1; min-width:0; }
+.file-chip strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:15px; }
+.file-chip small { color:var(--muted); font-size:12.5px; }
+.hub-question { margin:6px 0 0; font-size:22px; line-height:1.2; }
+.job-list { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+.job { display:flex; align-items:center; gap:11px; min-height:58px; padding:9px 12px; text-align:left; border:1px solid var(--border); border-radius:16px; background:var(--surface); transition:border-color .15s, background .15s, transform .15s; }
+.job:hover,.job:focus-visible { border-color:var(--ink); background:color-mix(in srgb, var(--accent) 30%, var(--surface)); transform:translateY(-1px); }
+.job>svg { flex:none; width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.job>span:nth-of-type(1) { flex:1; min-width:0; }
+.job strong { display:block; font-size:14.5px; font-weight:650; line-height:1.25; }
+.job small { display:block; color:var(--muted); font-size:12px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.job-go { font-size:20px; color:var(--muted); }
+.job.primary-job { border-color:var(--ink); background:var(--ink); color:var(--page); }
+.job.primary-job small { color:color-mix(in srgb, var(--page) 70%, transparent); }
+.job.primary-job:hover,.job.primary-job:focus-visible { background:var(--accent); color:var(--accent-ink); }
+.job.primary-job:hover small,.job.primary-job:focus-visible small { color:var(--accent-ink); }
+.job.back-job { grid-column:1 / -1; min-height:44px; background:transparent; border-style:dashed; }
+.job-note { min-height:0; box-shadow:none; }
+.result-card { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--ink); border-radius:18px; background:color-mix(in srgb, var(--accent) 28%, var(--surface)); }
+.result-card>svg { flex:none; width:32px; height:32px; padding:7px; border-radius:50%; background:var(--ink); color:var(--page); fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+.result-card div { flex:1; min-width:0; }
+.result-card strong { display:block; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.result-card span,.result-card small { display:block; font-size:12.5px; color:var(--muted); line-height:1.4; }
+@media (max-width:980px) { .hub-top { padding-top:16px; } }
+@media (max-width:640px) {
+  .steps { padding-top:14px; font-size:12.5px; }
+  .steps li { padding:4px 10px 4px 4px; }
+  .job-list { grid-template-columns:1fr; }
+  .dial-caption { font-size:14.5px; white-space:normal; }
+  .hub-top .hub-work { order:1; }
+}

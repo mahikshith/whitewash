@@ -29,19 +29,33 @@
 </header>
 <div id="content" tabindex="-1">
 <main id="hub-view" class="hub">
+  <ol id="hub-steps" class="steps" aria-label="How it works">
+    <li data-step="1"><span>1</span>Add a file</li>
+    <li data-step="2"><span>2</span>Pick what you want</li>
+    <li data-step="3"><span>3</span>Save it</li>
+  </ol>
   <section class="hub-top">
     <div class="hub-copy">
-      <p class="eyebrow" id="hub-eyebrow">Humanizer · Converter · PDF tools</p>
-      <h1 id="hub-title"></h1>
-      <p id="hub-lede" class="lede"></p>
-      <aside id="hub-info" class="dial-info" aria-live="polite"></aside>
-      <div class="hub-buttons"><button class="primary" id="hub-pick">Choose a file</button><button class="text-button" id="hub-clear" hidden>Start over</button></div>
+      <div id="hub-intro">
+        <p class="eyebrow" id="hub-eyebrow">Humanizer · Converter · PDF tools</p>
+        <h1 id="hub-title"></h1>
+        <p id="hub-lede" class="lede"></p>
+        <aside id="hub-info" class="dial-info" aria-live="polite"></aside>
+        <div class="hub-buttons"><button class="primary" id="hub-pick">Choose a file</button><span class="hub-or">or drop it anywhere on this page</span></div>
+        <ul class="trust" aria-label="Why it’s safe">
+          <li><svg aria-hidden="true"><use href="#lock"/></svg><span><strong>Never uploaded</strong>Runs in this tab. Nothing goes to a server. <button type="button" id="trust-check" class="link-button">Check it yourself</button></span></li>
+          <li><svg aria-hidden="true"><use href="#check"/></svg><span><strong>No account</strong>No sign-up, no email, no watermark.</span></li>
+          <li><svg aria-hidden="true"><use href="#shield"/></svg><span><strong>No tracking</strong>No analytics or ad scripts on the page.</span></li>
+        </ul>
+      </div>
+      <div id="hub-work" class="hub-work" hidden>
+        <div class="file-chip"><svg aria-hidden="true"><use href="#file"/></svg><span><strong id="hub-file"></strong><small id="hub-file-size"></small></span><button class="text-button" id="hub-change">Change file</button><button class="text-button" id="hub-clear">Start over</button></div>
+        <section id="hub-result" class="result-card" aria-live="polite" hidden><svg aria-hidden="true"><use href="#check"/></svg><div><strong id="hub-result-title"></strong><span id="hub-result-detail"></span><small>It’s in your downloads. Pick another job below, or start over.</small></div><button id="hub-result-action" class="text-button" hidden></button></section>
+        <h2 id="hub-question" class="hub-question">What do you want to do?</h2>
+        <div id="hub-jobs" class="job-list"></div>
+        <aside id="hub-note" class="dial-info job-note" aria-live="polite" hidden></aside>
+      </div>
       <p id="hub-error" class="office-error" role="alert" hidden></p>
-      <ul class="trust" aria-label="Why it’s safe">
-        <li><svg aria-hidden="true"><use href="#lock"/></svg><span><strong>Never uploaded</strong>Runs in this tab. Nothing goes to a server. <button type="button" id="trust-check" class="link-button">Check it yourself</button></span></li>
-        <li><svg aria-hidden="true"><use href="#check"/></svg><span><strong>No account</strong>No sign-up, no email, no watermark.</span></li>
-        <li><svg aria-hidden="true"><use href="#shield"/></svg><span><strong>No tracking</strong>No analytics or ad scripts on the page.</span></li>
-      </ul>
     </div>
     <div class="dial-wrap"><div id="hub-dial"></div></div>
   </section>
@@ -174,10 +188,11 @@
     <section id="ocr-output" class="office-output" hidden aria-live="polite">
       <h2 id="ocr-summary"></h2>
       <textarea id="ocr-text" class="ocr-text" rows="12" spellcheck="false" aria-label="Text found"></textarea>
-      <div class="image-buttons"><button class="primary" id="ocr-polish">Polish this text</button><button class="text-button" id="ocr-copy">Copy</button><button class="text-button" id="ocr-save">Save as .txt</button><button class="text-button" id="ocr-pdf">Save searchable PDF</button></div>
+      <div class="image-buttons"><button class="primary" id="ocr-docx">Save as Word</button><button class="text-button" id="ocr-md">Save as Markdown</button><button class="text-button" id="ocr-save">Save as .txt</button><button class="text-button" id="ocr-copy">Copy</button><button class="text-button" id="ocr-pdf">Save searchable PDF</button><button class="text-button" id="ocr-polish">Polish this text</button></div>
+      <p>Word and Markdown keep the headings, lists and tables from the scan. Copy and .txt use the text above, with any edits you made.</p>
     </section>
     <p id="ocr-error" class="office-error" role="alert" hidden></p>
-    <p class="image-note">The text reader downloads once (about 7 MB) and then runs in this tab. Clear, straight scans at a normal size work best. Handwriting mostly won’t work. Check names and numbers before you rely on them.</p>
+    <p class="image-note">The text reader downloads once (about 7 MB) and then runs in this tab. Clear, straight scans at a normal size work best. It reads English print: handwriting and other languages mostly won’t work. Headings, lists, columns and simple tables are kept; tables with merged or multi-line cells may come out as plain text. Check names and numbers before you rely on them.</p>
   </section>
   <input id="ocr-input" type="file" multiple hidden accept="image/jpeg,image/png,image/webp,image/bmp,image/gif,.pdf,application/pdf">
 </main>
@@ -226,6 +241,7 @@
 <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="arrow-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
 <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
 <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </defs></svg>
 </body>

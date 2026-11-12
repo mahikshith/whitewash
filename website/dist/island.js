@@ -26,6 +26,7 @@ export function progress(title, detail, fraction = null) {
 
 export function done(title, detail, action) {
   show('done', title, detail);
+  document.dispatchEvent(new CustomEvent('whitewash:done', { detail: { title, detail, action } }));
   $('island-bar').style.setProperty('--progress', '100%');
   $('island-bar').classList.remove('indeterminate');
   if (action) {
@@ -38,6 +39,7 @@ export function done(title, detail, action) {
 
 export function fail(title, detail) {
   show('failed', title, detail);
+  document.dispatchEvent(new CustomEvent('whitewash:fail', { detail: { title, detail } }));
 }
 
 export function hide() {

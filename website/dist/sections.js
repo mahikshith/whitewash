@@ -45,7 +45,7 @@ export const sections = [
     blurb: 'Drop a PDF and pick what you need: humanize, compress, convert, sign, lock or rearrange its pages.',
     items: [
       T('pdf-polish', 'Humanize'),
-      G('From PDF', 'swap', 'Turn a PDF into something else', [T('pdf-to-word', 'Word'), T('pdf-to-images', 'JPG'), ...out('pdf', ['png', 'md', 'txt', 'html', 'epub'])]),
+      G('From PDF', 'swap', 'Turn a PDF into something else', [T('pdf-to-word', 'Word'), ...out('pdf', ['pptx']), T('pdf-to-images', 'JPG'), ...out('pdf', ['png', 'md', 'txt', 'html', 'epub'])]),
       G('To PDF', 'file', 'Make a PDF from another file', [T('word-to-pdf', 'Word'), T('images-to-pdf', 'Images'), In('pptx', 'pdf'), In('xlsx', 'pdf'), T('markdown-to-pdf', 'MD'), In('html', 'pdf')]),
       T('pdf-compress', 'Compress'),
       G('Pages', 'grid', 'Merge, split, reorder, number or stamp', [T('pdf-merge'), T('pdf-split'), T('pdf-organize', 'Reorder'), T('pdf-numbers'), T('pdf-watermark')]),
@@ -79,10 +79,11 @@ export const sections = [
   {
     id: 'powerpoint', title: 'PowerPoint', icon: 'file',
     lede: 'Slide decks without the AI slop.',
-    blurb: 'Humanize the text on every slide and keep the layouts, or pull the slide text into a PDF or Word file.',
+    blurb: 'Humanize the text on every slide and keep the layouts, save a deck as a PDF that looks the same, or turn a PDF or document into slides you can edit.',
     items: [
       T('presentations', 'Humanize'),
-      G('Convert', 'swap', 'Turn the slide text into something else', out('pptx', ['pdf', 'docx', 'md', 'txt', 'html', 'odt', 'epub'])),
+      G('From PowerPoint', 'swap', 'Turn a deck into something else', out('pptx', ['pdf', 'docx', 'md', 'txt', 'html', 'odt', 'epub'])),
+      G('To PowerPoint', 'file', 'Make a deck from another file', [...out('pdf', ['pptx'], true), ...out('docx', ['pptx'], true), ...out('md', ['pptx'], true), ...out('html', ['pptx'], true)]),
       T('metadata', 'Wipe info'),
     ],
   },
